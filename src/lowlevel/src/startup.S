@@ -81,7 +81,7 @@
 @@Stack_Top       EQU     Stack_Mem + Stack_Size
 
 .arm
-.section .STACK, "w"
+.section .stack, "w"
 .align 3
 Stack_Mem:
 .space Stack_Size
@@ -97,7 +97,7 @@ Stack_Mem:
 @@Heap_Mem        SPACE   Heap_Size
 
 .equ Heap_Size,   0x00000000
-.section .HEAP, "w"
+.section .heap, "w"
 .align 3
 HeapMem:
 .if (Heap_Size>0)
@@ -110,7 +110,7 @@ HeapMem:
 
 @@                AREA    RESET, CODE, READONLY
 @@                ARM
-.section .RESET, "ax"
+.section .reset, "ax"
 .arm
 
 @ Exception Vectors
@@ -202,7 +202,7 @@ Reset_Handler:
 
 @  Relocate .data section (Copy from ROM to RAM)
                 LDR     R1, =_etext 
-                LDR     R2, =_data 
+                LDR     R2, =_sdata 
                 LDR     R3, =_edata 
                 CMP     R2, R3
                 BEQ     DataIsEmpty
@@ -214,8 +214,8 @@ DataIsEmpty:
  
 @  Clear .bss section (Zero init)
                 MOV     R0, #0 
-                LDR     R1, =__bss_start__ 
-                LDR     R2, =__bss_end__ 
+                LDR     R1, =_sbss
+                LDR     R2, =_ebss
                 CMP     R1,R2
                 BEQ     BSSIsEmpty
 LoopZI:         CMP     R1, R2 
