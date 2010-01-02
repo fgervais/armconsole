@@ -28,7 +28,7 @@
 	.global IntDisable
 
 .arm
-.section .SWI_HANDLER, "ax"
+.section .swi_handler, "ax"
 
 @********************************************************************
 @*  SWI interrupt handler											*
