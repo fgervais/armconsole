@@ -16,12 +16,12 @@
 /******************************************************************************
 ** Function name:		TargetInit
 **
-** Descriptions:		Initialize the target board; it is called in a necessary 
+** Descriptions:		Initialize the target board; it is called in a necessary
 **						place, change it as needed
 **
 ** parameters:			None
 ** Returned value:		None
-** 
+**
 ******************************************************************************/
 void TargetInit(void)
 {
@@ -30,63 +30,17 @@ void TargetInit(void)
 }
 
 /******************************************************************************
-** Function name:		GPIOResetInit
-**
-** Descriptions:		Initialize the target board before running the main() 
-**				function; User may change it as needed, but may not 
-**				deleted it.
-**
-** parameters:			None
-** Returned value:		None
-** 
-******************************************************************************/
-// void GPIOResetInit( void ) - mthomas, add static, avoid missing proto warning
-static void GPIOResetInit( void )
-{
-	/* Reset all GPIO pins to default: primary function */
-    PINSEL0 = 0x00000000;
-    PINSEL1 = 0x00000000;
-    PINSEL2 = 0x00000000;
-    PINSEL3 = 0x00000000;
-    PINSEL4 = 0x00000000;
-    PINSEL5 = 0x00000000;
-    PINSEL6 = 0x00000000;
-    PINSEL7 = 0x00000000;
-    PINSEL8 = 0x00000000;
-    PINSEL9 = 0x00000000;
-    PINSEL10 = 0x00000000;
-    
-    IODIR0 = 0x00000000;
-    IODIR1 = 0x00000000;
-	IOSET0 = 0x00000000;
-    IOSET1 = 0x00000000;
-    
-    FIO0DIR = 0x00000000;
-    FIO1DIR = 0x00000000;
-    FIO2DIR = 0x00000000;
-    FIO3DIR = 0x00000000;
-    FIO4DIR = 0x00000000;
-    
-    FIO0SET = 0x00000000;
-    FIO1SET = 0x00000000;
-    FIO2SET = 0x00000000;
-    FIO3SET = 0x00000000;
-    FIO4SET = 0x00000000;
-    return;        
-}
-
-/******************************************************************************
 ** Function name:		ConfigurePLL
 **
 ** Descriptions:		Configure PLL switching to main OSC instead of IRC
-**						at power up and wake up from power down. 
+**						at power up and wake up from power down.
 **						This routine is used in TargetResetInit() and those
 **						examples using power down and wake up such as
 **						USB suspend to resume, ethernet WOL, and power management
 **						example
 ** parameters:			None
 ** Returned value:		None
-** 
+**
 ******************************************************************************/
 void ConfigurePLL ( void )
 {
@@ -102,7 +56,7 @@ void ConfigurePLL ( void )
     PLLCON = 0;				/* Disable PLL, disconnected */
     PLLFEED = 0xaa;
     PLLFEED = 0x55;
-    
+
 	SCS |= 0x20;			/* Enable main OSC */
     while( !(SCS & 0x40) );	/* Wait until main OSC is usable */
 
@@ -111,7 +65,7 @@ void ConfigurePLL ( void )
     PLLCFG = PLL_MValue | (PLL_NValue << 16);
     PLLFEED = 0xaa;
     PLLFEED = 0x55;
-      
+
     PLLCON = 1;				/* Enable PLL, disconnected */
     PLLFEED = 0xaa;
     PLLFEED = 0x55;
@@ -122,7 +76,7 @@ void ConfigurePLL ( void )
 #endif
 
     while ( ((PLLSTAT & (1 << 26)) == 0) );	/* Check lock bit status */
-    
+
     MValue = PLLSTAT & 0x00007FFF;
     NValue = (PLLSTAT & 0x00FF0000) >> 16;
     while ((MValue != PLL_MValue) && ( NValue != PLL_NValue) );
@@ -137,33 +91,21 @@ void ConfigurePLL ( void )
 /******************************************************************************
 ** Function name:		TargetResetInit
 **
-** Descriptions:		Initialize the target board before running the main() 
-**						function; User may change it as needed, but may not 
+** Descriptions:		Initialize the target board before running the main()
+**						function; User may change it as needed, but may not
 **						deleted it.
 **
 ** parameters:			None
 ** Returned value:		None
-** 
+**
 ******************************************************************************/
 void TargetResetInit(void)
 {
-
-// mthomas
-#if 0
-#ifdef __DEBUG_RAM    
-    MEMMAP = 0x2;			/* remap to internal RAM */
-#endif
-
-#ifdef __DEBUG_FLASH    
-    MEMMAP = 0x1;			/* remap to internal flash */
-#endif
-#endif
-
-#ifdef __DEBUG_RAM    
+#ifdef __DEBUG_RAM
     MEMMAP = 0x2;			/* remap to internal RAM */
 #else
     MEMMAP = 0x1;			/* remap to internal flash */
-#endif 
+#endif
 
 
 #if USE_USB
@@ -179,11 +121,11 @@ void TargetResetInit(void)
 #endif
 #if (Fpclk / (Fcclk / 4)) == 2
     PCLKSEL0 = 0xAAAAAAAA;	/* PCLK is 1/2 CCLK */
-    PCLKSEL1 = 0xAAAAAAAA;	 
+    PCLKSEL1 = 0xAAAAAAAA;
 #endif
 #if (Fpclk / (Fcclk / 4)) == 4
     PCLKSEL0 = 0x55555555;	/* PCLK is the same as CCLK */
-    PCLKSEL1 = 0x55555555;	
+    PCLKSEL1 = 0x55555555;
 #endif
 
     /* Set memory accelerater module*/
@@ -198,8 +140,6 @@ void TargetResetInit(void)
 #endif
 #endif
     MAMCR = 2;
-
-    GPIOResetInit();
 
 	init_VIC();
     return;

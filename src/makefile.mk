@@ -50,6 +50,7 @@ USE_THUMB_MODE = YES
 
 # Directory variables
 LOWLEVEL  = ./lowlevel
+PERIPHERAL = ./peripheral
 
 
 # List C source files here
@@ -67,8 +68,8 @@ CPPSRC =
 
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension cpp for C++-files (use extension .cpp)
-CPPSRCARM = $(wildcard *.cpp)
-#CPPSRCARM += $(wildcard ./directory/*.cpp)
+CPPSRCARM  = $(wildcard *.cpp)
+CPPSRCARM += $(wildcard ./peripheral/*.cpp)
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -124,7 +125,8 @@ LINKERSCRIPTPATH = ./
 #EXTRAINCDIRS = $(DRIVERS)/inc $(CM3)
 #EXTRAINCDIRS += ./directory.
 
-EXTRAINCDIRS = $(LOWLEVEL)/inc
+EXTRAINCDIRS  = $(LOWLEVEL)/inc
+EXTRAINCDIRS += $(PERIPHERAL)
 
 
 # List any extra directories to look for library files here.
@@ -203,8 +205,8 @@ CFLAGS += -Wcast-qual
 endif
 
 # flags only for C++ (arm-elf-g++)
-#CPPFLAGS = -fno-rtti -fno-exceptions
-CPPFLAGS = -fno-exceptions
+CPPFLAGS = -fno-rtti -fno-exceptions
+#CPPFLAGS = -fno-exceptions
 
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
