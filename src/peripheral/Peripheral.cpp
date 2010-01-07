@@ -23,6 +23,13 @@ Peripheral::~Peripheral() {
 
 }
 
+/**
+ * Set an optional tag to the peripheral.
+ *
+ * This tag must be defined in the PeripheralTah enum.
+ *
+ * @param tag
+ */
 void Peripheral::setTag(PeripheralTag tag) {
 	this->tag = tag;
 }

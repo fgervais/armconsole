@@ -50,7 +50,10 @@ USE_THUMB_MODE = YES
 
 # Directory variables
 LOWLEVEL  = ./lowlevel
+HELPER = ./helper
 PERIPHERAL = ./peripheral
+CONFIGURATION = ./configuration
+EVENT = ./event
 
 
 # List C source files here
@@ -69,7 +72,11 @@ CPPSRC =
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension cpp for C++-files (use extension .cpp)
 CPPSRCARM  = $(wildcard *.cpp)
+CPPSRCARM += $(wildcard ./helper/*.cpp)
 CPPSRCARM += $(wildcard ./peripheral/*.cpp)
+CPPSRCARM += $(wildcard ./configuration/*.cpp)
+CPPSRCARM += $(wildcard ./event/*.cpp)
+
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -126,8 +133,10 @@ LINKERSCRIPTPATH = ./
 #EXTRAINCDIRS += ./directory.
 
 EXTRAINCDIRS  = $(LOWLEVEL)/inc
+EXTRAINCDIRS += $(HELPER)
 EXTRAINCDIRS += $(PERIPHERAL)
-
+EXTRAINCDIRS += $(CONFIGURATION)
+EXTRAINCDIRS += $(EVENT)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.
