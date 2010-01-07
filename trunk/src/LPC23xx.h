@@ -19,8 +19,6 @@
 #endif 
 
 /* Vectored Interrupt Controller (VIC) */
-
-
 #define VIC_BASE_ADDR	0xFFFFF000
 #define VICIRQStatus   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x000))
 #define VICFIQStatus   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x004))
@@ -189,6 +187,31 @@ these registers are known as "VICVectPriority(x)". */
 #define FIO4PIN        (*(volatile unsigned long *)(FIO_BASE_ADDR + 0x94))
 #define FIO4SET        (*(volatile unsigned long *)(FIO_BASE_ADDR + 0x98))
 #define FIO4CLR        (*(volatile unsigned long *)(FIO_BASE_ADDR + 0x9C))
+	
+/* FIO register structure */
+typedef struct
+{
+	unsigned long FIODIR;
+	unsigned long RESERVED0[3];
+	unsigned long FIOMASK;
+	unsigned long FIOPIN;
+	unsigned long FIOSET;
+	unsigned long FIOCLR;
+} FIO_TypeDef;
+
+/* FIO base address */
+#define FIO0_BASE     (0x3FFFC000 + 0x0000)
+#define FIO1_BASE     (0x3FFFC000 + 0x0020)
+#define FIO2_BASE     (0x3FFFC000 + 0x0040)
+#define FIO3_BASE     (0x3FFFC000 + 0x0060)
+#define FIO4_BASE     (0x3FFFC000 + 0x0080)
+
+/* FIO declaration */
+#define FIO0          (((FIO_TypeDef *) FIO0_BASE))
+#define FIO1          (((FIO_TypeDef *) FIO1_BASE))
+#define FIO2          (((FIO_TypeDef *) FIO2_BASE))
+#define FIO3          (((FIO_TypeDef *) FIO3_BASE))
+#define FIO4          (((FIO_TypeDef *) FIO4_BASE))
 
 /* FIOs can be accessed through WORD, HALF-WORD or BYTE. */
 #define FIO0DIR0       (*(volatile unsigned char *)(FIO_BASE_ADDR + 0x00)) 
