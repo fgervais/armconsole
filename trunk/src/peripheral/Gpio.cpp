@@ -14,11 +14,11 @@ Gpio::Gpio(FIO_TypeDef *gpioRegisters, uint8_t portLength, uint8_t id) : Periphe
 	this->gpioRegisters = gpioRegisters;
 	this->portLength = portLength;
 
-	gpioPins = new GpioPin*[portLength];
+	gpioPin = new GpioPin*[portLength];
 
 	for(uint8_t i=0; i<portLength; i++) {
 		// Create a new pin with it's corresponding pin number.
-		gpioPins[i] = new GpioPin(gpioRegisters, i, id);
+		gpioPin[i] = new GpioPin(gpioRegisters, i, id);
 	}
 
 }
@@ -26,8 +26,71 @@ Gpio::Gpio(FIO_TypeDef *gpioRegisters, uint8_t portLength, uint8_t id) : Periphe
 Gpio::~Gpio() {
 	/* Free memory */
 	for(uint8_t i=0; i<portLength; i++) {
-		// Create a new pin with it's corresponding pin number.
-		delete[] gpioPins[i];
+		delete[] gpioPin[i];
 	}
-	delete[] gpioPins;
+	delete[] gpioPin;
+}
+
+/**
+ * Configure the GPIO port according to the configuration provided.
+ *
+ * @param config Configuration of the port.
+ */
+void Gpio::configure(GpioConfiguration config) {
+	uint32_t fiodir;
+
+	fiodir = 0;
+	for(uint8_t pinNumber=0; pinNumber<portLength; pinNumber++) {
+		fiodir |= (config.pin[pinNumber] << pinNumber);
+	}
+	gpioRegisters->FIODIR = fiodir;
+}
+
+/**
+ * Get a handle on the specified GPIO pin.
+ *
+ * @param number Number of the pin required
+ * @return Handle to the pin if the pin number is valid, 0 otherwise.
+ */
+GpioPin* Gpio::getPin(uint8_t number) {
+	if(number < portLength) {
+		return gpioPin[number];
+	}
+	return 0;
+}
+
+/**
+ * Get data of the whole GPIO port.
+ *
+ * Note that the port mask should be all 0s or you won't get the
+ * whole port value. The mask default to 0x00 on reset so if
+ * you don't know what this is about, it's probably fine.
+ *
+ * @return Value of the port
+ */
+uint32_t Gpio::getData() {
+	return gpioRegisters->FIOPIN;
+}
+
+/**
+ * Set data of the whole GPIO port.
+ *
+ * Note that the port mask should be all 0s or you won't set the
+ * whole port value. The mask default to 0x00 on reset so if
+ * you don't know what this is about, it's probably fine.
+ *
+ * @param data Value of the port to set
+ */
+void Gpio::setData(uint32_t data) {
+	gpioRegisters->FIOPIN = data;
+}
+
+/**
+ * Set the port of the GPIO port.
+ *
+ * @see LPC2478 user manual for more informations.
+ * @param mask Mask to set
+ */
+void Gpio::setMask(uint32_t mask) {
+	gpioRegisters->FIOMASK = mask;
 }

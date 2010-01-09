@@ -46,33 +46,48 @@ void GpioPin::extInterrupt() {
  * @param config Configuration if the pin.
  */
 void GpioPin::configure(GpioPinConfiguration config) {
-	uint32_t configRegister;
+	uint32_t fiodir;
 
-
+	fiodir = gpioRegisters->FIODIR;
+	// Clear the pin configuration
+	fiodir &= ~(1 << pinNumber);
+	// Configure the pin direction
+	fiodir |= (config.pin << pinNumber);
+	// Apply changes
+	gpioRegisters->FIODIR = fiodir;
 }
 
 /**
- * @brief	Check if the pin is at the high level.
+ * Check if the pin is at the high level.
  * @return	0 if false, true otherwise.
  */
 uint32_t GpioPin::isHigh() {
-
+	return gpioRegisters->FIOPIN & ~(1 << pinNumber);
 }
 
 /**
- * @brief	Set the pin to the high level.
+ * Set the pin to the high level.
  */
 void GpioPin::setHigh() {
-
+	gpioRegisters->FIOSET = (1 << pinNumber);
 }
 
 /**
- * @brief	Set the pin to the low level.
+ * Set the pin to the low level.
  */
 void GpioPin::setLow() {
-
+	gpioRegisters->FIOCLR = (1 << pinNumber);
 }
 
+/**
+ * Add an event listener to this pin.
+ *
+ * Adding a listener will configure the external interrupt
+ * if not done already. For now, it gets notified on rising
+ * edge only. It may be configurable in the future.
+ *
+ * @param listener Listener to be added
+ */
 void GpioPin::addEventListener(GpioPinEventListener* listener) {
 	if(!extiConfigured) {
 		configureInterrupt();
@@ -82,7 +97,9 @@ void GpioPin::addEventListener(GpioPinEventListener* listener) {
 	this->listener = listener;
 }
 
-
+/**
+ * Helper method used to configure external interrupt.
+ */
 void GpioPin::configureInterrupt() {
 
 }
