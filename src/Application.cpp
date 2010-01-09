@@ -5,19 +5,23 @@
  *      Author: fgervais
  */
 
+#include "GpioConfiguration.h"
+#include "GpioPinConfiguration.h"
+#include "Gpio.h"
+#include "GpioPin.h"
+#include "LPC2478.h"
+
 int main() {
-/*
-	Gpio *gpioA = STM32F103::getGpioA();
-	Gpio *gpioB = STM32F103::getGpioB();
-	Gpio *gpioC = STM32F103::getGpioC();
+
+	Gpio *gpioA = LPC2478::getGpio0();
 
 	// Set default port behavior
-	GpioConfiguration portConfig(Gpio::FLOATING_INPUT);
+	GpioConfiguration portConfig(Gpio::INPUT);
 	gpioA->configure(portConfig);
 
 	// Configure blinking led
 	GpioPinConfiguration ledPinConfig;
-	ledPinConfig.pin = Gpio::GP_PUSH_PULL_OUTPUT | Gpio::OUTPUT_SPEED_50MHZ;
+	ledPinConfig.pin = Gpio::OUTPUT;
 	gpioA->getPin(0)->configure(ledPinConfig);
 
 	GpioPin *led = gpioA->getPin(0);
@@ -29,5 +33,5 @@ int main() {
 		led->setLow();	// Off
 		for(uint32_t i=0; i<100000; i++);
 	}
-*/
+
 }

@@ -8,10 +8,10 @@
 #include "GpioPinEventListener.h"
 
 GpioPinEventListener::GpioPinEventListener() {
-	// TODO Auto-generated constructor stub
+
 
 }
 
 GpioPinEventListener::~GpioPinEventListener() {
-	// TODO Auto-generated destructor stub
+
 }
