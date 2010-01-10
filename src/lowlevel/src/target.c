@@ -60,7 +60,7 @@ void ConfigurePLL ( void )
 	SCS |= 0x20;			/* Enable main OSC */
     while( !(SCS & 0x40) );	/* Wait until main OSC is usable */
 
-    CLKSRCSEL = 0x1;		/* select main OSC, 12MHz, as the PLL clock source */
+    CLKSRCSEL = 0x1;		/* select main OSC as the PLL clock source */
 
     PLLCFG = PLL_MValue | (PLL_NValue << 16);
     PLLFEED = 0xaa;
@@ -71,9 +71,7 @@ void ConfigurePLL ( void )
     PLLFEED = 0x55;
 
     CCLKCFG = CCLKDivValue;	/* Set clock divider */
-#if USE_USB
     USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
-#endif
 
     while ( ((PLLSTAT & (1 << 26)) == 0) );	/* Check lock bit status */
 
@@ -107,10 +105,6 @@ void TargetResetInit(void)
     MEMMAP = 0x1;			/* remap to internal flash */
 #endif
 
-
-#if USE_USB
-	PCONP |= 0x80000000;		/* Turn On USB PCLK */
-#endif
 	/* Configure PLL, switch from IRC to Main OSC */
 	ConfigurePLL();
 
@@ -118,12 +112,10 @@ void TargetResetInit(void)
 #if (Fpclk / (Fcclk / 4)) == 1
     PCLKSEL0 = 0x00000000;	/* PCLK is 1/4 CCLK */
     PCLKSEL1 = 0x00000000;
-#endif
-#if (Fpclk / (Fcclk / 4)) == 2
+#elif (Fpclk / (Fcclk / 4)) == 2
     PCLKSEL0 = 0xAAAAAAAA;	/* PCLK is 1/2 CCLK */
     PCLKSEL1 = 0xAAAAAAAA;
-#endif
-#if (Fpclk / (Fcclk / 4)) == 4
+#elif (Fpclk / (Fcclk / 4)) == 4
     PCLKSEL0 = 0x55555555;	/* PCLK is the same as CCLK */
     PCLKSEL1 = 0x55555555;
 #endif
@@ -132,12 +124,12 @@ void TargetResetInit(void)
     MAMCR = 0;
 #if Fcclk < 20000000
     MAMTIM = 1;
-#else
-#if Fcclk < 40000000
+#elif Fcclk < 40000000
     MAMTIM = 2;
-#else
+#elif Fcclk < 60000000
     MAMTIM = 3;
-#endif
+#else
+    MAMTIM = 4;
 #endif
     MAMCR = 2;
 
