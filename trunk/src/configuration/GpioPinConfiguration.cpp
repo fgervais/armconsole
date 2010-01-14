@@ -8,10 +8,10 @@
 #include "GpioPinConfiguration.h"
 
 GpioPinConfiguration::GpioPinConfiguration() {
-	// TODO Auto-generated constructor stub
+
 
 }
 
 GpioPinConfiguration::~GpioPinConfiguration() {
-	// TODO Auto-generated destructor stub
+
 }

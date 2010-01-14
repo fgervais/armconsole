@@ -134,6 +134,9 @@ void TargetResetInit(void)
     MAMCR = 2;
 
 	init_VIC();
+
+	// TODO: Config SDRAM
+
     return;
 }
 
