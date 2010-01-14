@@ -54,6 +54,7 @@ HELPER = ./helper
 PERIPHERAL = ./peripheral
 CONFIGURATION = ./configuration
 EVENT = ./event
+USB = ./usb
 
 
 # List C source files here
@@ -76,6 +77,7 @@ CPPSRCARM += $(wildcard ./helper/*.cpp)
 CPPSRCARM += $(wildcard ./peripheral/*.cpp)
 CPPSRCARM += $(wildcard ./configuration/*.cpp)
 CPPSRCARM += $(wildcard ./event/*.cpp)
+CPPSRCARM += $(wildcard ./usb/*.cpp)
 
 
 # List Assembler source files here.
@@ -137,6 +139,7 @@ EXTRAINCDIRS += $(HELPER)
 EXTRAINCDIRS += $(PERIPHERAL)
 EXTRAINCDIRS += $(CONFIGURATION)
 EXTRAINCDIRS += $(EVENT)
+EXTRAINCDIRS += $(USB)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.

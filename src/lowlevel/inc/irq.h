@@ -1,5 +1,5 @@
 /******************************************************************************
- *   irq.h:  Interrupt related Header file for NXP LPC23xx/24xx Family 
+ *   irq.h:  Interrupt related Header file for NXP LPC23xx/24xx Family
  *   Microprocessors
  *
  *   Copyright(C) 2006, NXP Semiconductor
@@ -9,8 +9,12 @@
  *   2006.09.01  ver 1.00    Prelimnary version, first Release
  *
 ******************************************************************************/
-#ifndef __IRQ_H 
+#ifndef __IRQ_H
 #define __IRQ_H
+
+#ifdef __cplusplus
+   extern "C" {
+#endif
 
 #define I_Bit			0x80
 #define F_Bit			0x40
@@ -64,17 +68,17 @@
 /* Be aware that, from compiler to compiler, nested interrupt will have to
 be handled differently. More details can be found in Philips LPC2000
 family app-note AN10381 */
- 
+
 
 // mthomas
 #ifdef __GNUC__
 #define __irq
-#define IENABLE 
+#define IENABLE
 #define IDISABLE
 #else
-/* unlike Keil CARM Compiler, in ARM's RealView compiler, don't save and 
-restore registers into the stack in RVD as the compiler does that for you. 
-See RVD ARM compiler Inline and embedded assemblers, "Rules for 
+/* unlike Keil CARM Compiler, in ARM's RealView compiler, don't save and
+restore registers into the stack in RVD as the compiler does that for you.
+See RVD ARM compiler Inline and embedded assemblers, "Rules for
 using __asm and asm keywords. */
 static DWORD sysreg;		/* used as LR register */
 #define IENABLE __asm { MRS sysreg, SPSR; MSR CPSR_c, #SYS32Mode }
@@ -83,6 +87,13 @@ static DWORD sysreg;		/* used as LR register */
 
 void init_VIC( void );
 DWORD install_irq( DWORD IntNumber, void *HandlerAddr, DWORD Priority );
+
+void wdt_irq_handler( void );
+void swi_irq_handler( void );
+
+#ifdef __cplusplus
+   }
+#endif
 
 #endif /* end __IRQ_H */
 
