@@ -88,8 +88,39 @@ static DWORD sysreg;		/* used as LR register */
 void init_VIC( void );
 DWORD install_irq( DWORD IntNumber, void *HandlerAddr, DWORD Priority );
 
+/* Every possible interrupt handler */
 void wdt_irq_handler( void );
 void swi_irq_handler( void );
+void armcore0_irq_handler( void );
+void armcore1_irq_handler( void );
+void timer0_irq_handler( void );
+void timer1_irq_handler( void );
+void uart0_irq_handler( void );
+void uart1_irq_handler( void );
+void pwm0_1_irq_handler( void );
+void i2c0_irq_handler( void );
+void spi0_irq_handler( void );
+void spi1_irq_handler( void );
+void pll_irq_handler( void );
+void rtc_irq_handler( void );
+void eint0_irq_handler( void );
+void eint1_irq_handler( void );
+void eint2_irq_handler( void );
+void eint3_irq_handler( void );
+void adc0_irq_handler( void );
+void i2c1_irq_handler( void );
+void bod_irq_handler( void );
+void emac_irq_handler( void );
+void usb_irq_handler( void );
+void can_irq_handler( void );
+void mci_irq_handler( void );
+void gpdma_irq_handler( void );
+void timer2_irq_handler( void );
+void timer3_irq_handler( void );
+void uart2_irq_handler( void );
+void uart3_irq_handler( void );
+void i2c2_irq_handler( void );
+void i2s_irq_handler( void );
 
 #ifdef __cplusplus
    }
