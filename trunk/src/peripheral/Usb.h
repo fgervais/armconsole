@@ -10,10 +10,21 @@
 
 #include "Peripheral.h"
 
+#include <stdint.h>
+
+class UsbDevice;
+
 class Usb: public Peripheral {
 public:
-	Usb();
+	Usb(uint8_t maxDeviceNumber);
 	virtual ~Usb();
+
+private:
+	UsbDevice** device;
+	uint8_t maxDeviceNumber;
+
+	void ohciInit();
+	void ohciReset();
 };
 
 #endif /* USB_H_ */

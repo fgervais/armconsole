@@ -27,33 +27,58 @@
 void init_VIC(void)
 {
     DWORD i = 0;
-    DWORD *vect_addr, *vect_cntl;
+    //DWORD *vect_cntl;
+    DWORD *vect_addr;
 
     /* initialize VIC*/
     VICIntEnClr = 0xffffffff;
     VICVectAddr = 0;
     VICIntSelect = 0;
 
-    static DWORD isr_vector_table[] = {
+    static DWORD isr_vector_table[VIC_SIZE] = {
     		(DWORD)wdt_irq_handler,
-    		(DWORD)swi_irq_handler
+    		(DWORD)swi_irq_handler,
+    		(DWORD)armcore0_irq_handler,
+    		(DWORD)armcore1_irq_handler,
+    		(DWORD)timer0_irq_handler,
+    		(DWORD)timer1_irq_handler,
+    		(DWORD)uart0_irq_handler,
+    		(DWORD)uart1_irq_handler,
+    		(DWORD)pwm0_1_irq_handler,
+    		(DWORD)i2c0_irq_handler,
+    		(DWORD)spi0_irq_handler,
+    		(DWORD)spi1_irq_handler,
+    		(DWORD)pll_irq_handler,
+    		(DWORD)rtc_irq_handler,
+    		(DWORD)eint0_irq_handler,
+    		(DWORD)eint1_irq_handler,
+    		(DWORD)eint2_irq_handler,
+    		(DWORD)eint3_irq_handler,
+    		(DWORD)adc0_irq_handler,
+    		(DWORD)i2c1_irq_handler,
+    		(DWORD)bod_irq_handler,
+    		(DWORD)emac_irq_handler,
+    		(DWORD)usb_irq_handler,
+    		(DWORD)can_irq_handler,
+    		(DWORD)mci_irq_handler,
+    		(DWORD)gpdma_irq_handler,
+    		(DWORD)timer2_irq_handler,
+    		(DWORD)timer3_irq_handler,
+    		(DWORD)uart2_irq_handler,
+    		(DWORD)uart3_irq_handler,
+    		(DWORD)i2c2_irq_handler,
+    		(DWORD)i2s_irq_handler
     		};
 
     /* set all the vector and vector control register to 0 */
     for ( i = 0; i < VIC_SIZE; i++ )
     {
 		vect_addr = (DWORD *)(VIC_BASE_ADDR + VECT_ADDR_INDEX + i*4);
-		vect_cntl = (DWORD *)(VIC_BASE_ADDR + VECT_CNTL_INDEX + i*4);
+		//vect_cntl = (DWORD *)(VIC_BASE_ADDR + VECT_CNTL_INDEX + i*4);
 		*vect_addr = isr_vector_table[i];
 		/* Set to lowest priority */
-		*vect_cntl = 0xF;
+		//*vect_cntl = 0xF;
     }
-
-    vect_addr = (DWORD *)(VIC_BASE_ADDR + VECT_ADDR_INDEX);
-
-    *vect_addr = (DWORD)wdt_irq_handler;
-    vect_addr += 4;
-    *vect_addr = (DWORD)swi_irq_handler;
     return;
 }
 
@@ -93,6 +118,126 @@ void wdt_irq_handler( void ) {
 }
 
 void swi_irq_handler( void ) {
+
+}
+
+void armcore0_irq_handler( void ) {
+
+}
+
+void armcore1_irq_handler( void ) {
+
+}
+
+void timer0_irq_handler( void ) {
+
+}
+
+void timer1_irq_handler( void ) {
+
+}
+
+void uart0_irq_handler( void ) {
+
+}
+
+void uart1_irq_handler( void ) {
+
+}
+
+void pwm0_1_irq_handler( void ) {
+
+}
+
+void i2c0_irq_handler( void ) {
+
+}
+
+void spi0_irq_handler( void ) {
+
+}
+
+void spi1_irq_handler( void ) {
+
+}
+
+void pll_irq_handler( void ) {
+
+}
+
+void rtc_irq_handler( void ) {
+
+}
+
+void eint0_irq_handler( void ) {
+
+}
+
+void eint1_irq_handler( void ) {
+
+}
+
+void eint2_irq_handler( void ) {
+
+}
+
+void eint3_irq_handler( void ) {
+
+}
+
+void adc0_irq_handler( void ) {
+
+}
+
+void i2c1_irq_handler( void ) {
+
+}
+
+void bod_irq_handler( void ) {
+
+}
+
+void emac_irq_handler( void ) {
+
+}
+
+void usb_irq_handler( void ) {
+
+}
+
+void can_irq_handler( void ) {
+
+}
+
+void mci_irq_handler( void ) {
+
+}
+
+void gpdma_irq_handler( void ) {
+
+}
+
+void timer2_irq_handler( void ) {
+
+}
+
+void timer3_irq_handler( void ) {
+
+}
+
+void uart2_irq_handler( void ) {
+
+}
+
+void uart3_irq_handler( void ) {
+
+}
+
+void i2c2_irq_handler( void ) {
+
+}
+
+void i2s_irq_handler( void ) {
 
 }
 
