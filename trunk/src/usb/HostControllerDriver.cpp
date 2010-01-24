@@ -15,3 +15,7 @@ HostControllerDriver::HostControllerDriver() {
 HostControllerDriver::~HostControllerDriver() {
 
 }
+
+void HostControllerDriver::init() {
+	hcca = (Hcca *)0x7FD00000;
+}

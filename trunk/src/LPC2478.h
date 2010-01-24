@@ -11,6 +11,7 @@
 #include "Microcontroller.h"
 
 class Gpio;
+class HostControllerDriver;
 
 /**
  * Software interface to the LPC2478 microcontroller.
@@ -24,9 +25,11 @@ public:
 	virtual ~LPC2478();
 
 	static Gpio* getGpio0();
+	static HostControllerDriver* getHCD();
 
 private:
 	static Gpio *gpio0;
+	static HostControllerDriver *hcd;
 };
 
 #endif /* LPC2478_H_ */
