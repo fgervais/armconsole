@@ -43,6 +43,7 @@ public:
 	HostControllerDriver(OHCI_Typedef* ohciRegisters);
 	virtual ~HostControllerDriver();
 
+	void hcInterrupt();
 private:
 	Hcca* hcca;
 	OHCI_Typedef* ohciRegisters;

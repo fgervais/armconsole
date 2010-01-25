@@ -14,6 +14,8 @@
 #include "LPC23xx.h"			/* LPC23XX/24xx Peripheral Registers */
 #include "type.h"
 #include "irq.h"
+#include "LPC2478.h"
+#include "HostControllerDriver.h"
 
 /* Initialize the interrupt controller */
 /******************************************************************************
@@ -202,7 +204,7 @@ void emac_irq_handler( void ) {
 }
 
 void usb_irq_handler( void ) {
-
+	LPC2478::getHCD()->hcInterrupt();
 }
 
 void can_irq_handler( void ) {
