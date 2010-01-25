@@ -12,7 +12,6 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
 
 	init();
-
 }
 
 HostControllerDriver::~HostControllerDriver() {
@@ -69,4 +68,14 @@ void HostControllerDriver::init() {
 
 	// Master interrupt enable
 	ohciRegisters->HcInterruptEnable |= OHCI_INTR_MIE;
+}
+
+/**
+ * Host Controller interrupt handler.
+ *
+ * This is called by the C interrupt wrapper is case of
+ * a USB interrupt.
+ */
+void HostControllerDriver::hcInterrupt() {
+
 }
