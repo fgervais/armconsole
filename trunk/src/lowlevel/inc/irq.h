@@ -12,6 +12,8 @@
 #ifndef __IRQ_H
 #define __IRQ_H
 
+#include "type.h"
+
 #ifdef __cplusplus
    extern "C" {
 #endif
