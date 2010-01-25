@@ -8,6 +8,12 @@
 #ifndef HOSTCONTROLLERDRIVER_H_
 #define HOSTCONTROLLERDRIVER_H_
 
+/*
+ * All this is highly inspired of NXP USB Host Stack and
+ * the Linux implementation of OHCI.
+ */
+
+#include "LPC23xx.h"
 #include <stdint.h>
 
 struct HcEd {                       /* ----------- HostController EndPoint Descriptor ------------- */
@@ -34,11 +40,12 @@ struct Hcca {                       /* ----------- Host Controller Communication
 
 class HostControllerDriver {
 public:
-	HostControllerDriver();
+	HostControllerDriver(OHCI_Typedef* ohciRegisters);
 	virtual ~HostControllerDriver();
 
 private:
-	Hcca *hcca;
+	Hcca* hcca;
+	OHCI_Typedef* ohciRegisters;
 
 	void init();
 };
