@@ -21,8 +21,8 @@ class GpioPin;
  */
 class Gpio: public Peripheral {
 public:
-	static const uint8_t INPUT = 0;		/** Output mode */
-	static const uint8_t OUTPUT = 1;	/** Input mode */
+	static const uint8_t INPUT = 0;		/** Input mode */
+	static const uint8_t OUTPUT = 1;	/** Output mode */
 
 	Gpio(FIO_TypeDef *gpioRegisters, uint8_t portLength, uint8_t id);
 	virtual ~Gpio();
