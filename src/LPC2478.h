@@ -25,10 +25,12 @@ public:
 	virtual ~LPC2478();
 
 	static Gpio* getGpio0();
+	static Gpio* getGpio1();
 	static HostControllerDriver* getHCD();
 
 private:
 	static Gpio *gpio0;
+	static Gpio *gpio1;
 	static HostControllerDriver *hcd;
 };
 

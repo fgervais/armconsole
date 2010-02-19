@@ -11,6 +11,7 @@
 
 /* Static initialization. Required to make the compiler happy */
 Gpio* LPC2478::gpio0 = 0;
+Gpio* LPC2478::gpio1 = 0;
 HostControllerDriver* LPC2478::hcd = 0;
 
 LPC2478::LPC2478() {
@@ -30,8 +31,26 @@ LPC2478::~LPC2478() {
 Gpio* LPC2478::getGpio0() {
 	if(gpio0 == 0) {
 		gpio0 = new Gpio(FIO0, 32, 0);
+
+		// Enable High speed GPIO on ports 0 and 1
+		SCS |= 1;
 	}
 	return gpio0;
+}
+
+/**
+ * Used to access General Purpose IO port 0.
+ *
+ * @return Reference to IO port 0
+ */
+Gpio* LPC2478::getGpio1() {
+	if(gpio1 == 0) {
+		gpio1 = new Gpio(FIO1, 32, 1);
+
+		// Enable High speed GPIO on ports 0 and 1
+		SCS |= 1;
+	}
+	return gpio1;
 }
 
 /**

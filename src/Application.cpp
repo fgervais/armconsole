@@ -12,19 +12,18 @@
 #include "LPC2478.h"
 
 int main() {
-
-	Gpio *gpioA = LPC2478::getGpio0();
+	Gpio *gpio1 = LPC2478::getGpio1();
 
 	// Set default port behavior
-	GpioConfiguration portConfig(Gpio::INPUT);
-	gpioA->configure(portConfig);
+	GpioConfiguration portConfig(32, Gpio::INPUT);
+	gpio1->configure(portConfig);
 
 	// Configure blinking led
-	GpioPinConfiguration ledPinConfig;
-	ledPinConfig.pin = Gpio::OUTPUT;
-	gpioA->getPin(0)->configure(ledPinConfig);
+	GpioPinConfiguration *ledPinConfig = new GpioPinConfiguration();
+	ledPinConfig->pin = Gpio::OUTPUT;
+	gpio1->getPin(12)->configure(*ledPinConfig);
 
-	GpioPin *led = gpioA->getPin(0);
+	GpioPin *led = gpio1->getPin(12);
 
 	// Blink led
 	while(1) {

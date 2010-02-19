@@ -13,32 +13,32 @@
 @  - changed comment char to @ for GNU assembler (arm-elf-as)
 @    "The line comment character is [...] ‘@’ on the ARM [...]"
 @    (GNU-as manual from binutils V 2.17)
-@  - ported RV-ASM to GNU-ASM (sections, import/export, equ, 
+@  - ported RV-ASM to GNU-ASM (sections, import/export, equ,
 @    :OR:, Labels etc.)
 @  - added .data and .bss inits
 @  - call main instead of __main (since there is no "RV runtime-init")
 @  - call main with bx so it can be thumb-code
 @  - added IRQ-Wrapper for easier porting of ISR-codes for IAR, RV etc.
 @  - TargetResetInit can be a thumb-function (using BX instead of BL)
-@  - moved TargetResetInit call before the stack-inits and use 
+@  - moved TargetResetInit call before the stack-inits and use
 @    a temporary stack-pointer
 @  - route swi-exception to handler implemented in swi_handler.h
 
 @@	PRESERVE8
 
 @/*
-@ *  The STARTUP.S code is executed after CPU Reset. This file may be 
-@ *  translated with the following SET symbols. In uVision these SET 
+@ *  The STARTUP.S code is executed after CPU Reset. This file may be
+@ *  translated with the following SET symbols. In uVision these SET
 @ *  symbols are entered under Options - ASM - Define.
 @ *
-@ *  REMAP: when set the startup code initializes the register MEMMAP 
-@ *  which overwrites the settings of the CPU configuration pins. The 
+@ *  REMAP: when set the startup code initializes the register MEMMAP
+@ *  which overwrites the settings of the CPU configuration pins. The
 @ *  startup and interrupt vectors are remapped from:
 @ *     0x00000000  default setting (not remapped)
 @ *     0x40000000  when RAM_MODE is used
 @ *
 @ *  RAM_MODE: when set the device is configured for code execution
-@ *  from on-chip RAM starting at address 0x40000000. 
+@ *  from on-chip RAM starting at address 0x40000000.
 @ */
 
 
@@ -85,7 +85,8 @@
 .align 3
 Stack_Mem:
 .space Stack_Size
-.equ Stack_Top, Stack_Mem + Stack_Size
+@.equ Stack_Top, Stack_Mem + Stack_Size
+.equ Stack_Top,	__stack
 
 
 @// <h> Heap Configuration
@@ -118,12 +119,12 @@ HeapMem:
 @  Absolute addressing mode must be used.
 @  Dummy Handlers are implemented as infinite loops which can be modified.
 
-Vectors:        LDR     PC, Reset_Addr         
+Vectors:        LDR     PC, Reset_Addr
                 LDR     PC, Undef_Addr
                 LDR     PC, SWI_Addr
                 LDR     PC, PAbt_Addr
                 LDR     PC, DAbt_Addr
-                NOP                            @ Reserved Vector 
+                NOP                            @ Reserved Vector
                 LDR     PC, IRQ_Addr
 @@                LDR     PC, [PC, #-0x0120]     @ Vector from VicVectAddr
                 LDR     PC, FIQ_Addr
@@ -133,7 +134,7 @@ Undef_Addr:      .word     Undef_Handler
 SWI_Addr:        .word     SWI_Handler
 PAbt_Addr:       .word     PAbt_Handler
 DAbt_Addr:       .word     DAbt_Handler
-                 .word     0xB9206E28             @ Reserved Address 
+                 .word     0xB9206E28             @ Reserved Address
 IRQ_Addr:        .word     IRQ_Handler
 FIQ_Addr:        .word     FIQ_Handler
 
@@ -158,7 +159,7 @@ Reset_Handler:
 @                BL   TargetResetInit
 
                  .extern TargetResetInit
-                 ldr     SP, =Stack_Top    @ temporary stack at Stack_Top
+                 LDR     SP, =Stack_Top    @ temporary stack at Stack_Top
                  LDR R0, =TargetResetInit
                  MOV LR, PC
                  BX R0
@@ -201,32 +202,36 @@ Reset_Handler:
 @  They can be enabled at runtime thru IntEnable in swi.h/swi_handler.S.
 
 @  Relocate .data section (Copy from ROM to RAM)
-                LDR     R1, =_etext 
-                LDR     R2, =_sdata 
-                LDR     R3, =_edata 
+                LDR     R1, =_etext
+                LDR     R2, =_sdata
+                LDR     R3, =_edata
                 CMP     R2, R3
                 BEQ     DataIsEmpty
-LoopRel:        CMP     R2, R3 
-                LDRLO   R0, [R1], #4 
-                STRLO   R0, [R2], #4 
-                BLO     LoopRel 
+LoopRel:        CMP     R2, R3
+                LDRLO   R0, [R1], #4
+                STRLO   R0, [R2], #4
+                BLO     LoopRel
 DataIsEmpty:
- 
+
 @  Clear .bss section (Zero init)
-                MOV     R0, #0 
+                MOV     R0, #0
                 LDR     R1, =_sbss
                 LDR     R2, =_ebss
                 CMP     R1,R2
                 BEQ     BSSIsEmpty
-LoopZI:         CMP     R1, R2 
-                STRLO   R0, [R1], #4 
-                BLO     LoopZI 
+LoopZI:         CMP     R1, R2
+                STRLO   R0, [R1], #4
+                BLO     LoopZI
 BSSIsEmpty:
 
 
 @  Enter the C code
 @                IMPORT  __main
 @                LDR     R0, =__main
+				.extern __libc_init_array
+				LDR R0, =__libc_init_array
+				MOV LR, PC
+				BX      R0
                 .extern main
                 LDR R0, =main
                 BX      R0
@@ -290,14 +295,14 @@ IRQ_Handler:
             msr         CPSR_c, #I_Bit | Mode_IRQ
 
 @-  Mark the End of Interrupt on the VIC
-@   by writing to VICVectAddr - not needed 
+@   by writing to VICVectAddr - not needed
 @   here since already done in the ISRs
 @@           ldr         r14, =LPC_BASE_VIC
 @@           str         r14, [r14, #VIC_VectAddr]
 
 			ldr         r14, =LPC_BASE_VIC
 			str         r14, [r14, #VIC_VectAddr]
-					
+
 @- Restore R0
             ldmia       sp!, {r0}
 

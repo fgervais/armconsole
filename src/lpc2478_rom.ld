@@ -47,7 +47,7 @@ MEMORY
 }
 
 /* higher address of the user mode stack */
-_estack = 0x40010000;
+__stack = 0x40010000;
 
 
 
@@ -191,22 +191,16 @@ SECTIONS
    	 	_ebss = . ;
     } >ON_CHIP_RAM
     
-    .stack ALIGN(256) :
-	{
-		. = ALIGN(4);
-		_sstack = .;
-		
-		*(.stack)
-		
-		_estack = .;
-	} > ON_CHIP_RAM
-	
-	
-	PROVIDE ( end = _estack );
-    PROVIDE ( _end = _estack );
-	
-	
-	.heap :
+    PROVIDE ( end = _ebss );
+    PROVIDE ( _end = _ebss );
+    
+    /* Heap and Stack are dummy sections that can be removed.
+	They were both in the original file so I let them there. With the stack
+	section, if you have a bigger stack than the size of you memory, the linker
+	should tell you. Keep in mind that what is important is the definition of
+	__stack on top of that file. */
+    
+    .heap :
 	{
 		. = ALIGN(4);
 		_sheap = .;
@@ -216,6 +210,16 @@ SECTIONS
 		. = ALIGN(4);
 		_eheap = .;
 	} >ON_CHIP_RAM
+    
+    .stack ALIGN(256) :
+	{
+		. = ALIGN(4);
+		_sstack = .;
+		
+		*(.stack)
+		
+		_estack = .;
+	} > ON_CHIP_RAM
     
     
     /* after that it's only debugging information. */

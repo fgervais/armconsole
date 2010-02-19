@@ -105,7 +105,7 @@ void TargetResetInit(void)
     MEMMAP = 0x1;			/* remap to internal flash */
 #endif
 
-	/* Configure PLL, switch from IRC to Main OSC */
+    /* Configure PLL, switch from IRC to Main OSC */
 	ConfigurePLL();
 
   /* Set system timers for each component */
