@@ -11,7 +11,7 @@
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
 
-	init();
+	//init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
@@ -33,12 +33,18 @@ void HostControllerDriver::init() {
 	hcca->DoneHead = 0;
 	hcca->FrameNumber = 0;
 
+	//debug - delay
+	for(uint32_t i=0; i<1000000; i++);
+
 	/*
 	 * Switch to UsbReset State
 	 *
 	 * This is also called "Hardware reset"
 	 */
 	ohciRegisters->HcControl = 0;
+
+	ohciRegisters->HcBulkHeadED = 0;
+	ohciRegisters->HcControlHeadED = 0;
 
 	// Initiate a software reset
 	ohciRegisters->HcCommandStatus |= OHCI_HCR;
@@ -49,8 +55,11 @@ void HostControllerDriver::init() {
 	ohciRegisters->HcControl =
 		((ohciRegisters->HcControl & ~OHCI_CTRL_HCFS) | OHCI_USB_OPER);
 
-	// Turn off power to all ports
+	// Turn on power to all ports
 	ohciRegisters->HcRh.Status |= RH_HS_LPSC;
+
+	// A delay is needed here.
+	for(uint32_t i=0; i<1000000; i++);
 
 	// Set HCCA
 	ohciRegisters->HcHCCA = (uint32_t)hcca;
@@ -60,14 +69,12 @@ void HostControllerDriver::init() {
 
 	// Enable interrupts
 	ohciRegisters->HcInterruptEnable =
-		OHCI_INTR_WDH		/* writeback of done_head */
+		OHCI_INTR_MIE
+		| OHCI_INTR_WDH		/* writeback of done_head */
 		| OHCI_INTR_RHSC;	/* root hub status change */
 
-	VICIntEnable = 1 << USB_INT;
 	VICIntSelect &= ~(1 << USB_INT); // IRQ Category (Not FIQ)
-
-	// Master interrupt enable
-	ohciRegisters->HcInterruptEnable |= OHCI_INTR_MIE;
+	VICIntEnable |= (1 << USB_INT);
 }
 
 /**
@@ -77,5 +84,15 @@ void HostControllerDriver::init() {
  * a USB interrupt.
  */
 void HostControllerDriver::hcInterrupt() {
+	//debug
+	while(1) {
+		FIO1->FIOCLR = (1 << 12);
+		for(uint32_t i=0; i<1000000; i++);
+		FIO1->FIOSET = (1 << 12);
+		for(uint32_t i=0; i<1000000; i++);
+	}
+
+	// Clear any active interrupt
+	ohciRegisters->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
 
 }

@@ -8,6 +8,7 @@
 #include "LPC2478.h"
 #include "Gpio.h"
 #include "HostControllerDriver.h"
+#include "irq.h"
 
 /* Static initialization. Required to make the compiler happy */
 Gpio* LPC2478::gpio0 = 0;
@@ -67,12 +68,16 @@ HostControllerDriver* LPC2478::getHCD() {
 
 
 		PCONP |= 0x80000000;
-		// Enable the USB interrupt source
-		VICIntEnClr    = (1 << 22);
+		// Disable the USB interrupt source
+		VICIntEnClr    = (1 << USB_INT);
 		// Enable USB host clock
-		OTG_CLK_CTRL   = 0x00000001;
+		OTG_CLK_CTRL   = 0x09;
 		// Wait until USB host clock is stable
-		while ((OTG_CLK_STAT & 0x00000001) == 0);
+		while ((OTG_CLK_STAT & 0x09) == 0);
+
+		// The USB device controller signals are mapped to the U2 port
+		USBPortSel &= ~0x03;
+		USBPortSel |= 0x01;
 
 		/* Configure USB pins */
 
