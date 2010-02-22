@@ -11,7 +11,7 @@
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
 
-	//init();
+	init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
