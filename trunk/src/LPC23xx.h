@@ -116,6 +116,7 @@ these registers are known as "VICVectPriority(x)". */
 #define PINSEL8        (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x20))
 #define PINSEL9        (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x24))
 #define PINSEL10       (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x28))
+#define PINSEL11       (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x2C))
 
 #define PINMODE0        (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x40))
 #define PINMODE1        (*(volatile unsigned long *)(PINSEL_BASE_ADDR + 0x44))

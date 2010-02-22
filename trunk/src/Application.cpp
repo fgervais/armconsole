@@ -31,11 +31,9 @@ int main() {
 
 	// USB debug section
 	HostControllerDriver* hcd = LPC2478::getHCD();
-	hcd->init();
+	//hcd->init();
 
 	IntEnable();
-
-	//VICSoftInt |= (1 << USB_INT);
 
 	// Blink led
 	while(1) {

@@ -10,8 +10,11 @@
 
 #include "Microcontroller.h"
 
+#include <stdint.h>
+
 class Gpio;
 class HostControllerDriver;
+class LCDControllerDriver;
 
 /**
  * Software interface to the LPC2478 microcontroller.
@@ -27,11 +30,14 @@ public:
 	static Gpio* getGpio0();
 	static Gpio* getGpio1();
 	static HostControllerDriver* getHCD();
+	static LCDControllerDriver* getLCD();
 
+	static void delay(uint32_t usec);
 private:
 	static Gpio *gpio0;
 	static Gpio *gpio1;
 	static HostControllerDriver *hcd;
+	static LCDControllerDriver *lcd;
 };
 
 #endif /* LPC2478_H_ */
