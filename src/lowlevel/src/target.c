@@ -72,6 +72,7 @@ void ConfigurePLL ( void )
 
     CCLKCFG = CCLKDivValue;	/* Set clock divider */
     USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
+    LCD_CFG = LCDCLKDivValue-1;		/* LCD panel clock = 72 MHz/8 = 9 MHz */
 
     while ( ((PLLSTAT & (1 << 26)) == 0) );	/* Check lock bit status */
 
