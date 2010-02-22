@@ -125,20 +125,87 @@ HostControllerDriver* LPC2478::getHCD() {
 
 LCDControllerDriver* LPC2478::getLCD() {
 	if(lcd == 0) {
+		uint32_t  pinsel;
+
 		PCONP |= (1 << 20); //power on LCD controller
 
 		// Time delay?
 
-		//TODO: Clear before set
-		PINSEL0 |= 0x00055500; //P0.4-P0.9
-		PINSEL3 |= 0x05555500; //P1.20-P1.29
+		// Enable LCD in 24 bits mode
+		PINSEL11 = 0x0000000F;
+
+		/*
+		 * P0[4] = LCDVD[0]		01
+		 * P0[5] = LCDVD[1]		01
+		 * P0[6] = LCDVD[8]		01
+		 * P0[7] = LCDVD[9]		01
+		 * P0[8] = LCDVD[16]	01
+		 * P0[9] = LCDVD[17]	01
+		 */
+		pinsel = PINSEL0;
+		pinsel &= 0xFFF000FF;
+		pinsel |= 0x00055500;
+		PINSEL0 = pinsel;
+
+		/*
+		 * P1[20] = LCDVD[6]/LCDVD[10]		01
+		 * P1[21] = LCDVD[7]/LCDVD[11]		01
+		 * P1[22] = LCDVD[8]/LCDVD[12]		01
+		 * P1[23] = LCDVD[9]/LCDVD[13]		01
+		 * P1[24] = LCDVD[10]/LCDVD[14]		01
+		 * P1[25] = LCDVD[11]/LCDVD[15]		01
+		 * P1[26] = LCDVD[12]/LCDVD[20]		01
+		 * P1[27] = LCDVD[13]/LCDVD[21]		01
+		 * P1[28] = LCDVD[14]/LCDVD[22]		01
+		 * P1[29] = LCDVD[15]/LCDVD[23]		01
+		 */
+		pinsel = PINSEL3;
+		pinsel &= 0xF00000FF;
+		pinsel |= 0x05555500;
+		PINSEL3 = pinsel;
+
+		/*
+		 * P2[0] = LCDPWR				11
+		 * P2[2] = LCDDCLK				11
+		 * P2[3] = LCDFP				11
+		 * P2[4] = LCDENAB/LCDM			11
+		 * P2[5] = LCDLP				11
+		 * P2[6] = LCDVD[0]/LCDVD[4]	11
+		 * P2[7] = LCDVD[1]/LCDVD[5]	11
+		 * P2[8] = LCDVD[2]/LCDVD[6]	11
+		 * P2[9] = LCDVD[3]/LCDVD[7]	11
+		 * P2[12] = LCDVD[4]/
+		 *			LCDVD[3]/
+		 *			LCDVD[8]/
+		 *			LCDVD[18]			01
+		 * P2[13] = LCDVD[5]/
+		 * 			LCDVD[9]/
+		 * 			LCDVD[19]			01
+		 */
+		pinsel = PINSEL4;
+		pinsel &= 0xF0F0000C;
+		pinsel |= 0x050FFFF3;
+		PINSEL4 = pinsel;
+
 		PINSEL4 |= 0x050FFFF3; //P2.0,P2.2-P2.9,P2.12-P2.13
-		PINSEL9 |= 0x0A000000; //P4.28-P4.29
+
+		/*
+		 * P4[28] = LCDVD[6]/
+		 * 			LCDVD[10]/
+		 * 			LCDVD[2]		10
+		 * P4[29] = LCDVD[7]/
+		 * 			LCDVD[11]/
+		 * 			LCDVD[3]		10
+		 *
+		 */
+		pinsel = PINSEL9;
+		pinsel &= 0xF0FFFFFF;
+		pinsel |= 0x0A000000;
+		PINSEL9 = pinsel;
 
 		PINSEL10 = 0;
-		PINSEL11 = 0x0000000F; //24-bit mode
 
-		lcd = new LCDControllerDriver();
+		lcd = new LCDControllerDriver(LCD);
 	}
 	return lcd;
 }
