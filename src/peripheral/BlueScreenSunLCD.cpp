@@ -14,13 +14,14 @@
 BlueScreenSunLCD::BlueScreenSunLCD(LCD_Typedef* lcdRegisters)
 	: LCDControllerDriver(lcdRegisters) {
 
+	// This pin is used to control the LCD back light
 	lcdAdjPin = LPC2478::getGpio2()->getPin(1);
 
 	GpioPinConfiguration pinConfig;
 	pinConfig.pin = Gpio::OUTPUT;
 
 	lcdAdjPin->configure(pinConfig);
-	lcdAdjPin->setLow();
+	lcdAdjPin->setLow();	// Turn off the back light
 }
 
 BlueScreenSunLCD::~BlueScreenSunLCD() {
@@ -29,10 +30,10 @@ BlueScreenSunLCD::~BlueScreenSunLCD() {
 
 void BlueScreenSunLCD::powerUp() {
 	LCDControllerDriver::powerUp();
-	lcdAdjPin->setHigh();
+	lcdAdjPin->setHigh();	// Back light ON
 }
 
 void BlueScreenSunLCD::powerDown() {
-	lcdAdjPin->setLow();
+	lcdAdjPin->setLow();	// Back light OFF
 	LCDControllerDriver::powerDown();
 }
