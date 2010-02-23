@@ -43,9 +43,9 @@ void LCDControllerDriver::powerUp() {
  * @see datasheet for more information
  */
 void LCDControllerDriver::powerDown() {
-	lcdRegisters->LCD_CTRL |= (1 << 11);	// LCD power enable
+	lcdRegisters->LCD_CTRL &= ~(1 << 11);	// LCD power enable
 	LPC2478::delay(50000);					// 50 ms
-	lcdRegisters->LCD_CTRL |= 1;			// LCD enable
+	lcdRegisters->LCD_CTRL &= ~1;			// LCD enable
 	lcdState = Down;
 }
 

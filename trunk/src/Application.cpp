@@ -11,6 +11,7 @@
 #include "GpioPin.h"
 #include "LPC2478.h"
 #include "HostControllerDriver.h"
+#include "LCDControllerDriver.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -30,9 +31,11 @@ int main() {
 	GpioPin *led = gpio1->getPin(12);
 
 	// USB debug section
-	HostControllerDriver* hcd = LPC2478::getHCD();
+	//HostControllerDriver* hcd = LPC2478::getHCD();
+	//IntEnable();
 
-	IntEnable();
+	LCDControllerDriver* lcd = LPC2478::getLCD();
+	//lcd->powerDown();
 
 	// Blink led
 	while(1) {
