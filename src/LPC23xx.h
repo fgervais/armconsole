@@ -1036,31 +1036,7 @@ typedef struct
  * This is coming from the Catalog Demo (POS Demo) by Bluescreen SUN (ThaiEasyElec)
  */
 #define LCD_CFG			(*(volatile unsigned long *)(0xE01FC1B8))
-#define LCD_TIMH		(*(volatile unsigned long *)(LCD_BASE + 0x00))
-#define LCD_TIMV		(*(volatile unsigned long *)(LCD_BASE + 0x04))
-#define LCD_POL			(*(volatile unsigned long *)(LCD_BASE + 0x08))
-#define LCD_LE			(*(volatile unsigned long *)(LCD_BASE + 0x0C))
-#define LCD_UPBASE		(*(volatile unsigned long *)(LCD_BASE + 0x10))
-#define LCD_LPBASE		(*(volatile unsigned long *)(LCD_BASE + 0x14))
-#define LCD_CTRL		(*(volatile unsigned long *)(LCD_BASE + 0x18))
-#define LCD_INTMSK		(*(volatile unsigned long *)(LCD_BASE + 0x1C))
-#define LCD_INTRAW		(*(volatile unsigned long *)(LCD_BASE + 0x20))
-#define LCD_INTSTAT		(*(volatile unsigned long *)(LCD_BASE + 0x24))
-#define LCD_INTCLR		(*(volatile unsigned long *)(LCD_BASE + 0x28))
-#define LCD_UPCURR		(*(volatile unsigned long *)(LCD_BASE + 0x2C))
-#define LCD_LPCURR		(*(volatile unsigned long *)(LCD_BASE + 0x30))
-#define LCD_PAL			(*(volatile unsigned long *)(LCD_BASE + 0x200))
-#define CRSR_IMG		(*(volatile unsigned long *)(LCD_BASE + 0x800))
-#define CRSR_CTRL		(*(volatile unsigned long *)(LCD_BASE + 0xC00))
-#define CRSR_CFG		(*(volatile unsigned long *)(LCD_BASE + 0xC04))
-#define CRSR_PAL0		(*(volatile unsigned long *)(LCD_BASE + 0xC08))
-#define CRSR_PAL1		(*(volatile unsigned long *)(LCD_BASE + 0xC0C))
-#define CRSR_XY			(*(volatile unsigned long *)(LCD_BASE + 0xC10))
-#define CRSR_CLIP		(*(volatile unsigned long *)(LCD_BASE + 0xC14))
-#define CRSR_INTMSK		(*(volatile unsigned long *)(LCD_BASE + 0xC20))
-#define CRSR_INTCLR		(*(volatile unsigned long *)(LCD_BASE + 0xC24))
-#define CRSR_INTRAW		(*(volatile unsigned long *)(LCD_BASE + 0xC28))
-#define CRSR_INTSTAT	(*(volatile unsigned long *)(LCD_BASE + 0xC2C))
+
 
 /* USB Controller */
 #define USB_INT_BASE_ADDR	0xE01FC1C0

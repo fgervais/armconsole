@@ -17,12 +17,15 @@ public:
 	LCDControllerDriver(LCD_Typedef* lcdRegisters);
 	virtual ~LCDControllerDriver();
 
+	virtual void powerUp();
+	virtual void powerDown();
 	void configure(LCDConfiguration config);
 
 private:
-	LCD_Typedef* lcdRegisters;
+	enum State { Up, Down };
 
-	void init();
+	LCD_Typedef* lcdRegisters;
+	State lcdState;
 };
 
 #endif /* LCDCONTROLLERDRIVER_H_ */

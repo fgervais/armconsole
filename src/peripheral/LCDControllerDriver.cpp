@@ -7,19 +7,46 @@
 
 #include "LCDControllerDriver.h"
 #include "LCDConfiguration.h"
+#include "LPC2478.h"
 
 LCDControllerDriver::LCDControllerDriver(LCD_Typedef* lcdRegisters) {
 	this->lcdRegisters = lcdRegisters;
 
-	init();
+	lcdState = Down;
 }
 
 LCDControllerDriver::~LCDControllerDriver() {
 
 }
 
-void LCDControllerDriver::init() {
+/**
+ * LCD controller power up sequence.
+ *
+ * According to the datasheet, this sequence must be
+ * strictly followed.
+ *
+ * @see datasheet for more information
+ */
+void LCDControllerDriver::powerUp() {
+	lcdRegisters->LCD_CTRL |= 1;			// LCD enable
+	LPC2478::delay(50000);					// 50 ms
+	lcdRegisters->LCD_CTRL |= (1 << 11);	// LCD power enable
+	lcdState = Up;
+}
 
+/**
+ * LCD controller power down sequence.
+ *
+ * According to the datasheet, this sequence must be
+ * strictly followed.
+ *
+ * @see datasheet for more information
+ */
+void LCDControllerDriver::powerDown() {
+	lcdRegisters->LCD_CTRL |= (1 << 11);	// LCD power enable
+	LPC2478::delay(50000);					// 50 ms
+	lcdRegisters->LCD_CTRL |= 1;			// LCD enable
+	lcdState = Down;
 }
 
 /**
@@ -76,4 +103,16 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 	 * This is where all the clocking work is done.
 	 */
 
+	/*
+	 * If don't know if this is required, but I prefer to have the
+	 * LCD powered down when playing with the controller timings.
+	 *
+	 * Note that there is not mention in the datasheet that this
+	 * should be done.
+	 */
+	if(lcdState == Up) {
+		powerDown();
+	}
+
+	//LCD_TIMH =
 }

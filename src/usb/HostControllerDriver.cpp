@@ -6,6 +6,7 @@
  */
 
 #include "HostControllerDriver.h"
+#include "LPC2478.h"
 #include "irq.h"
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
@@ -33,8 +34,7 @@ void HostControllerDriver::init() {
 	hcca->DoneHead = 0;
 	hcca->FrameNumber = 0;
 
-	//debug - delay
-	for(uint32_t i=0; i<1000000; i++);
+	LPC2478::delay(50000);	// 50 ms
 
 	/*
 	 * Switch to UsbReset State

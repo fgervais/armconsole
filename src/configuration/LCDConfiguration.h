@@ -8,12 +8,15 @@
 #ifndef LCDCONFIGURATION_H_
 #define LCDCONFIGURATION_H_
 
+#include <stdint.h>
+
 class LCDConfiguration {
 public:
 	LCDConfiguration();
 	virtual ~LCDConfiguration();
 
-
+	uint32_t width;
+	uint32_t height;
 };
 
 #endif /* LCDCONFIGURATION_H_ */

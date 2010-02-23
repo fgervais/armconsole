@@ -29,6 +29,8 @@ public:
 
 	static Gpio* getGpio0();
 	static Gpio* getGpio1();
+	static Gpio* getGpio2();
+	static Gpio* getGpio3();
 	static HostControllerDriver* getHCD();
 	static LCDControllerDriver* getLCD();
 
@@ -36,6 +38,8 @@ public:
 private:
 	static Gpio *gpio0;
 	static Gpio *gpio1;
+	static Gpio *gpio2;
+	static Gpio *gpio3;
 	static HostControllerDriver *hcd;
 	static LCDControllerDriver *lcd;
 };
