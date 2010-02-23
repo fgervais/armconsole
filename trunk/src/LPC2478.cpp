@@ -9,16 +9,18 @@
 #include "Gpio.h"
 #include "HostControllerDriver.h"
 #include "LCDControllerDriver.h"
+#include "BlueScreenSunLCD.h"
 #include "irq.h"
 
 /* Static initialization. Required to make the compiler happy */
 Gpio* LPC2478::gpio0 = 0;
 Gpio* LPC2478::gpio1 = 0;
+Gpio* LPC2478::gpio2 = 0;
+Gpio* LPC2478::gpio3 = 0;
 HostControllerDriver* LPC2478::hcd = 0;
 LCDControllerDriver* LPC2478::lcd = 0;
 
 LPC2478::LPC2478() {
-
 
 }
 
@@ -42,9 +44,9 @@ Gpio* LPC2478::getGpio0() {
 }
 
 /**
- * Used to access General Purpose IO port 0.
+ * Used to access General Purpose IO port 1.
  *
- * @return Reference to IO port 0
+ * @return Reference to IO port 1
  */
 Gpio* LPC2478::getGpio1() {
 	if(gpio1 == 0) {
@@ -54,6 +56,30 @@ Gpio* LPC2478::getGpio1() {
 		gpio1 = new Gpio(FIO1, 32, 1);
 	}
 	return gpio1;
+}
+
+/**
+ * Used to access General Purpose IO port 2.
+ *
+ * @return Reference to IO port 2
+ */
+Gpio* LPC2478::getGpio2() {
+	if(gpio2 == 0) {
+		gpio2 = new Gpio(FIO2, 32, 2);
+	}
+	return gpio2;
+}
+
+/**
+ * Used to access General Purpose IO port 3.
+ *
+ * @return Reference to IO port 3
+ */
+Gpio* LPC2478::getGpio3() {
+	if(gpio3 == 0) {
+		gpio3 = new Gpio(FIO3, 32, 3);
+	}
+	return gpio3;
 }
 
 /**
@@ -205,7 +231,23 @@ LCDControllerDriver* LPC2478::getLCD() {
 
 		PINSEL10 = 0;
 
-		lcd = new LCDControllerDriver(LCD);
+		//lcd = new LCDControllerDriver(LCD);
+
+		// Board specific implementation
+		lcd = new BlueScreenSunLCD(LCD);
 	}
 	return lcd;
+}
+
+/**
+ * Delay function.
+ *
+ * Configured for a 72 Mhz cclk.
+ *
+ * @param usec Length of the delay in microseconds
+ */
+void LPC2478::delay(uint32_t usec) {
+	// Crazy unaccurate function for now
+	//TODO: High priority fix needed here
+	for(uint32_t i=0; i<24; i++);
 }
