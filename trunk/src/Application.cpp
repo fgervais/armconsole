@@ -12,6 +12,7 @@
 #include "LPC2478.h"
 #include "HostControllerDriver.h"
 #include "LCDControllerDriver.h"
+#include "LCDConfiguration.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -34,8 +35,12 @@ int main() {
 	//HostControllerDriver* hcd = LPC2478::getHCD();
 	//IntEnable();
 
+	LCDConfiguration lcdConfig;
+	lcdConfig.bufferBaseAddress = 0xA0000000;
+	lcdConfig.height = 272;
+	lcdConfig.width = 480;
 	LCDControllerDriver* lcd = LPC2478::getLCD();
-	//lcd->powerDown();
+	lcd->configure(lcdConfig);
 
 	// Blink led
 	while(1) {

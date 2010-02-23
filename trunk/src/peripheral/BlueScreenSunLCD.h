@@ -11,6 +11,7 @@
 #include "LCDControllerDriver.h"
 
 class GpioPin;
+class LCDConfiguration;
 
 /**
  * This is a specific implementation of the LCD controller
@@ -28,8 +29,10 @@ public:
 
 	virtual void powerUp();
 	virtual void powerDown();
+	virtual void configure(LCDConfiguration config);
 
 private:
+	LCD_Typedef* lcdRegisters;
 	GpioPin* lcdAdjPin;
 };
 

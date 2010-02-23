@@ -58,43 +58,12 @@ void LCDControllerDriver::powerDown() {
  * @param config LCD controller configuration
  */
 void LCDControllerDriver::configure(LCDConfiguration config) {
-	/*LCD_CTRL = 0;
-	LCD_CFG = LCD_CLK_DIV-1;
-	buf = 0;
-	buf |= (((LCD_WIDTH >> 4)-1) & 0x3F) << 2;//pixel per line
-	buf |= 40 << 8; //horizontal sync pulse width
-	buf |= 1 << 16; //horizontal front porch
-	buf |= 1 << 24; //horizontal back porch
-	LCD_TIMH = buf;
-	buf = 0;
-	buf |= ((LCD_HEIGHT-1) & 0x3FF);//line per panel
-	buf |= 9 << 10; //vertical sync pulse width
-	buf |= 1 << 16; //vertical front porch
-	buf |= 1 << 24; //vertical back porch
-	LCD_TIMV = buf;
-	buf = 0;
-	buf |= 1 << 11; //invert vertical sync
-	buf |= 1 << 12; //invert horizontal sync
-	//buf |= 1 << 13; //invert panel clock
-	buf |= (LCD_WIDTH-1) << 16; //clock per line
-	buf |= 1 << 26; //bypass pixel clock divider
-	LCD_POL = buf;
-	LCD_LE = 0; //disable LE pin
-	LCD_UPBASE = LCD_BUFFER_BASE;
-	//LCD_LPBASE = LCD_BUFFER_BASE;
-	buf = 0;
-	buf |= (5 << 1); //24 bpp
-	buf |= (1 << 5); //TFT type
-	//buf |= (0 << 8); //RGB format
-	//buf |= (0 << 12); //vertical compare interrupt generated at start of vertical sync
-	//buf |= (0 << 16); //DMA FIFO watermark level : 4 or more
-	LCD_CTRL = buf;
-	LCD_INTMSK = 0;
+	uint32_t regVal;
 
-	LCD_CTRL |= 1; //LCD enable
-	delay_1ms(50);
-	LCD_CTRL |= 1 << 11; //LCD power enable
-	Setb(LCD_ADJ_PRTS,LCD_ADJ_PIN);*/
+	// Save the information
+	this->bufferBase = (uint32_t*)config.bufferBaseAddress;
+	this->lcdHeight = config.height;
+	this->lcdWidth = config.width;
 
 	/*
 	 * IMPORTANT NOTICE
@@ -114,5 +83,53 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 		powerDown();
 	}
 
-	//LCD_TIMH =
+	// Set pixel per line
+	regVal = lcdRegisters->LCD_TIMH;
+	regVal &= 0xFFFFFF03;
+	regVal |= (((config.width >> 4)-1) & 0x3F) << 2;
+	lcdRegisters->LCD_TIMH = regVal;
+
+	// Set line per panel
+	regVal = lcdRegisters->LCD_TIMV;
+	regVal &= 0xFFFFFC00;
+	regVal |= ((config.height-1) & 0x3FF);
+	lcdRegisters->LCD_TIMV = regVal;
+
+	regVal = 0;
+	regVal |= (1 << 11);	//invert vertical sync
+	regVal |= (1 << 12);	//invert horizontal sync
+	regVal |= ((config.width-1) << 16);	//clock per line
+	regVal |= (1 << 26);	//bypass pixel clock divider
+	lcdRegisters->LCD_POL = regVal;
+
+	lcdRegisters->LCD_LE = 0;	//disable LE pin
+
+	lcdRegisters->LCD_UPBASE = config.bufferBaseAddress;
+
+	regVal = 0;
+	regVal |= (5 << 1); //24 bpp
+	regVal |= (1 << 5); //TFT type
+	//regVal |= (0 << 8); //RGB format
+	//regVal |= (0 << 12); //vertical compare interrupt generated at start of vertical sync
+	//regVal |= (0 << 16); //DMA FIFO watermark level : 4 or more
+	lcdRegisters->LCD_CTRL = regVal;
+
+	lcdRegisters->LCD_INTMSK = 0;
+
+	/*
+	 * The BlueScreen SUN team change de default round-robin
+	 * AHB1 access scheduler to a priority based one with
+	 * LCD getting the highest priority. I'll try using the
+	 * default stuff and we'll see how it goes.
+	 */
+	//AHBCFG1 = 0x12340144;
+}
+
+void LCDControllerDriver::clearScreen() {
+	uint32_t* lcd_ptr = bufferBase;
+	uint32_t bufferLength = lcdWidth*lcdHeight;
+
+	for (uint32_t i=0; i<bufferLength; i++) {
+		*(lcd_ptr++) = 0x00000000;
+	}
 }
