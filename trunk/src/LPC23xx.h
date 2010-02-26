@@ -994,8 +994,6 @@ are for LPC24xx only. */
  */
 typedef struct
 {
-	unsigned long HcRevision;
-	unsigned long HcControl;
 	unsigned long LCD_TIMH;
 	unsigned long LCD_TIMV;
 	unsigned long LCD_POL;

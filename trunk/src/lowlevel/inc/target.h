@@ -31,6 +31,7 @@
 extern void TargetInit(void);
 extern void ConfigurePLL(void);
 extern void TargetResetInit(void);
+extern void ConfigureSDRAM(void);
 
 #ifdef __cplusplus
    }

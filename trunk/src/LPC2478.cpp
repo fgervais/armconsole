@@ -249,5 +249,10 @@ LCDControllerDriver* LPC2478::getLCD() {
 void LPC2478::delay(uint32_t usec) {
 	// Crazy unaccurate function for now
 	//TODO: High priority fix needed here
-	for(uint32_t i=0; i<24; i++);
+	for(uint32_t i=0; i<usec; i++) {
+		//for(uint32_t j=0; j<1; j++);
+		asm("nop");
+		asm("nop");
+		asm("nop");
+	}
 }
