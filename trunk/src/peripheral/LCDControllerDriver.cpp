@@ -126,10 +126,14 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 }
 
 void LCDControllerDriver::clearScreen() {
+	setBackground(0x00000000);
+}
+
+void LCDControllerDriver::setBackground(uint32_t rgbColor) {
 	uint32_t* lcd_ptr = (uint32_t*)bufferBase;
 	uint32_t bufferLength = lcdWidth*lcdHeight;
 
 	for (uint32_t i=0; i<bufferLength; i++) {
-		*(lcd_ptr++) = 0x00000000;
+		*(lcd_ptr++) = rgbColor;
 	}
 }
