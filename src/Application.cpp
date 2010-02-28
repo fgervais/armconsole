@@ -18,7 +18,8 @@
 
 #include "irq.h"
 #include "swi.h"
-#include "megaman.h"
+//#include "megaman.h"
+#include "megaman_running.h"
 
 #include <stdint.h>
 
@@ -48,7 +49,20 @@ int main() {
 	lcd->configure(lcdConfig);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
-	displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
+	// Display megaman screenshot
+	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
+
+	// Set white background
+	lcd->setBackground(0x00FFFFFF);
+
+	// Display megaman gif
+	displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[0][0],35,35);
+	while(1) {
+		for(uint8_t i=1;i<11; i++) {
+			displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[i][0],35,35);
+			LPC2478::delay(100000);
+		}
+	}
 
 	led->setLow();
 

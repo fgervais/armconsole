@@ -24,6 +24,7 @@ public:
 	virtual void powerDown();
 	virtual void configure(LCDConfiguration config);
 	void clearScreen();
+	void setBackground(uint32_t rgbColor);
 
 	State getState() { return lcdState; }
 	uint32_t getBufferBase() { return bufferBase; }
