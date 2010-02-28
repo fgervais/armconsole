@@ -26,7 +26,7 @@ public:
 	void clearScreen();
 
 	State getState() { return lcdState; }
-	uint32_t* getBufferBase() { return bufferBase; }
+	uint32_t getBufferBase() { return bufferBase; }
 	uint32_t getHeight() { return lcdHeight; }
 	uint32_t getWidth() { return lcdWidth; }
 
@@ -34,7 +34,7 @@ private:
 	LCD_Typedef* lcdRegisters;
 	State lcdState;
 
-	uint32_t* bufferBase;
+	uint32_t bufferBase;
 	uint32_t lcdHeight;
 	uint32_t lcdWidth;
 };

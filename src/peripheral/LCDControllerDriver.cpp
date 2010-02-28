@@ -61,7 +61,7 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 	uint32_t regVal;
 
 	// Save the information
-	this->bufferBase = (uint32_t*)config.bufferBaseAddress;
+	this->bufferBase = config.bufferBaseAddress;
 	this->lcdHeight = config.height;
 	this->lcdWidth = config.width;
 
@@ -126,7 +126,7 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 }
 
 void LCDControllerDriver::clearScreen() {
-	uint32_t* lcd_ptr = bufferBase;
+	uint32_t* lcd_ptr = (uint32_t*)bufferBase;
 	uint32_t bufferLength = lcdWidth*lcdHeight;
 
 	for (uint32_t i=0; i<bufferLength; i++) {

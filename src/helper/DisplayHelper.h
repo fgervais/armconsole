@@ -17,8 +17,8 @@ public:
 	DisplayHelper(LCDControllerDriver* lcd);
 	virtual ~DisplayHelper();
 
-	void drawLine(uint32_t x, uint32_t y);
-
+	void drawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
+	void drawImage(uint32_t x, uint32_t y, uint32_t* imageBase, uint32_t imageWidth, uint32_t imageHeight);
 	void println(uint32_t x, uint32_t y);
 
 private:

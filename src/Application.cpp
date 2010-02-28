@@ -13,9 +13,14 @@
 #include "HostControllerDriver.h"
 #include "LCDControllerDriver.h"
 #include "LCDConfiguration.h"
+#include "math.h"
+#include "DisplayHelper.h"
 
 #include "irq.h"
 #include "swi.h"
+#include "megaman.h"
+
+#include <stdint.h>
 
 int main() {
 	Gpio *gpio1 = LPC2478::getGpio1();
@@ -42,7 +47,12 @@ int main() {
 	LCDControllerDriver* lcd = LPC2478::getLCD();
 	lcd->configure(lcdConfig);
 
+	DisplayHelper* displayHelper = new DisplayHelper(lcd);
+	displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
+
 	led->setLow();
+
+	while(1);
 
 	uint32_t* lcd_ptr = (uint32_t*)0xA0000000;
 	uint32_t bufferLength = 480*272;
@@ -50,6 +60,19 @@ int main() {
 
 	/*for (uint32_t i=0; i<bufferLength; i++) {
 		*(lcd_ptr++) = 0x00FFFF00 | (i & 0xFF);
+	}
+	while(1);*/
+
+	/*uint32_t nrows = 272;
+	uint32_t ncols = 480;
+	for (uint32_t i = 0; i < nrows; ++i) {
+		for (uint32_t j = 0; j < ncols; ++j) {
+			//lcd_ptr[i*ncols + j] = i*j;
+			//lcd_ptr[i*ncols + j] = sqrt(pow(i,2)+pow(j,2));
+			//lcd_ptr[i*ncols + j] = pow(i,2)+pow(j,2);
+			//lcd_ptr[i*ncols + j] = (0xff << 16) | (uint32_t)((float)0x7f * (sin((float)(j/10)) + 1.0));
+
+		}
 	}
 	while(1);*/
 
