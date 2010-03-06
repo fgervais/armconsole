@@ -56,6 +56,7 @@ CONFIGURATION = ./configuration
 EVENT = ./event
 USB = ./usb
 DISPLAY = ./display
+ENGINE = ./engine
 
 
 # List C source files here
@@ -80,6 +81,7 @@ CPPSRCARM += $(wildcard ./configuration/*.cpp)
 CPPSRCARM += $(wildcard ./event/*.cpp)
 CPPSRCARM += $(wildcard ./usb/*.cpp)
 CPPSRCARM += $(wildcard ./display/*.cpp)
+CPPSRCARM += $(wildcard ./engine/*.cpp)
 
 
 # List Assembler source files here.
@@ -143,6 +145,7 @@ EXTRAINCDIRS += $(CONFIGURATION)
 EXTRAINCDIRS += $(EVENT)
 EXTRAINCDIRS += $(USB)
 EXTRAINCDIRS += $(DISPLAY)
+EXTRAINCDIRS += $(ENGINE)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.
