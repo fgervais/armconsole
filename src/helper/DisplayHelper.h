@@ -20,6 +20,9 @@ public:
 	void drawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
 	void drawImage(uint32_t x, uint32_t y, uint32_t* imageBase, uint32_t imageWidth, uint32_t imageHeight);
 	void println(uint32_t x, uint32_t y);
+	void drawString(uint32_t x, uint32_t y, char* string);
+	void drawString(uint32_t x, uint32_t y, char* string, uint32_t fontColor, uint32_t bgColor);
+	void drawChar(uint32_t x, uint32_t y, char ch, uint32_t fontColor, uint32_t bgColor);
 
 private:
 	LCDControllerDriver* lcd;
