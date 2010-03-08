@@ -72,24 +72,31 @@ void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string) {
  * @param bgColor Color of the background
  */
 void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string, uint32_t fontColor, uint32_t bgColor) {
-#define FONTWIDTH	6
-#define FONTHEIGHT	8
-
 	uint32_t nrows = lcd->getHeight();
 	uint32_t ncols = lcd->getWidth();
 	uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
 	uint32_t stringIndex;
 	uint32_t charPosition;
+	uint32_t currentChar;
 
 	stringIndex = 0;
 	charPosition = x;
 
 	// Are we trying to print outside the screen
+	// This test is not enough to know if we will eventually print outside the screen
 	if(x < ncols && y < nrows) {
 		while(string[stringIndex] != 0) {
+			// Avoid printing a character for which we don't have the font
+			if((string[stringIndex] < 0x20) || (string[stringIndex]  > 0x7f)) {
+				// If it's an unknown character, lets print a space
+				currentChar = ' ';
+			}
+			// We just want to avoid doing this over and over in the loop
+			currentChar = string[stringIndex]-' ';
+			// Draw the character
 			for (uint32_t i=0; i<FONTHEIGHT; i++) {
 				for (uint32_t j=0; j<FONTWIDTH; j++) {
-					if((font5x7[(uint8_t)(string[stringIndex]-' ')][i] & (0x80>>j)) == 0) {
+					if((font5x7[(uint8_t)(currentChar)][i] & (0x80>>j)) == 0) {
 						lcd_ptr[(i+y)*ncols + (j+charPosition)] = bgColor;
 					}
 					else {
@@ -98,35 +105,11 @@ void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string, uint32_t fo
 
 				}
 			}
+			// Point to the next character of the string
 			stringIndex++;
+			// Point to the next character position on the screen
 			charPosition += FONTWIDTH;
 		}
 	}
 }
 
-void DisplayHelper::drawChar(uint32_t x, uint32_t y, char ch, uint32_t fontColor, uint32_t bgColor) {
-#define FONTWIDTH	6
-#define FONTHEIGHT	8
-
-	uint32_t nrows = lcd->getHeight();
-	uint32_t ncols = lcd->getWidth();
-	uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
-
-	if( (ch < 0x20) || (ch > 0x7f) ) {
-		ch = 0x20;		/* unknown character will be set to blank */
-	}
-
-	if(x < ncols && y < nrows) {
-		for (uint32_t i=0; i<FONTHEIGHT; i++) {
-			for (uint32_t j=0; j<FONTWIDTH; j++) {
-				if((font5x7[(uint8_t)(ch-' ')][i] & (0x80>>j)) == 0) {
-					lcd_ptr[(i+y)*ncols + (j)] = bgColor;
-				}
-				else {
-					lcd_ptr[(i+y)*ncols + (j)] = fontColor;
-				}
-
-			}
-		}
-	}
-}
