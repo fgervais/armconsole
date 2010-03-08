@@ -12,6 +12,8 @@ class Synchronized {
 public:
 	Synchronized();
 	virtual ~Synchronized();
+
+	virtual void update() = 0;
 };
 
 #endif /* SYNCHRONIZED_H_ */

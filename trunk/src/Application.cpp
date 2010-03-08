@@ -56,19 +56,6 @@ int main() {
 	// Set white background
 	lcd->setBackground(0x00FFFFFF);
 
-	//displayHelper->drawString(0, 50,"String");
-	for(uint32_t i=0; i<17; i++) {
-		Debug::writeLine("Debug 1");
-		Debug::writeLine("Debug 2 longer line longer line longer line longer line longer line longer line longer line longer line longer line longer line");
-	}
-	Debug::writeLine("Debug 3");
-	Debug::writeLine("Debug 4");
-	Debug::writeLine("Debug 3");
-	Debug::writeLine("Debug 4");
-	Debug::writeLine("Debug 3");
-	Debug::writeLine("Debug 4");
-	//Debug::writeLine("Debug 4");
-
 	// Display megaman gif
 	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
 	uint32_t bufferLenght = 480*272;

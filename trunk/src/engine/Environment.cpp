@@ -7,7 +7,7 @@
 
 #include "Environment.h"
 
-Environment::Environment() {
+Environment::Environment(uint32_t height, uint32_t width) {
 
 
 }
