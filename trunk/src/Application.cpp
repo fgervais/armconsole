@@ -15,6 +15,7 @@
 #include "LCDConfiguration.h"
 #include "math.h"
 #include "DisplayHelper.h"
+#include "Debug.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -48,23 +49,37 @@ int main() {
 	LCDControllerDriver* lcd = LPC2478::getLCD();
 	lcd->configure(lcdConfig);
 
-	DisplayHelper* displayHelper = new DisplayHelper(lcd);
+	//DisplayHelper* displayHelper = new DisplayHelper(lcd);
 	// Display megaman screenshot
 	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
 
 	// Set white background
 	lcd->setBackground(0x00FFFFFF);
 
-	displayHelper->drawString(0, 50,"String");
-
-	displayHelper->drawString(0, 100,"   ", 0x00FFFFFF, 0x00000000);
+	//displayHelper->drawString(0, 50,"String");
+	for(uint32_t i=0; i<17; i++) {
+		Debug::writeLine("Debug 1");
+		Debug::writeLine("Debug 2 longer line longer line longer line longer line longer line longer line longer line longer line longer line longer line");
+	}
+	Debug::writeLine("Debug 3");
+	Debug::writeLine("Debug 4");
+	Debug::writeLine("Debug 3");
+	Debug::writeLine("Debug 4");
+	Debug::writeLine("Debug 3");
+	Debug::writeLine("Debug 4");
+	//Debug::writeLine("Debug 4");
 
 	// Display megaman gif
-	/*displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[0][0],35,35);
+	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
+	uint32_t bufferLenght = 480*272;
+	displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[0][0],35,35);
 	while(1) {
 		for(uint8_t i=1;i<11; i++) {
-			displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[i][0],35,35);
-			LPC2478::delay(100000);
+			displayHelper->drawImage(0,0,(uint32_t*)&megaman_running[i][0],35,35);
+			//LPC2478::delay(100000);
+			for (uint32_t i=16800; i<bufferLenght; i++) {
+				*(lcd_ptr++) = 0x00FFFFFF;
+			}
 		}
 	}
 

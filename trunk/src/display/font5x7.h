@@ -7,6 +7,9 @@
 
 #include "font_macro.h"
 
+#define FONTWIDTH	6
+#define FONTHEIGHT	8
+
 /* 5*7 */
 const unsigned char font5x7[][8] =
 {

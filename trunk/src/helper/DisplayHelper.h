@@ -22,7 +22,6 @@ public:
 	void println(uint32_t x, uint32_t y);
 	void drawString(uint32_t x, uint32_t y, char* string);
 	void drawString(uint32_t x, uint32_t y, char* string, uint32_t fontColor, uint32_t bgColor);
-	void drawChar(uint32_t x, uint32_t y, char ch, uint32_t fontColor, uint32_t bgColor);
 
 private:
 	LCDControllerDriver* lcd;
