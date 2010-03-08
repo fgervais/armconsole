@@ -15,3 +15,12 @@ Engine::Engine() {
 Engine::~Engine() {
 
 }
+
+void Engine::start() {
+	// Start tick timer
+
+	// Infinite game loop
+	while(1) {
+
+	}
+}

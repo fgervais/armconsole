@@ -12,6 +12,8 @@ class Engine {
 public:
 	Engine();
 	virtual ~Engine();
+
+	void start();
 };
 
 #endif /* ENGINE_H_ */
