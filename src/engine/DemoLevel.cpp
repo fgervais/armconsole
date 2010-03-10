@@ -8,11 +8,15 @@
 #include "DemoLevel.h"
 
 DemoLevel::DemoLevel() :
-	Environment(10,20) {
+	Environment(10,20,24,24) {
 
 
 }
 
 DemoLevel::~DemoLevel() {
+
+}
+
+void DemoLevel::build() {
 
 }
