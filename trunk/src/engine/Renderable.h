@@ -8,12 +8,14 @@
 #ifndef RENDERABLE_H_
 #define RENDERABLE_H_
 
+class VideoMemory;
+
 class Renderable {
 public:
 	Renderable();
 	virtual ~Renderable();
 
-	virtual void render() = 0;
+	virtual void render(VideoMemory*) = 0;
 };
 
 #endif /* RENDERABLE_H_ */

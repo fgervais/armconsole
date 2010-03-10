@@ -15,3 +15,11 @@ Graphic::Graphic() {
 Graphic::~Graphic() {
 
 }
+
+void Graphic::update() {
+
+}
+
+void Graphic::render() {
+
+}

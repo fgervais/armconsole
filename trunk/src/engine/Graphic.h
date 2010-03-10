@@ -8,12 +8,17 @@
 #ifndef GRAPHIC_H_
 #define GRAPHIC_H_
 
+#include "Synchronized.h"
+#include "Renderable.h"
 #include <stdint.h>
 
-class Graphic {
+class Graphic : public Synchronized, public Renderable {
 public:
 	Graphic();
 	virtual ~Graphic();
+
+	virtual void update();
+	virtual void render();
 
 private:
 	uint32_t height;

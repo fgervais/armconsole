@@ -14,6 +14,8 @@ class DemoLevel: public Environment {
 public:
 	DemoLevel();
 	virtual ~DemoLevel();
+
+	virtual void build();
 };
 
 #endif /* DEMOLEVEL_H_ */
