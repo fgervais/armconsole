@@ -39,6 +39,7 @@ protected:
 	uint8_t set(Hero* hero, uint32_t x, uint32_t y);
 	uint8_t set(Background* background);
 	uint8_t set(Physics* physics);
+	uint8_t set(Perspective* perspective);
 
 private:
 	// Coming from constructor
