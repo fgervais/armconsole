@@ -57,6 +57,7 @@ EVENT = ./event
 USB = ./usb
 DISPLAY = ./display
 ENGINE = ./engine
+LEVELS = ./engine/levels
 
 
 # List C source files here
@@ -82,6 +83,8 @@ CPPSRCARM += $(wildcard ./event/*.cpp)
 CPPSRCARM += $(wildcard ./usb/*.cpp)
 CPPSRCARM += $(wildcard ./display/*.cpp)
 CPPSRCARM += $(wildcard ./engine/*.cpp)
+CPPSRCARM += $(wildcard ./engine/levels/*.cpp)
+
 
 
 # List Assembler source files here.
@@ -146,6 +149,7 @@ EXTRAINCDIRS += $(EVENT)
 EXTRAINCDIRS += $(USB)
 EXTRAINCDIRS += $(DISPLAY)
 EXTRAINCDIRS += $(ENGINE)
+EXTRAINCDIRS += $(LEVELS)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.

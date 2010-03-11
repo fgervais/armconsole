@@ -7,8 +7,8 @@
 
 #include "Background.h"
 
-Background::Background(char* path, uint32_t height, uint32_t width) {
-	this->path = path;
+Background::Background(uint32_t* handle, uint32_t height, uint32_t width) {
+	this->handle = handle;
 	this->height = height;
 	this->width = width;
 }
