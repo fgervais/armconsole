@@ -43,6 +43,7 @@ Environment::Environment(uint32_t height, uint32_t width, uint32_t tileHeight, u
 	hero = 0;
 	background = 0;
 	physics = 0;
+	perspective = 0;
 }
 
 Environment::~Environment() {
@@ -51,19 +52,23 @@ Environment::~Environment() {
 
 void Environment::render(VideoMemory* videoMemory) {
 	Hero::Direction heroDirection = hero->getDirection();
+	int32_t xHeroVelocity = hero->getVelocityX();
+	uint32_t xTileToRender = (xHeroVelocity/tileWidth) + 1;
 
-	if(heroDirection == Hero::Up) {
-		scrollUp(background, hero->getVelocityY());
-	}
-	else if(heroDirection == Hero::Down) {
-		scrollDown(background, -(hero->getVelocityY()));
-	}
-	else if(heroDirection == Hero::Left) {
-		scrollLeft(background, hero->getVelocityX());
+	if(heroDirection == Hero::Left) {
+		scrollRight(background, xHeroVelocity);
+		for(uint32_t i=0; i<heightInTile; i++) {
+			for(uint32_t j=0; j<xTileToRender; j++) {
+				//tile
+			}
+		}
 	}
 	else if(heroDirection == Hero::Right) {
-		scrollRight(background, -(hero->getVelocityX()));
+		scrollLeft(background, -(xHeroVelocity));
 	}
+
+	perspective->x1 += xHeroVelocity;
+	perspective->x2 += xHeroVelocity;
 
 }
 
@@ -146,6 +151,11 @@ uint8_t Environment::set(Background* background) {
  */
 uint8_t Environment::set(Physics* physics) {
 	this->physics = physics;
+	return 0;
+}
+
+uint8_t Environment::set(Perspective* perspective) {
+	this->perspective = perspective;
 	return 0;
 }
 
