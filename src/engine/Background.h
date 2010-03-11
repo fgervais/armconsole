@@ -12,11 +12,11 @@
 
 class Background {
 public:
-	Background(char* path, uint32_t height, uint32_t width);
+	Background(uint32_t* handle, uint32_t height, uint32_t width);
 	virtual ~Background();
 
 private:
-	char* path;
+	uint32_t* handle;
 	uint32_t height;
 	uint32_t width;
 };

@@ -18,6 +18,7 @@ class Hero;
 class VideoMemory;
 class Background;
 class Physics;
+class Perspective;
 
 class Environment : public Synchronized, public Renderable {
 public:
@@ -33,23 +34,34 @@ public:
 	virtual void update();
 
 protected:
-	void add(Sprite sprite, uint32_t x, uint32_t y);
-	void add(Tile tile, uint32_t x, uint32_t y);
-	void set(Hero hero, uint32_t x, uint32_t y);
-	void set(Background* background);
-	void set(Physics physics);
+	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);
+	uint8_t add(Tile* tile, uint32_t x, uint32_t y);
+	uint8_t set(Hero* hero, uint32_t x, uint32_t y);
+	uint8_t set(Background* background);
+	uint8_t set(Physics* physics);
 
 private:
+	// Coming from constructor
 	uint32_t height;
 	uint32_t width;
+	uint32_t tileHeight;
+	uint32_t tileWidth;
 	uint32_t heightInTile;
 	uint32_t widthInTile;
 
 	Tile*** tileMap;
-	Sprite** sprite;
+	Sprite** sprites;
+	uint32_t spriteLimit;
+	uint32_t numberOfSprite;
 	Hero* hero;
 	Background* background;
 	Physics* physics;
+	Perspective* perspective;
+
+	void scrollUp(Background* background, uint32_t numberOfPixel);
+	void scrollDown(Background* background, uint32_t numberOfPixel);
+	void scrollLeft(Background* background, uint32_t numberOfPixel);
+	void scrollRight(Background* background, uint32_t numberOfPixel);
 };
 
 #endif /* ENVIRONMENT_H_ */
