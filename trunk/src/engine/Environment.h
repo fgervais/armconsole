@@ -19,6 +19,7 @@ class VideoMemory;
 class Background;
 class Physics;
 class Perspective;
+class Request;
 
 class Environment : public Synchronized, public Renderable {
 public:
@@ -32,6 +33,8 @@ public:
 	virtual void render(VideoMemory* videoMemory);
 	// Synchronized interface implementation
 	virtual void update();
+
+	void receive(Request request);
 
 protected:
 	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);
