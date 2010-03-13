@@ -19,7 +19,7 @@
 
 #include "irq.h"
 #include "swi.h"
-//#include "megaman.h"
+#include "megaman.h"
 //#include "megaman_running.h"
 
 #include <stdint.h>
@@ -49,12 +49,21 @@ int main() {
 	LCDControllerDriver* lcd = LPC2478::getLCD();
 	lcd->configure(lcdConfig);
 
-	//DisplayHelper* displayHelper = new DisplayHelper(lcd);
+	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 	// Display megaman screenshot
-	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
+	displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
+
+	// Scroll the megaman screenshot
+	while(1) {
+		//for(uint32_t i=0; i<1920; i++) {
+		for(uint32_t i=0; i<486; i++) {
+			LCD->LCD_UPBASE = 0xA0000000 + (i<<2);
+			LPC2478::delay(16000);
+		}
+	}
 
 	// Set white background
-	lcd->setBackground(0x00FFFFFF);
+	//lcd->setBackground(0x00FFFFFF);
 
 	// Display megaman gif
 	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();

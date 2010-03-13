@@ -11,9 +11,10 @@
 class LCDConfiguration;
 
 #include "LPC23xx.h"
+#include "Peripheral.h"
 #include <stdint.h>
 
-class LCDControllerDriver {
+class LCDControllerDriver : public Peripheral {
 public:
 	LCDControllerDriver(LCD_Typedef* lcdRegisters);
 	virtual ~LCDControllerDriver();
