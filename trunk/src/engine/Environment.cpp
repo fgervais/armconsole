@@ -53,17 +53,18 @@ Environment::~Environment() {
 void Environment::render(VideoMemory* videoMemory) {
 	Hero::Direction heroDirection = hero->getDirection();
 	int32_t xHeroVelocity = hero->getVelocityX();
-	uint32_t xTileToRender = (xHeroVelocity/tileWidth) + 1;
+
+	visibleArea->x1 += xHeroVelocity;
+	visibleArea->x2 += xHeroVelocity;
 
 	if(heroDirection == Hero::Left) {
-		// Scroll background
-		scrollRight(background, xHeroVelocity);
+		// Render background
 
 		// Add new background section
 
-		// Render new tiles
+		// Render tiles
 		for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
-			for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x1/tileWidth)+xTileToRender; j++) {
+			for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
 				tileMap[i][j]->render(videoMemory);
 			}
 		}
@@ -71,9 +72,6 @@ void Environment::render(VideoMemory* videoMemory) {
 	else if(heroDirection == Hero::Right) {
 		scrollLeft(background, -(xHeroVelocity));
 	}
-
-	visibleArea->x1 += xHeroVelocity;
-	visibleArea->x2 += xHeroVelocity;
 
 }
 
@@ -160,6 +158,10 @@ void Environment::set(VisibleArea* visibleArea) {
 /*
  * PRIVATE FUNCTIONS
  */
+
+void Environment::renderBackground() {
+
+}
 
 void Environment::scrollUp(Background* background, uint32_t numberOfPixel) {
 
