@@ -10,6 +10,8 @@
 
 #include "Graphic.h"
 
+class Environment;
+
 class Sprite: public Graphic {
 public:
 	Sprite(uint32_t height, uint32_t width, uint32_t** handles, uint32_t numberOfFrame);

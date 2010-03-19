@@ -8,7 +8,7 @@
 #include "Level1.h"
 
 Level1::Level1()
-	: Environment(480, 240, 24, 24) {
+	: Environment(480, 272, 16, 16) {
 
 }
 

@@ -8,10 +8,14 @@
 #ifndef DMACONFIGURATION_H_
 #define DMACONFIGURATION_H_
 
+#include "DMAChannel.h"
+
 class DMAConfiguration {
 public:
 	DMAConfiguration();
 	virtual ~DMAConfiguration();
+
+	DMACCxLLI* lli;
 };
 
 #endif /* DMACONFIGURATION_H_ */
