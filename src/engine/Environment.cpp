@@ -11,7 +11,7 @@
 #include "Hero.h"
 #include "Background.h"
 #include "Physics.h"
-#include "Perspective.h"
+#include "VisibleArea.h"
 
 Environment::Environment(uint32_t height, uint32_t width, uint32_t tileHeight, uint32_t tileWidth) {
 	this->height = height;
@@ -43,7 +43,7 @@ Environment::Environment(uint32_t height, uint32_t width, uint32_t tileHeight, u
 	hero = 0;
 	background = 0;
 	physics = 0;
-	perspective = 0;
+	visibleArea = 0;
 }
 
 Environment::~Environment() {
@@ -56,10 +56,15 @@ void Environment::render(VideoMemory* videoMemory) {
 	uint32_t xTileToRender = (xHeroVelocity/tileWidth) + 1;
 
 	if(heroDirection == Hero::Left) {
+		// Scroll background
 		scrollRight(background, xHeroVelocity);
-		for(uint32_t i=0; i<heightInTile; i++) {
-			for(uint32_t j=0; j<xTileToRender; j++) {
-				//tile
+
+		// Add new background section
+
+		// Render new tiles
+		for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
+			for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x1/tileWidth)+xTileToRender; j++) {
+				tileMap[i][j]->render(videoMemory);
 			}
 		}
 	}
@@ -67,8 +72,8 @@ void Environment::render(VideoMemory* videoMemory) {
 		scrollLeft(background, -(xHeroVelocity));
 	}
 
-	perspective->x1 += xHeroVelocity;
-	perspective->x2 += xHeroVelocity;
+	visibleArea->x1 += xHeroVelocity;
+	visibleArea->x2 += xHeroVelocity;
 
 }
 
@@ -124,39 +129,32 @@ uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
  * @param hero Hero to be set.
  * @param x X position in pixel
  * @param y Y position in pixel
- * @return 0 if the hero is successfully set. 1 otherwise.
  */
-uint8_t Environment::set(Hero* hero, uint32_t x, uint32_t y) {
+void Environment::set(Hero* hero, uint32_t x, uint32_t y) {
 	this->hero = hero;
 	hero->setPosition(x,y);
-	return 0;
 }
 
 /**
  * Set the environment background.
  *
  * @param background Background to be set
- * @return 0 if the background is successfully set. 1 otherwise.
  */
-uint8_t Environment::set(Background* background) {
+void Environment::set(Background* background) {
 	this->background = background;
-	return 0;
 }
 
 /**
  * Set the environment physics.
  *
  * @param physics Physics to be set
- * @return 0 if the physics is successfully set. 1 otherwise.
  */
-uint8_t Environment::set(Physics* physics) {
+void Environment::set(Physics* physics) {
 	this->physics = physics;
-	return 0;
 }
 
-uint8_t Environment::set(Perspective* perspective) {
-	this->perspective = perspective;
-	return 0;
+void Environment::set(VisibleArea* visibleArea) {
+	this->visibleArea = visibleArea;
 }
 
 /*

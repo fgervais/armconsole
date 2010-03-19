@@ -18,7 +18,7 @@ class Hero;
 class VideoMemory;
 class Background;
 class Physics;
-class Perspective;
+class VisibleArea;
 class Request;
 
 class Environment : public Synchronized, public Renderable {
@@ -35,14 +35,15 @@ public:
 	virtual void update();
 
 	void receive(Request request);
+	VisibleArea* getVisibleArea() { return visibleArea; };
 
 protected:
 	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);
 	uint8_t add(Tile* tile, uint32_t x, uint32_t y);
-	uint8_t set(Hero* hero, uint32_t x, uint32_t y);
-	uint8_t set(Background* background);
-	uint8_t set(Physics* physics);
-	uint8_t set(Perspective* perspective);
+	void set(Hero* hero, uint32_t x, uint32_t y);
+	void set(Background* background);
+	void set(Physics* physics);
+	void set(VisibleArea* visibleArea);
 
 private:
 	// Coming from constructor
@@ -60,7 +61,7 @@ private:
 	Hero* hero;
 	Background* background;
 	Physics* physics;
-	Perspective* perspective;
+	VisibleArea* visibleArea;
 
 	void scrollUp(Background* background, uint32_t numberOfPixel);
 	void scrollDown(Background* background, uint32_t numberOfPixel);
