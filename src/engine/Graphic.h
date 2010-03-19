@@ -35,6 +35,7 @@ private:
 	uint32_t width;
 	uint32_t** handles;
 	uint32_t numberOfFrame;
+	uint32_t currentFrame;
 	uint32_t positionX;
 	uint32_t positionY;
 	Environment* environment;

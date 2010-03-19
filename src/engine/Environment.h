@@ -63,6 +63,7 @@ private:
 	Physics* physics;
 	VisibleArea* visibleArea;
 
+	void renderBackground();
 	void scrollUp(Background* background, uint32_t numberOfPixel);
 	void scrollDown(Background* background, uint32_t numberOfPixel);
 	void scrollLeft(Background* background, uint32_t numberOfPixel);
