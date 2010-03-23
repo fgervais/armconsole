@@ -63,11 +63,10 @@ private:
 	Physics* physics;
 	VisibleArea* visibleArea;
 
-	void renderBackground();
-	void scrollUp(Background* background, uint32_t numberOfPixel);
-	void scrollDown(Background* background, uint32_t numberOfPixel);
-	void scrollLeft(Background* background, uint32_t numberOfPixel);
-	void scrollRight(Background* background, uint32_t numberOfPixel);
+	void renderBackground(VideoMemory* videoMemory);
+	void renderTiles(VideoMemory* videoMemory);
+	void renderHero(VideoMemory* videoMemory);
+	void renderSprites(VideoMemory* videoMemory);
 };
 
 #endif /* ENVIRONMENT_H_ */
