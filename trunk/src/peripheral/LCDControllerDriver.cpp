@@ -104,7 +104,7 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 
 	lcdRegisters->LCD_LE = 0;	//disable LE pin
 
-	lcdRegisters->LCD_UPBASE = config.bufferBaseAddress + 0x3C0;
+	lcdRegisters->LCD_UPBASE = config.bufferBaseAddress;
 
 	regVal = 0;
 	regVal |= (5 << 1); //24 bpp

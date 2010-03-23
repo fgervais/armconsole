@@ -254,5 +254,59 @@ void LPC2478::delay(uint32_t usec) {
 		asm("nop");
 		asm("nop");
 		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+
+		asm("nop");
+		asm("nop");
 	}
 }
