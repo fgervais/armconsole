@@ -51,27 +51,22 @@ Environment::~Environment() {
 }
 
 void Environment::render(VideoMemory* videoMemory) {
-	Hero::Direction heroDirection = hero->getDirection();
-	int32_t xHeroVelocity = hero->getVelocityX();
+	int32_t heroVelocityX = hero->getVelocityX();
 
-	visibleArea->x1 += xHeroVelocity;
-	visibleArea->x2 += xHeroVelocity;
+	visibleArea->x1 += heroVelocityX;
+	visibleArea->x2 += heroVelocityX;
 
-	if(heroDirection == Hero::Left) {
-		// Render background
+	// Render background
+	renderBackground();
 
-		// Add new background section
-
-		// Render tiles
-		for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
-			for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
-				tileMap[i][j]->render(videoMemory);
-			}
+	// Render tiles
+	for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
+		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
+			tileMap[i][j]->render(videoMemory);
 		}
 	}
-	else if(heroDirection == Hero::Right) {
-		scrollLeft(background, -(xHeroVelocity));
-	}
+
+	// Render sprites
 
 }
 

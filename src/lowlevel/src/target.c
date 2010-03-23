@@ -62,7 +62,7 @@ void ConfigurePLL ( void )
 
     CLKSRCSEL = 0x1;		/* select main OSC as the PLL clock source */
 
-    PLLCFG = PLL_MValue | (PLL_NValue << 16);
+    PLLCFG = (PLL_MValue-1) | ((PLL_NValue-1) << 16);
     PLLFEED = 0xaa;
     PLLFEED = 0x55;
 
@@ -70,14 +70,14 @@ void ConfigurePLL ( void )
     PLLFEED = 0xaa;
     PLLFEED = 0x55;
 
-    CCLKCFG = CCLKDivValue;	/* Set clock divider */
-    USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
+    CCLKCFG = CCLKDivValue-1;		/* Set clock divider */
+    USBCLKCFG = USBCLKDivValue-1;	/* usbclk = 288 MHz/6 = 48 MHz */
     LCD_CFG = LCDCLKDivValue-1;		/* LCD panel clock = 72 MHz/8 = 9 MHz */
 
     while ( ((PLLSTAT & (1 << 26)) == 0) );	/* Check lock bit status */
 
-    MValue = PLLSTAT & 0x00007FFF;
-    NValue = (PLLSTAT & 0x00FF0000) >> 16;
+    MValue = (PLLSTAT & 0x00007FFF) + 1;
+    NValue = ((PLLSTAT & 0x00FF0000) >> 16) + 1;
     while ((MValue != PLL_MValue) && ( NValue != PLL_NValue) );
 
     PLLCON = 3;				/* enable and connect */
