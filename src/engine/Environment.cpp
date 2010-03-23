@@ -51,27 +51,25 @@ Environment::~Environment() {
 }
 
 void Environment::render(VideoMemory* videoMemory) {
-	int32_t heroVelocityX = hero->getVelocityX();
-
-	visibleArea->x1 += heroVelocityX;
-	visibleArea->x2 += heroVelocityX;
-
 	// Render background
-	renderBackground();
+	renderBackground(videoMemory);
 
 	// Render tiles
-	for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
-		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
-			tileMap[i][j]->render(videoMemory);
-		}
-	}
+	renderTiles(videoMemory);
+
+	// Render Hero
+	renderHero(videoMemory);
 
 	// Render sprites
+	renderSprites(videoMemory);
 
 }
 
 void Environment::update() {
+	int32_t heroVelocityX = hero->getVelocityX();
 
+	visibleArea->x1 += heroVelocityX;
+	visibleArea->x2 += heroVelocityX;
 }
 
 /*
@@ -154,22 +152,22 @@ void Environment::set(VisibleArea* visibleArea) {
  * PRIVATE FUNCTIONS
  */
 
-void Environment::renderBackground() {
+void Environment::renderBackground(VideoMemory* videoMemory) {
 
 }
 
-void Environment::scrollUp(Background* background, uint32_t numberOfPixel) {
+void Environment::renderTiles(VideoMemory* videoMemory) {
+	for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
+		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
+			tileMap[i][j]->render(videoMemory);
+		}
+	}
+}
+
+void Environment::renderHero(VideoMemory* videoMemory) {
 
 }
 
-void Environment::scrollDown(Background* background, uint32_t numberOfPixel) {
-
-}
-
-void Environment::scrollLeft(Background* background, uint32_t numberOfPixel) {
-
-}
-
-void Environment::scrollRight(Background* background, uint32_t numberOfPixel) {
+void Environment::renderSprites(VideoMemory* videoMemory) {
 
 }
