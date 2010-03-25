@@ -9,8 +9,14 @@
 #define MEMORY_H_
 
 #include <stdint.h>
+#include "Vector.h"
 
 class Memory;
+
+struct MemoryChunk {
+	void* pointer;
+	uint32_t length;
+};
 
 /**
  * This class is used to manage a memory pool.
@@ -40,12 +46,19 @@ public:
 	Memory(void* poolLocation, uint32_t poolSize);
 	virtual ~Memory();
 
-	void* alloc(uint32_t size);
-	void* alloc(uint32_t size, uint32_t align);
-	void dealloc(void* ptr);
+	void* allocate(uint32_t size);
+	void* allocate(uint32_t size, uint32_t align);
+	//void free(void* ptr);
+	void free();
 
 private:
-	Memory* usbMemory;
+	Vector<MemoryChunk*> allocationList;
+
+	// Memory pool management variables
+	uint8_t* poolLocation;
+	// Point to the next free spot in the pool
+	uint8_t* freeMemoryPointer;
+	uint32_t poolSize;
 };
 
 #endif /* MEMORY_H_ */
