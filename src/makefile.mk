@@ -58,11 +58,13 @@ USB = ./usb
 DISPLAY = ./display
 ENGINE = ./engine
 LEVELS = ./engine/levels
+FILESYSTEM = ./filesystem
 
 
 # List C source files here
 SRC  = $(LOWLEVEL)/src/target.c
 SRC += $(LOWLEVEL)/src/irq.c
+SRC += $(wildcard ./filesystem/ff7e/src/*.c)
 
 
 # List C source files here which must be compiled in ARM-Mode.
@@ -150,6 +152,7 @@ EXTRAINCDIRS += $(USB)
 EXTRAINCDIRS += $(DISPLAY)
 EXTRAINCDIRS += $(ENGINE)
 EXTRAINCDIRS += $(LEVELS)
+EXTRAINCDIRS += $(FILESYSTEM)/ff7e/src
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.
