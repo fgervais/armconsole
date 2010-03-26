@@ -16,6 +16,7 @@
 #include "irq.h"
 #include "LPC2478.h"
 #include "HostControllerDriver.h"
+#include "Debug.h"
 
 /* Initialize the interrupt controller */
 /******************************************************************************
@@ -131,8 +132,16 @@ void armcore1_irq_handler( void ) {
 
 }
 
+extern void disk_timerproc();
 void timer0_irq_handler( void ) {
+	T0IR |= 1;
 
+	//debug
+	Debug::writeLine("Timer interrupt!");
+	while(1);
+
+	// sd_spi_lpc200.c
+	disk_timerproc();
 }
 
 void timer1_irq_handler( void ) {

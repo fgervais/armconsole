@@ -20,7 +20,7 @@
 #include "irq.h"
 #include "swi.h"
 //#include "megaman.h"
-#include "megaman_running.h"
+//#include "megaman_running.h"
 
 #include <stdint.h>
 
@@ -49,6 +49,24 @@ int main() {
 	LCDControllerDriver* lcd = LPC2478::getLCD();
 	lcd->configure(lcdConfig);
 
+	/*
+	 * SD Card and file system section
+	 *
+	 * This is all C for now
+	 */
+	Debug::writeLine("Init Timer");
+	T0TCR = 0;				/* Disable Timer */
+	T0MR0 = 720000 - 1;		/* 72M / 100 = 720000 */
+	T0MCR = 0x3;			/* Clear TC and Interrupt on MR0 match */
+	T0TCR = 1;				/* Enable Timer */
+	VICIntSelect &= ~(1 << TIMER0_INT); // IRQ Category (Not FIQ)
+	VICIntEnable |= (1 << TIMER0_INT);
+
+	IntEnable();
+
+	while(1);
+
+
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 	// Display megaman screenshot
 	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
@@ -66,7 +84,7 @@ int main() {
 	lcd->setBackground(0x00FFFFFF);
 
 	// Display megaman gif
-	uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
+	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
 	uint32_t bufferLenght = 480*272;
 	displayHelper->drawImage(50,50,(uint32_t*)&megaman_running[0][0],35,35);
 	while(1) {
@@ -77,7 +95,7 @@ int main() {
 				*(lcd_ptr++) = 0x00FFFFFF;
 			}
 		}
-	}
+	}*/
 
 	led->setLow();
 
