@@ -65,6 +65,12 @@ DRESULT disk_ioctl (BYTE, BYTE, void*);
 #define ATA_GET_MODEL		21
 #define ATA_GET_SN			22
 
+/* Card type flags (CardType) */
+#define CT_MMC				0x01
+#define CT_SD1				0x02
+#define CT_SD2				0x04
+#define CT_SDC				(CT_SD1|CT_SD2)
+#define CT_BLOCK			0x08
 
 #define _DISKIO
 #endif

@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------*/
-/* MMC/SDSC/SDHC (in SPI mode) control module for LPC2xxx SSP            */
+/* MMC/SDSC/SDHC (in SPI mode) control module for LPC2xxx SSP1            */
 /* (C) Martin Thomas, 2009 - based on the AVR module (C)ChaN, 2007       */
 /*-----------------------------------------------------------------------*/
 
@@ -36,7 +36,7 @@
  * Martin Thomas 5/2009
  * - inspired by the EFSL interface-driver by Mike Anton and me
  * - using ChaN's driver-skeleton from his AVR mmc.c
- * - This code is for the SSP-Interface ("SPI1") and fast-IO (FIO).
+ * - This code is for the SSP1-Interface ("SPI1") and fast-IO (FIO).
  *   It is not prepared for "old style" SPI or "legacy/slow" IO
  * - Olimex LPC-P2148: P0.17 SD-Card clock, P0.18 from SD-Card,
      P0.19 to SD-Card, P0.20 SD-Card select - NO ext. pull-up mounted
@@ -102,13 +102,13 @@ BYTE CardType;			/* b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing */
 // that trace is disable to use them for GPIO
 #ifndef SD_SOCKET_WP_PIN
 // Pin connected to the Write-Protect WP switch of the card socket
-#define SD_SOCKET_WP_PIN       24
+#define SD_SOCKET_WP_PIN       7
 #define SD_SOCKET_WP_DIR       FIO1DIR
 #define SD_SOCKET_WP_IN        FIO1PIN
 #endif
 #ifndef SD_SOCKET_INS_PIN
 /// Pin connected to the Insert/Card Detect switch of the card socket
-#define SD_SOCKET_INS_PIN       25
+#define SD_SOCKET_INS_PIN       13
 #define SD_SOCKET_INS_DIR       FIO1DIR
 #define SD_SOCKET_INS_IN        FIO1PIN
 #endif
@@ -190,28 +190,28 @@ static void init_SOCKPOWER( void )
 /* SPI-Interface (Platform dependent, mthomas)                           */
 /*-----------------------------------------------------------------------*/
 
-#define SSPCR0_DSS      0
-#define SSPCR0_CPOL     6
-#define SSPCR0_CPHA     7
-#define SSPCR0_SCR      8
-#define SSPCR1_SSE      1
-#define SSPSR_TNF       1
-#define SSPSR_RNE       2
-#define SSPSR_BSY       4
+#define SSP1CR0_DSS      0
+#define SSP1CR0_CPOL     6
+#define SSP1CR0_CPHA     7
+#define SSP1CR0_SCR      8
+#define SSP1CR1_SSE      1
+#define SSP1SR_TNF       1
+#define SSP1SR_RNE       2
+#define SSP1SR_BSY       4
 
 #define PCONP_PCSPI1    10
 
-#define SD_CS_BIT       20
+#define SD_CS_BIT       11
 #define SD_CS_DIR       FIO0DIR
 #define SD_CS_SET       FIO0SET
 #define SD_CS_CLR       FIO0CLR
 #define SD_CS_SEL       PINSEL1
 #define SD_CS_SEL_BIT   8
 
-// bit-frequency = PCLK / (CPSDVSR * [SCR+1]), here SCR=0, PCLK=60MHz, must be even
-#define SPI_SPEED_20MHz		4	/* => 15MHz */
-#define SPI_SPEED_25MHz		4	/* => 15MHz */
-#define SPI_SPEED_400kHz  150	/* => 400kHz */
+// bit-frequency = PCLK / (CPSDVSR * [SCR+1]), here SCR=0, PCLK=72MHz, must be even
+#define SPI_SPEED_20MHz		4	/* => 18MHz */
+#define SPI_SPEED_25MHz		4	/* => 18MHz */
+#define SPI_SPEED_400kHz  180	/* => 400kHz */
 
 
 // select card ( MMC CS = L )
@@ -233,7 +233,7 @@ static void spiSetSpeed(BYTE speed)
 	if ( speed < 2  ) {
 		speed = 2 ;
 	}
-	SSPCPSR = speed;
+	SSP1CPSR = speed;
 }
 
 /* general SPI send/receive */
@@ -241,10 +241,10 @@ static inline BYTE spi_write_read( BYTE outgoing )
 {
 	BYTE incoming;
 
-	/// while( !( SSPSR & (1 << SSPSR_TNF ) ) ) { ; }
-	SSPDR = outgoing;
-	while( !( SSPSR & ( 1 << SSPSR_RNE ) ) ) { ; }
-	incoming = SSPDR;
+	/// while( !( SSP1SR & (1 << SSP1SR_TNF ) ) ) { ; }
+	SSP1DR = outgoing;
+	while( !( SSP1SR & ( 1 << SSP1SR_RNE ) ) ) { ; }
+	incoming = SSP1DR;
 
 	return incoming;
 }
@@ -268,26 +268,26 @@ static inline void spi_rcvr_block (
 		startcnt = FIFO_ELEM;
 	}
 
-	SSPCR0 |= 0x0000000f;  // DSS to 16 bit
+	SSP1CR0 |= 0x0000000f;  // DSS to 16 bit
 
 	for ( i = startcnt; i; i-- ) {
-		SSPDR = 0xffff;  // fill TX FIFO
+		SSP1DR = 0xffff;  // fill TX FIFO
 	}
 
 	do {
-		while ( !(SSPSR & ( 1 << SSPSR_RNE ) ) ) {
+		while ( !(SSP1SR & ( 1 << SSP1SR_RNE ) ) ) {
 			// wait for data in RX FIFO (RNE set)
 		}
-		rec = SSPDR;
+		rec = SSP1DR;
 		if ( i < ( hwtr - startcnt ) ) {
-			SSPDR = 0xffff;
+			SSP1DR = 0xffff;
 		}
 		*buff++ = (BYTE)(rec>>8);
 		*buff++ = (BYTE)(rec);
 		i++;
 	} while ( i < hwtr );
 
-	SSPCR0 &= ~0x00000008;  // DSS to 8 bit
+	SSP1CR0 &= ~0x00000008;  // DSS to 8 bit
 }
 
 static inline void spi_xmit_block (
@@ -297,25 +297,25 @@ static inline void spi_xmit_block (
 	UINT cnt;
 	WORD data;
 
-	SSPCR0 |= 0x0000000f;  // DSS to 16 bit
+	SSP1CR0 |= 0x0000000f;  // DSS to 16 bit
 
 	for ( cnt = 0; cnt < ( 512 / 2 ); cnt++ ) {
-		while ( !( SSPSR & ( 1 << SSPSR_TNF ) ) ) {
+		while ( !( SSP1SR & ( 1 << SSP1SR_TNF ) ) ) {
 			// wait for TX FIFO not full (TNF)
 		}
 		data  = (*buff++) << 8;
 		data |= *buff++;
-		SSPDR = data;
+		SSP1DR = data;
 	}
 
-	while ( SSPSR & ( 1 << SSPSR_BSY ) ) {
+	while ( SSP1SR & ( 1 << SSP1SR_BSY ) ) {
 		// wait for BSY gone
 	}
-	while ( SSPSR & ( 1 << SSPSR_RNE ) ) {
-		data = SSPDR; // drain receive FIFO
+	while ( SSP1SR & ( 1 << SSP1SR_RNE ) ) {
+		data = SSP1DR; // drain receive FIFO
 	}
 
-	SSPCR0 &= ~0x00000008;  // DSS to 8 bit
+	SSP1CR0 &= ~0x00000008;  // DSS to 8 bit
 }
 #endif /* USE_FIFO */
 
@@ -329,39 +329,39 @@ static void init_spi( void )
 	SD_CS_DIR |= (1UL << SD_CS_BIT);
 	DESELECT();
 
-	// enable SSP power
+	// enable SSP1 power
 	PCONP |= (1UL << PCONP_PCSPI1);
 
 	// reset pin-functions
-	PINSEL1 &= ~(
-		(3UL << 2) | // SCK
-		(3UL << 4) | // MISO
-		(3UL << 6) | // MOSI
-		(3UL << 8)   // SSEL
+	PINSEL9 &= ~(
+		(3UL << 8) | // SCK
+		(3UL << 10) | // SSEL
+		(3UL << 12) | // MISO
+		(3UL << 14)   // MOSI
 	);
-	// set pin-functions to SSP
-	PINSEL1 |= (
-		(2UL << 2) | // SCK
-		(2UL << 4) | // MISO
-		(2UL << 6)   // MOSI
+	// set pin-functions to SSP1
+	PINSEL9 |= (
+			(3UL << 8) | // SCK
+			(3UL << 12) | // MISO
+			(3UL << 14)  // MOSI
 		// slave-select handled though GPIO
 	);
 
 	// configure and enable as SPI-Master
-	SSPCR0 = ((8-1) << SSPCR0_DSS) | (0 << SSPCR0_CPOL) |
-		(0 << SSPCR0_CPHA ) | (0 << SSPCR0_SCR);
-	SSPCR1 = (1 << SSPCR1_SSE);
+	SSP1CR0 = ((8-1) << SSP1CR0_DSS) | (0 << SSP1CR0_CPOL) |
+		(0 << SSP1CR0_CPHA ) | (0 << SSP1CR0_SCR);
+	SSP1CR1 = (1 << SSP1CR1_SSE);
 
 	// slow during initialization
 	spiSetSpeed( SPI_SPEED_400kHz );
 
-	// wait for SSP idle)
-	while( SSPSR & ( 1 << SSPSR_BSY ) ) {
+	// wait for SSP1 idle)
+	while( SSP1SR & ( 1 << SSP1SR_BSY ) ) {
 		// wait for busy gone
 	}
 
-	while( SSPSR & ( 1 << SSPSR_RNE ) ) {
-		dummy = SSPDR; // drain SPI RX FIFO
+	while( SSP1SR & ( 1 << SSP1SR_RNE ) ) {
+		dummy = SSP1DR; // drain SPI RX FIFO
 	}
 }
 
@@ -369,17 +369,17 @@ static void init_spi( void )
 static void close_spi( void )
 {
 	// disable SPI
-	SSPCR1 = 0;
+	SSP1CR1 = 0;
 
 	// Pins to GPIO
-	PINSEL1 &= ~(
-		(3UL << 2) | // SCK
-		(3UL << 4) | // MISO
-		(3UL << 6) | // MOSI
-		(3UL << 8)   // SEL
+	PINSEL9 &= ~(
+		(3UL << 8) | // SCK
+		(3UL << 10) | // SSEL
+		(3UL << 12) | // MISO
+		(3UL << 14)   // MOSI
 	);
 
-	// disable SSP power
+	// disable SSP1 power
 	PCONP &= ~(1UL << PCONP_PCSPI1);
 
 }
@@ -790,7 +790,7 @@ DRESULT disk_ioctl (
 )
 {
 	DRESULT res;
-	BYTE n, csd[16], *ptr = buff;
+	BYTE n, csd[16], *ptr = (BYTE *)buff;
 	WORD csize;
 
 
