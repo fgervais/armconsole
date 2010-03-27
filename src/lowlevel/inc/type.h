@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   type.h:  Type definition Header file for NXP LPC230x Family 
+ *   type.h:  Type definition Header file for NXP LPC230x Family
  *   Microprocessors
  *
  *   Copyright(C) 2006, NXP Semiconductor
@@ -27,6 +27,6 @@
 typedef unsigned char  BYTE;
 typedef unsigned short WORD;
 typedef unsigned long  DWORD;
-typedef unsigned int   BOOL;
+//typedef unsigned int   BOOL;
 
 #endif  /* __TYPE_H__ */

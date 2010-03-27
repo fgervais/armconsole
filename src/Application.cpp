@@ -16,6 +16,7 @@
 #include "math.h"
 #include "DisplayHelper.h"
 #include "Debug.h"
+#include "ff.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -49,6 +50,9 @@ int main() {
 	LCDControllerDriver* lcd = LPC2478::getLCD();
 	lcd->configure(lcdConfig);
 
+	// Set background
+	lcd->setBackground(0x00FFFFFF);
+
 	/*
 	 * SD Card and file system section
 	 *
@@ -63,6 +67,30 @@ int main() {
 	VICIntEnable |= (1 << TIMER0_INT);
 
 	IntEnable();
+
+	FRESULT f_err_code;
+	FATFS FATFS_Obj[1];
+	FIL fsrc;
+
+	f_err_code = f_mount(0, &FATFS_Obj[0]);
+
+	if(f_err_code == 0) {
+		Debug::writeLine("SD card mounted");
+	}
+	else {
+		Debug::writeLine("Failed to mount SD card");
+	}
+
+	f_err_code = f_open(&fsrc, "0:mmx1.bmp", FA_OPEN_EXISTING | FA_READ);
+
+	if(f_err_code == 0) {
+		Debug::writeLine("File opened");
+	}
+	else {
+		Debug::writeLine("Failed to open file");
+	}
+
+	f_close(&fsrc);
 
 	while(1);
 
@@ -79,9 +107,6 @@ int main() {
 			LPC2478::delay(16000);
 		}
 	}*/
-
-	// Set background
-	lcd->setBackground(0x00FFFFFF);
 
 	// Display megaman gif
 	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
