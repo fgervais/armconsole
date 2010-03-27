@@ -136,10 +136,6 @@ extern void disk_timerproc();
 void timer0_irq_handler( void ) {
 	T0IR |= 1;
 
-	//debug
-	Debug::writeLine("Timer interrupt!");
-	while(1);
-
 	// sd_spi_lpc200.c
 	disk_timerproc();
 }
