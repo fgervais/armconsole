@@ -42,7 +42,7 @@ Console::~Console() {
  *
  * @param string Line to be written
  */
-void Console::writeLine(char* string) {
+void Console::writeLine(const char* string) {
 	uint32_t j;
 
 	if(bottomReached) {

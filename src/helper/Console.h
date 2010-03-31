@@ -22,7 +22,7 @@ public:
 	Console(LCDControllerDriver* lcd);
 	virtual ~Console();
 
-	void writeLine(char* string);
+	void writeLine(const char* string);
 
 private:
 	LCDControllerDriver* lcd;

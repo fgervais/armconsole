@@ -17,6 +17,7 @@
 #include "DisplayHelper.h"
 #include "Debug.h"
 #include "ff.h"
+#include "Bitmap.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -53,6 +54,8 @@ int main() {
 	// Set background
 	lcd->setBackground(0x00FFFFFF);
 
+	DisplayHelper* displayHelper = new DisplayHelper(lcd);
+
 	/*
 	 * SD Card and file system section
 	 *
@@ -70,7 +73,6 @@ int main() {
 
 	FRESULT f_err_code;
 	FATFS FATFS_Obj[1];
-	FIL fsrc;
 
 	f_err_code = f_mount(0, &FATFS_Obj[0]);
 
@@ -81,21 +83,12 @@ int main() {
 		Debug::writeLine("Failed to mount SD card");
 	}
 
-	f_err_code = f_open(&fsrc, "0:mmx1.bmp", FA_OPEN_EXISTING | FA_READ);
-
-	if(f_err_code == 0) {
-		Debug::writeLine("File opened");
-	}
-	else {
-		Debug::writeLine("Failed to open file");
-	}
-
-	f_close(&fsrc);
+	Bitmap* bitmap = new Bitmap("0:mmx1.bmp");
+	bitmap->load();
+	displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
 
 	while(1);
 
-
-	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 	// Display megaman screenshot
 	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
 
