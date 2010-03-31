@@ -21,7 +21,7 @@ Debug::~Debug() {
 
 }
 
-void Debug::writeLine(char* string) {
+void Debug::writeLine(const char* string) {
 	//TODO: This is a hack since it should be called from the constructor
 	if(console == 0) {
 		console = new Console(LPC2478::getLCD());

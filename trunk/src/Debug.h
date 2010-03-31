@@ -15,7 +15,7 @@ public:
 	Debug();
 	virtual ~Debug();
 
-	static void writeLine(char* string);
+	static void writeLine(const char* string);
 
 private:
 	static Console* console;
