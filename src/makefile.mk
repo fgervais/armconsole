@@ -64,6 +64,7 @@ FILESYSTEM = ./filesystem
 # List C source files here
 SRC  = $(LOWLEVEL)/src/target.c
 SRC += $(LOWLEVEL)/src/irq.c
+#SRC += $(LOWLEVEL)/src/syscalls.c
 SRC += $(wildcard ./filesystem/ff7e/src/*.c)
 
 
