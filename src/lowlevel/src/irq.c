@@ -38,7 +38,7 @@ void init_VIC(void)
     VICVectAddr = 0;
     VICIntSelect = 0;
 
-    static DWORD isr_vector_table[VIC_SIZE] = {
+    DWORD isr_vector_table[VIC_SIZE] = {
     		(DWORD)wdt_irq_handler,
     		(DWORD)swi_irq_handler,
     		(DWORD)armcore0_irq_handler,

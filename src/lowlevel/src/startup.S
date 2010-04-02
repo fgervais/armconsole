@@ -86,7 +86,7 @@
 Stack_Mem:
 .space Stack_Size
 @.equ Stack_Top, Stack_Mem + Stack_Size
-.equ Stack_Top,	__stack
+@.equ Stack_Top,	__stack
 
 
 @// <h> Heap Configuration
@@ -159,14 +159,14 @@ Reset_Handler:
 @                BL   TargetResetInit
 
                  .extern TargetResetInit
-                 LDR     SP, =Stack_Top    @ temporary stack at Stack_Top
+				 LDR     SP, =__preinit_stack    @ temporary stack at Stack_Top
                  LDR R0, =TargetResetInit
                  MOV LR, PC
                  BX R0
 
 
 @  Setup Stack for each mode
-                LDR     R0, =Stack_Top
+				LDR     R0, =__postinit_stack
 
 @  Enter Undefined Instruction Mode and set its Stack Pointer
                 MSR     CPSR_c, #Mode_UND | I_Bit | F_Bit
@@ -261,7 +261,6 @@ BSSIsEmpty:
 
 .arm
 IRQ_Handler:
-
 @- Manage Exception Entry
 @- Adjust and save LR_irq in IRQ stack
             sub         lr, lr, #4
@@ -273,7 +272,7 @@ IRQ_Handler:
 
 @- Save and r0 in IRQ stack
             stmfd       sp!, {r0}
-
+			
 @- Load the ISR-Address from VICVectAddr
             ldr         r14, =LPC_BASE_VIC
             ldr         r0 , [r14, #VIC_VectAddr]
@@ -283,11 +282,11 @@ IRQ_Handler:
 
 @- Save scratch/used registers and LR in User Stack
             stmfd       sp!, { r1-r3, r12, r14 }
-
+			
 @- Branch to the routine pointed by the VIC_VectAddr
             mov         r14, pc
             bx          r0
-
+			
 @- Restore scratch/used registers and LR from User Stack
             ldmia       sp!, { r1-r3, r12, r14 }
 
