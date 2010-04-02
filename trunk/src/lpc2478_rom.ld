@@ -11,30 +11,6 @@ Modified for LPC2400 devices
 byt Francois Gervais, December 2009
 */
 
-
-/* default stack sizes. 
-
-These are used by the startup in order to allocate stacks for the different modes.
-*/
-
-/******* DELETE CANDIDATE ***********/
-/*__Stack_Size = 1024 ;*/
-
-/*PROVIDE ( _Stack_Size = __Stack_Size ) ;*/
-
-/*__Stack_Init = _estack  - __Stack_Size ;*/
-
-/*"PROVIDE" allows to easily override these values from an object file or the commmand line.*/
-/*PROVIDE ( _Stack_Init = __Stack_Init ) ;*/
-
-/*
-There will be a link error if there is not this amount of RAM free at the end.
-*/
-/*_Minimum_Stack_Size = 0x100 ;*/
-
-/******* DELETE CANDIDATE ***********/
-
-
 /* include the memory spaces definitions sub-script */
 
 /* Memory Spaces Definitions */
@@ -43,11 +19,13 @@ MEMORY
 {
   ON_CHIP_FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 512K
   ON_CHIP_RAM (xrw) : ORIGIN = 0x40000000, LENGTH = 64K
-  OFF_CHIP_SDRAM (rx) : ORIGIN = 0xA0000000, LENGTH = 64M
+  /* The video memory takes the first 1 MB of SDRAM */
+  OFF_CHIP_SDRAM (xrw) : ORIGIN = 0xA0100000, LENGTH = 63M
 }
 
 /* higher address of the user mode stack */
-__stack = 0x40010000;
+__preinit_stack = 0x40010000;
+__postinit_stack = 0xA4000000;
 
 
 
@@ -171,7 +149,7 @@ SECTIONS
 	    . = ALIGN(4);
 	    /* This is used by the startup in order to initialize the .data secion */
    	 	_edata = . ;
-    } >ON_CHIP_RAM
+	} >OFF_CHIP_SDRAM
     
     
 
@@ -189,7 +167,7 @@ SECTIONS
 	    . = ALIGN(4);
 	    /* This is used by the startup in order to initialize the .bss secion */
    	 	_ebss = . ;
-    } >ON_CHIP_RAM
+	} >OFF_CHIP_SDRAM
     
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );
@@ -209,7 +187,7 @@ SECTIONS
 		
 		. = ALIGN(4);
 		_eheap = .;
-	} >ON_CHIP_RAM
+	} >OFF_CHIP_SDRAM
     
     .stack ALIGN(256) :
 	{
@@ -219,7 +197,7 @@ SECTIONS
 		*(.stack)
 		
 		_estack = .;
-	} > ON_CHIP_RAM
+	} >OFF_CHIP_SDRAM
     
     
     /* after that it's only debugging information. */
