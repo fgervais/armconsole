@@ -42,7 +42,7 @@ public:
 	 * Paul Bourke work (http://local.wasp.uwa.edu.au/~pbourke/dataformats/bmp/)
 	 */
 	struct Magic {
-		uint8_t magic[2];
+		uint8_t content[2];
 	};
 
 	struct Header {
@@ -67,23 +67,15 @@ public:
 		uint16_t planes;			/* Number of colour planes   */
 		uint16_t bpp;				/* Bits per pixel            */
 		uint32_t compression;		/* Compression type          */
-		uint32_t imagesize;			/* Image size in bytes       */
-		int32_t xresolution;		/* Pixels per meter          */
-		int32_t yresolution;		/* Pixels per meter          */
-		uint32_t ncolours;			/* Number of colours         */
-		uint32_t importantcolours;	/* Important colours         */
+		uint32_t imageSize;			/* Image size in bytes       */
+		int32_t xResolution;		/* Pixels per meter          */
+		int32_t yResolution;		/* Pixels per meter          */
+		uint32_t nColours;			/* Number of colours         */
+		uint32_t importantColours;	/* Important colours         */
 	};
 
 	Bitmap(const XCHAR *path);
 	virtual ~Bitmap();
-
-	Magic* magic;
-	Header* header;
-	InfoHeader* infoHeader;
-	uint32_t* data;
-
-	FIL handle;
-	const XCHAR *path;
 
 	Magic* getMagic() { return magic; }
 	Header* getHeader() { return header; };
@@ -91,6 +83,15 @@ public:
 	uint32_t* getData() { return data; }
 
 	uint8_t load();
+
+private:
+	Magic* magic;
+	Header* header;
+	InfoHeader* infoHeader;
+	uint32_t* data;
+
+	FIL handle;
+	const XCHAR *path;
 };
 
 #endif /* BITMAP_H_ */

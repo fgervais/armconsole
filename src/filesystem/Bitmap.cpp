@@ -10,6 +10,11 @@
 
 Bitmap::Bitmap(const XCHAR *path) {
 	this->path = path;
+
+	magic = 0;
+	header = 0;
+	infoHeader = 0;
+	data = 0;
 }
 
 Bitmap::~Bitmap() {
@@ -28,33 +33,34 @@ Bitmap::~Bitmap() {
 uint8_t Bitmap::load() {
 	FRESULT f_err_code;
 	UINT byteRead;
-	uint32_t ptr;
+	uint8_t* ptr;
 
-	f_err_code = f_open(&handle, "0:mmx1.bmp", FA_OPEN_EXISTING | FA_READ);
+	f_err_code = f_open(&handle, path, FA_OPEN_EXISTING | FA_READ);
 
 	if(f_err_code == 0) {
-		Debug::writeLine("File opened");
+		Debug::writeLine("Bitmap File opened");
 	}
 	else {
 		Debug::writeLine("Failed to open file");
 		return 1;
 	}
 
-	ptr = 0xA0080000;
-	magic = (Magic*)ptr;
-	f_read(&handle, (void*)ptr, sizeof(Magic), &byteRead);
+	magic = new Magic();
+	f_read(&handle, (void*)magic, sizeof(Magic), &byteRead);
 
-	ptr += 4;
-	header = (Header*)ptr;
-	f_read(&handle, (void*)ptr, sizeof(Header), &byteRead);
+	if(magic->content[0] != 'B' || magic->content[1] != 'M') {
+		Debug::writeLine("File invalid");
+		return 1;
+	}
 
-	ptr += sizeof(Header);
-	infoHeader = (InfoHeader*)ptr;
-	f_read(&handle, (void*)ptr, sizeof(InfoHeader), &byteRead);
+	header = new Header();
+	f_read(&handle, (void*)header, sizeof(Header), &byteRead);
 
-	ptr += sizeof(InfoHeader);
-	data = (uint32_t*)ptr;
-	uint32_t dataLength = header->size-header->offset;
+	infoHeader = new InfoHeader();
+	f_read(&handle, (void*)infoHeader, sizeof(InfoHeader), &byteRead);
+
+	uint32_t dataLength = infoHeader->height*infoHeader->width;
+	data = new uint32_t[dataLength];
 
 	// Compute padding
 	uint32_t padLength = 0;
@@ -62,32 +68,23 @@ uint8_t Bitmap::load() {
 		padLength++;
 	}
 
-	/*for(uint32_t i=0; i<dataLength; i+=3) {
+	ptr = (uint8_t*)&data[dataLength];
 
-
-		// Bitmap is stored as BRG format
-		f_read(&handle, (void*)(ptr+2), 1, &byteRead);
-		f_read(&handle, (void*)(ptr+1), 1, &byteRead);
-		f_read(&handle, (void*)(ptr), 1, &byteRead);
-		ptr += 4;
-
-		//if(i>0 && (i % ((infoHeader->width * (infoHeader->bpp/8)))) == 0) {
-		if(i > 0 && ((i/3) % 0)) {
-			f_lseek(&handle, handle.fptr + padLength);
-		}
-	}*/
-
-	ptr += infoHeader->height*infoHeader->width*4;
+	// Get at the end of the last line
 	ptr -= infoHeader->width*4;
 
 	for(int32_t i=0; i<infoHeader->height; i++) {
+		// Fill a line
 		for(int32_t j=0; j<infoHeader->width; j++) {
+			// Bitmap is stored as BRG format so we have to invert it
 			f_read(&handle, (void*)(ptr+2), 1, &byteRead);
 			f_read(&handle, (void*)(ptr+1), 1, &byteRead);
 			f_read(&handle, (void*)(ptr), 1, &byteRead);
 			ptr += 4;
 		}
+		// Go up 2 lines
 		ptr -= 2*infoHeader->width*4;
+		// Skip padding
 		f_lseek(&handle, handle.fptr + padLength);
 	}
 
