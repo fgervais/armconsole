@@ -15,6 +15,7 @@ Bitmap::Bitmap(const XCHAR *path) {
 	header = 0;
 	infoHeader = 0;
 	data = 0;
+	loaded = 0;
 }
 
 Bitmap::~Bitmap() {
@@ -89,5 +90,6 @@ uint8_t Bitmap::load() {
 	}
 
 	f_close(&handle);
+	loaded = 1;
 	return 0;
 }
