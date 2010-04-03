@@ -20,6 +20,7 @@
 #include "Bitmap.h"
 #include "Wave.h"
 #include "AudioHelper.h"
+#include "DAC.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -94,8 +95,14 @@ int main() {
 	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC());
 	Wave* wave = new Wave("0:intro.wav");
 	wave->load();
+
+	//LPC2478::getDAC()->setValue(32768);
+	//DAC0->DACR = 32768;
+	//while(1);
+
 	if(wave->isLoaded()) {
-		//audioHelper->play(wave);
+		Debug::writeLine("Playing wave file");
+		audioHelper->play(wave);
 	}
 	while(1);
 

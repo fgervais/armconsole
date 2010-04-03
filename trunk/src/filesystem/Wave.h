@@ -42,7 +42,7 @@ public:
 	RIFFHeader* getRIFFHeader() { return riffHeader; }
 	WAVEHeader* getWAVEHeader() { return waveHeader; }
 	DataHeader* getDataHeader() { return dataHeader; }
-	uint16_t* getData() { return data; }
+	int16_t* getData() { return data; }
 	uint8_t isLoaded() { return loaded; }
 
 	uint8_t load();
@@ -55,7 +55,7 @@ private:
 	RIFFHeader* riffHeader;
 	WAVEHeader* waveHeader;
 	DataHeader* dataHeader;
-	uint16_t* data;
+	int16_t* data;
 };
 
 #endif /* WAVE_H_ */
