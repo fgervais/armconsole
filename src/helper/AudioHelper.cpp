@@ -23,11 +23,14 @@ AudioHelper::~AudioHelper() {
 
 void AudioHelper::play(Wave* wave) {
 	if(!wave->isLoaded()) {
-		wave->load();
+		// Check if file is loaded successfully
+		if(wave->load() == 1) {
+			return;
+		}
 	}
 
 	uint32_t waveLength = (wave->getDataHeader()->size * 8) /  wave->getWAVEHeader()->bitPerSample;
-	uint32_t usDelay = (1.0/(float)wave->getWAVEHeader()->sampleRate) / (1.0/(float)LPC2478::getFrequency());
+	uint32_t usDelay = (1.0/(float)wave->getWAVEHeader()->sampleRate) / (1.0/0.000001);
 
 	stopped = 0;
 	for(uint32_t sampleCount=0; sampleCount<waveLength; sampleCount++) {

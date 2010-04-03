@@ -18,6 +18,8 @@
 #include "Debug.h"
 #include "ff.h"
 #include "Bitmap.h"
+#include "Wave.h"
+#include "AudioHelper.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -88,19 +90,14 @@ int main() {
 	if(bitmap->getData() != 0) {
 		displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
 	}
+
+	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC());
+	Wave* wave = new Wave("0:intro.wav");
+	wave->load();
+	if(wave->isLoaded()) {
+		//audioHelper->play(wave);
+	}
 	while(1);
-
-	// Display megaman screenshot
-	//displayHelper->drawImage(112,24,(uint32_t*)megaman,256,224);
-
-	// Scroll the megaman screenshot
-	/*while(1) {
-		//for(uint32_t i=0; i<1920; i++) {
-		for(uint32_t i=0; i<486; i++) {
-			LCD->LCD_UPBASE = 0xA0000000 + (i<<2);
-			LPC2478::delay(16000);
-		}
-	}*/
 
 	// Display megaman gif
 	/*uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();

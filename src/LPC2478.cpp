@@ -254,6 +254,8 @@ DAC* LPC2478::getDAC() {
 		pinsel &= ~0x00300000;
 		pinsel |= 0x00200000;	/* Set P0.26 to AOUT (10) */
 		PINSEL1 = pinsel;
+
+		dac = new DAC(DAC0);
 	}
 	return dac;
 }

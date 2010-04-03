@@ -51,6 +51,12 @@ uint8_t Wave::load() {
 	waveHeader = new WAVEHeader();
 	f_read(&handle, (void*)waveHeader, sizeof(WAVEHeader), &byteRead);
 
+	// For now only 16 bits wide sample are supported
+	if(waveHeader->bitPerSample != 16) {
+		Debug::writeLine("Unsupported file");
+		return 1;
+	}
+
 	dataHeader = new DataHeader();
 	f_read(&handle, (void*)dataHeader, sizeof(DataHeader), &byteRead);
 
