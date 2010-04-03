@@ -9,6 +9,7 @@
 #define LPC2478_H_
 
 #include "Microcontroller.h"
+#include "target.h"
 
 #include <stdint.h>
 
@@ -28,6 +29,7 @@ public:
 	LPC2478();
 	virtual ~LPC2478();
 
+	static uint32_t getFrequency() { return frequency; };
 	static Gpio* getGpio0();
 	static Gpio* getGpio1();
 	static Gpio* getGpio2();
@@ -38,6 +40,8 @@ public:
 
 	static void delay(uint32_t usec);
 private:
+	static const uint32_t frequency = Fcclk;
+
 	static Gpio *gpio0;
 	static Gpio *gpio1;
 	static Gpio *gpio2;

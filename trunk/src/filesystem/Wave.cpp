@@ -15,6 +15,7 @@ Wave::Wave(const XCHAR *path) {
 	waveHeader = 0;
 	dataHeader = 0;
 	data = 0;
+	loaded = 0;
 }
 
 Wave::~Wave() {
@@ -57,5 +58,6 @@ uint8_t Wave::load() {
 	f_read(&handle, (void*)data, dataHeader->size, &byteRead);
 
 	f_close(&handle);
+	loaded = 1;
 	return 0;
 }

@@ -81,6 +81,7 @@ public:
 	Header* getHeader() { return header; };
 	InfoHeader* getInfoHeader() { return infoHeader; }
 	uint32_t* getData() { return data; }
+	uint8_t isLoaded() { return loaded; }
 
 	uint8_t load();
 
@@ -92,6 +93,7 @@ private:
 
 	FIL handle;
 	const XCHAR *path;
+	uint8_t loaded;
 };
 
 #endif /* BITMAP_H_ */
