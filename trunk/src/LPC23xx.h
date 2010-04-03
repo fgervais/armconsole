@@ -836,8 +836,22 @@ are for LPC24xx only. */
 
 
 /* D/A Converter */
-#define DAC_BASE_ADDR		0xE006C000
-#define DACR           (*(volatile unsigned long *)(DAC_BASE_ADDR + 0x00))
+//#define DAC_BASE_ADDR		0xE006C000
+//#define DACR           (*(volatile unsigned long *)(DAC_BASE_ADDR + 0x00))
+
+/*
+ *DAC register structure
+ */
+typedef struct
+{
+	unsigned long DACR;
+} DAC_Typedef;
+
+/* DAC base address */
+#define DAC_BASE		0xE006C000
+
+/* DAC declaration */
+#define DAC0			(((DAC_Typedef *)DAC_BASE))
 
 
 /* Watchdog */

@@ -85,8 +85,9 @@ int main() {
 
 	Bitmap* bitmap = new Bitmap("0:mmx1.bmp");
 	bitmap->load();
-	displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
-
+	if(bitmap->getData() != 0) {
+		displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
+	}
 	while(1);
 
 	// Display megaman screenshot

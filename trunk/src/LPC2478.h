@@ -15,6 +15,7 @@
 class Gpio;
 class HostControllerDriver;
 class LCDControllerDriver;
+class DAC;
 
 /**
  * Software interface to the LPC2478 microcontroller.
@@ -33,6 +34,7 @@ public:
 	static Gpio* getGpio3();
 	static HostControllerDriver* getHCD();
 	static LCDControllerDriver* getLCD();
+	static DAC* getDAC();
 
 	static void delay(uint32_t usec);
 private:
@@ -42,6 +44,7 @@ private:
 	static Gpio *gpio3;
 	static HostControllerDriver *hcd;
 	static LCDControllerDriver *lcd;
+	static DAC* dac;
 };
 
 #endif /* LPC2478_H_ */

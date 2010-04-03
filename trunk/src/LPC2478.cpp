@@ -10,6 +10,7 @@
 #include "HostControllerDriver.h"
 #include "LCDControllerDriver.h"
 #include "BlueScreenSunLCD.h"
+#include "DAC.h"
 #include "irq.h"
 
 /* Static initialization. Required to make the compiler happy */
@@ -19,6 +20,7 @@ Gpio* LPC2478::gpio2 = 0;
 Gpio* LPC2478::gpio3 = 0;
 HostControllerDriver* LPC2478::hcd = 0;
 LCDControllerDriver* LPC2478::lcd = 0;
+DAC* LPC2478::dac = 0;
 
 LPC2478::LPC2478() {
 
@@ -237,6 +239,23 @@ LCDControllerDriver* LPC2478::getLCD() {
 		lcd = new BlueScreenSunLCD(LCD);
 	}
 	return lcd;
+}
+
+/**
+ * Get the Digital to Analog Converter.
+ *
+ * @return An instance to the Digital to Analog Converter interface
+ */
+DAC* LPC2478::getDAC() {
+	if(dac == 0) {
+		uint32_t  pinsel;
+
+		pinsel = PINSEL1;
+		pinsel &= ~0x00300000;
+		pinsel |= 0x00200000;	/* Set P0.26 to AOUT (10) */
+		PINSEL1 = pinsel;
+	}
+	return dac;
 }
 
 /**
