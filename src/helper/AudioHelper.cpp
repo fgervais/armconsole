@@ -34,8 +34,12 @@ void AudioHelper::play(Wave* wave) {
 
 	stopped = 0;
 	for(uint32_t sampleCount=0; sampleCount<waveLength; sampleCount++) {
-		dac->setValue(wave->getData()[sampleCount]);
-		LPC2478::delay(usDelay);
+		// Sample are stored as a 16 bits signed value
+		int32_t sample = wave->getData()[sampleCount];
+		sample = (sample + 32768) >> 1;
+		dac->setValue(sample);
+		//LPC2478::delay(usDelay);
+		LPC2478::delay(24);
 	}
 	stopped = 1;
 }

@@ -60,7 +60,7 @@ uint8_t Wave::load() {
 	dataHeader = new DataHeader();
 	f_read(&handle, (void*)dataHeader, sizeof(DataHeader), &byteRead);
 
-	data = new uint16_t[dataHeader->size/2];
+	data = new int16_t[dataHeader->size/2];
 	f_read(&handle, (void*)data, dataHeader->size, &byteRead);
 
 	f_close(&handle);
