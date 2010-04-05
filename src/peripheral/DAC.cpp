@@ -16,6 +16,5 @@ DAC::~DAC() {
 }
 
 void DAC::setValue(uint16_t value) {
-	//dacRegisters->DACR = (value & 0x0000FFFF);
 	dacRegisters->DACR = (value & 0x0000FFC0);
 }
