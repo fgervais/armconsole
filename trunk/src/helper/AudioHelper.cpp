@@ -38,6 +38,7 @@ void AudioHelper::play(Wave* wave) {
 		int32_t sample = wave->getData()[sampleCount];
 		sample = (sample + 32768) >> 1;
 		dac->setValue(sample);
+		// TODO: Fixme
 		//LPC2478::delay(usDelay);
 		LPC2478::delay(24);
 	}
