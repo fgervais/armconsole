@@ -83,20 +83,20 @@ void Tile::render(VideoMemory* videoMemory) {
 		renderPositionY = visibleArea->y1;
 	}
 	if((positionX+width) > visibleArea->x2) {
-		renderMaskX2 = (positionX+width) - visibleArea->x2;
+		renderMaskX2 = visibleArea->x2 - positionX;
 	}
 	if((positionY+height) > visibleArea->y2) {
-		renderMaskY2 = (positionY+height) - visibleArea->y2;
+		renderMaskY2 = visibleArea->y2 - positionY;
 	}
 
 	// Draw the image on the screen
 	uint32_t videoMemoryWidth = videoMemory->getWidth();
 	uint32_t* videoMemoryPointer = videoMemory->getPointer();
-	uint32_t renderWidth = renderMaskX2 - renderMaskX1;
 
 	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
 		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
-			videoMemoryPointer[(i+renderPositionY)*videoMemoryWidth + (j+renderPositionX)] = frames[currentFrame]->getData()[i*renderWidth + j];
+			videoMemoryPointer[(i+renderPositionY)*videoMemoryWidth + (j+renderPositionX)]
+			                   = frames[currentFrame]->getData()[i*width + j];
 		}
 	}
 

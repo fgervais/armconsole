@@ -22,7 +22,14 @@ Environment::Environment(uint32_t width, uint32_t height, uint32_t tileWidth, ui
 	this->tileWidth = tileWidth;
 
 	heightInTile = height/tileHeight;
+	if((height % tileHeight) > 0) {
+		heightInTile++;
+	}
+
 	widthInTile = width/tileWidth;
+	if((width % tileWidth) > 0) {
+		widthInTile++;
+	}
 
 	tileMap = new Tile**[heightInTile];
 	for(uint32_t i=0; i<widthInTile; i++) {
@@ -184,13 +191,29 @@ void Environment::renderBackground(VideoMemory* videoMemory) {
 	uint32_t bufferLength = videoMemory->getWidth()*videoMemory->getHeight();
 
 	for (uint32_t i=0; i<bufferLength; i++) {
-		*(lcd_ptr++) = 0x00FF6633;
+		//*(lcd_ptr++) = 0x00BDE3F7;
+		*(lcd_ptr++) = 0x00F7E3BD;
 	}
 }
 
 void Environment::renderTiles(VideoMemory* videoMemory) {
-	for(uint32_t i=visibleArea->y1/tileHeight; i<visibleArea->y2/tileHeight; i++) {
-		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
+	uint32_t iRenderStart = visibleArea->y1/tileHeight;
+	uint32_t iRenderStop = visibleArea->y2/tileHeight;
+	uint32_t jRenderStart = visibleArea->x1/tileWidth;
+	uint32_t jRenderStop = visibleArea->x2/tileWidth;
+
+	// If the division is not exact, we render one more tile
+	// This is similar to the ceiling mathematical function
+	if((visibleArea->y2%tileHeight) != 0) {
+		iRenderStop++;
+	}
+	if((visibleArea->x2%tileWidth) != 0) {
+		jRenderStop++;
+	}
+
+
+	for(uint32_t i=iRenderStart; i<iRenderStop; i++) {
+		for(uint32_t j=jRenderStart; j<jRenderStop; j++) {
 			// Set the tile position - This is subject to change
 			if(tileMap[i][j] != 0) {
 				/*if(i == 10 && j == 10) {
