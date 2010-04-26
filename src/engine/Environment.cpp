@@ -12,8 +12,10 @@
 #include "Background.h"
 #include "Physics.h"
 #include "VisibleArea.h"
+#include "Debug.h"
+#include "VideoMemory.h"
 
-Environment::Environment(uint32_t height, uint32_t width, uint32_t tileHeight, uint32_t tileWidth) {
+Environment::Environment(uint32_t width, uint32_t height, uint32_t tileWidth, uint32_t tileHeight) {
 	this->height = height;
 	this->width = width;
 	this->tileHeight = tileHeight;
@@ -44,6 +46,7 @@ Environment::Environment(uint32_t height, uint32_t width, uint32_t tileHeight, u
 	background = 0;
 	physics = 0;
 	visibleArea = 0;
+	//Debug::writeLine("Environment constructor done");
 }
 
 Environment::~Environment() {
@@ -66,10 +69,31 @@ void Environment::render(VideoMemory* videoMemory) {
 }
 
 void Environment::update() {
-	int32_t heroVelocityX = hero->getVelocityX();
+	//int32_t heroVelocityX = hero->getVelocityX();
 
-	visibleArea->x1 += heroVelocityX;
-	visibleArea->x2 += heroVelocityX;
+	//visibleArea->x1 += heroVelocityX;
+	//visibleArea->x2 += heroVelocityX;
+
+	/*if(visibleArea->x2 < (width-1)) {
+		visibleArea->x1 += 5;
+		visibleArea->x2 += 5;
+	}
+	else {
+		visibleArea->x1 = 0;
+		visibleArea->x2 = 479;
+	}*/
+
+	// Update background
+	updateBackground();
+
+	// Update tiles
+	updateTiles();
+
+	// Update hero
+	updateHero();
+
+	// Update sprites
+	updateSprites();
 }
 
 /*
@@ -108,7 +132,9 @@ uint8_t Environment::add(Sprite* sprite, uint32_t x, uint32_t y) {
 uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
 	if(x < widthInTile && y < heightInTile) {
 		tileMap[y][x] = tile;
-		tile->setPosition(x*tileWidth, y*tileHeight);
+		// The tile needs to know its parent environment
+		tile->set(this);
+		//tile->setPosition(x*tileWidth, y*tileHeight);
 		return 0;
 	}
 	return 1;
@@ -153,13 +179,29 @@ void Environment::set(VisibleArea* visibleArea) {
  */
 
 void Environment::renderBackground(VideoMemory* videoMemory) {
+	// Set white background for now
+	uint32_t* lcd_ptr = videoMemory->getPointer();
+	uint32_t bufferLength = videoMemory->getWidth()*videoMemory->getHeight();
 
+	for (uint32_t i=0; i<bufferLength; i++) {
+		*(lcd_ptr++) = 0x00FF6633;
+	}
 }
 
 void Environment::renderTiles(VideoMemory* videoMemory) {
-	for(uint32_t i=visibleArea->y1/tileHeight; i<=visibleArea->y2/tileHeight; i++) {
+	for(uint32_t i=visibleArea->y1/tileHeight; i<visibleArea->y2/tileHeight; i++) {
 		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
-			tileMap[i][j]->render(videoMemory);
+			// Set the tile position - This is subject to change
+			if(tileMap[i][j] != 0) {
+				/*if(i == 10 && j == 10) {
+					Debug::writeLine("Rendering tile [10,10]");
+				}
+				else {
+					Debug::writeLine("Rendering other tile");
+				}*/
+				tileMap[i][j]->setPosition(j*tileWidth, i*tileHeight);
+				tileMap[i][j]->render(videoMemory);
+			}
 		}
 	}
 }
@@ -169,5 +211,27 @@ void Environment::renderHero(VideoMemory* videoMemory) {
 }
 
 void Environment::renderSprites(VideoMemory* videoMemory) {
+
+}
+
+void Environment::updateBackground() {
+
+}
+
+void Environment::updateTiles() {
+	for(uint32_t i=visibleArea->y1/tileHeight; i<visibleArea->y2/tileHeight; i++) {
+		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
+			if(tileMap[i][j] != 0) {
+				tileMap[i][j]->update();
+			}
+		}
+	}
+}
+
+void Environment::updateHero() {
+
+}
+
+void Environment::updateSprites() {
 
 }

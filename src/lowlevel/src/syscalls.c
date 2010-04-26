@@ -39,10 +39,10 @@ caddr_t _sbrk (int incr)
 
 		_write (1, "_sbrk: Heap and stack collision\n", 32);
       
-						   abort ();
+		abort ();
 #else
-						   errno = ENOMEM;
-				   return (caddr_t) -1;
+		errno = ENOMEM;
+		return (caddr_t) -1;
 #endif
 	}
   

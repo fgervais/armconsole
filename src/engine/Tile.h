@@ -8,17 +8,35 @@
 #ifndef TILE_H_
 #define TILE_H_
 
-#include "Graphic.h"
+#include "Synchronized.h"
+#include "Renderable.h"
+#include <stdint.h>
 
 class Environment;
 class VideoMemory;
+class Bitmap;
 
-class Tile: public Graphic {
+class Tile : public Synchronized, public Renderable {
 public:
-	Tile(uint32_t height, uint32_t width, uint32_t** handles, uint32_t numberOfFrame);
+	Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
 	virtual ~Tile();
-private:
 
+	// Interface implementation
+	virtual void update();
+	virtual void render(VideoMemory*);
+
+	void setPosition(uint32_t x, uint32_t y);
+	void set(Environment* environment);
+private:
+	uint32_t height;
+	uint32_t width;
+	uint32_t** handles;
+	Bitmap** frames;
+	uint32_t numberOfFrame;
+	uint32_t currentFrame;
+	uint32_t positionX;
+	uint32_t positionY;
+	Environment* environment;
 };
 
 #endif /* TILE_H_ */
