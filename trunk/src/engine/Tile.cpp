@@ -21,9 +21,9 @@ Tile::Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFr
 	this->environment = 0;
 
 	// Ensure every bitmap are loaded into memory
-	for(uint32_t frameNb=0; frameNb<numberOfFrame; frameNb++) {
-		if(!(frames[frameNb]->isLoaded())) {
-			frames[frameNb]->load();
+	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
+		if(!(frames[frameNumber]->isLoaded())) {
+			frames[frameNumber]->load();
 		}
 	}
 }
@@ -57,6 +57,7 @@ void Tile::render(VideoMemory* videoMemory) {
 	}
 	VisibleArea* visibleArea = environment->getVisibleArea();
 
+	// Get x,y coordinates inside the visible area
 	uint32_t renderPositionX = positionX - visibleArea->x1;
 	uint32_t renderPositionY = positionY - visibleArea->y1;
 
@@ -71,7 +72,7 @@ void Tile::render(VideoMemory* videoMemory) {
 
 	/*
 	 * These 4 following tests check if part of the image is outside
-	 * the visible area. If so, t set the render mask so it won't
+	 * the visible area. If so, set the render mask so it won't
 	 * render the part outside the screen.
 	 */
 	if(positionX < visibleArea->x1) {
@@ -93,6 +94,7 @@ void Tile::render(VideoMemory* videoMemory) {
 	uint32_t videoMemoryWidth = videoMemory->getWidth();
 	uint32_t* videoMemoryPointer = videoMemory->getPointer();
 
+	// Render the part of the tile inside the render mask
 	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
 		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
 			videoMemoryPointer[(i+renderPositionY)*videoMemoryWidth + (j+renderPositionX)]
