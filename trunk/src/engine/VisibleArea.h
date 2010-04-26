@@ -10,6 +10,11 @@
 
 #include <stdint.h>
 
+/**
+ * This is the portion of the game that we see on the screen.
+ *
+ * All those coordinates are in pixel unit.
+ */
 class VisibleArea {
 public:
 	VisibleArea();

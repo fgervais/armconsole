@@ -137,3 +137,13 @@ void LCDControllerDriver::setBackground(uint32_t rgbColor) {
 		*(lcd_ptr++) = rgbColor;
 	}
 }
+
+/**
+ * This function is used to switch video frame buffer page.
+ *
+ * @param bufferBaseAddress Base Memory address of the video page.
+ */
+void LCDControllerDriver::setBaseAddress(uint32_t bufferBaseAddress) {
+	this->bufferBase = bufferBaseAddress;
+	lcdRegisters->LCD_UPBASE = bufferBaseAddress;
+}

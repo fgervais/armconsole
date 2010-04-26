@@ -26,6 +26,7 @@ public:
 	virtual void configure(LCDConfiguration config);
 	void clearScreen();
 	void setBackground(uint32_t rgbColor);
+	void setBaseAddress(uint32_t bufferBaseAddress);
 
 	State getState() { return lcdState; }
 	uint32_t getBufferBase() { return bufferBase; }

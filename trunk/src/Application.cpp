@@ -21,6 +21,7 @@
 #include "Wave.h"
 #include "AudioHelper.h"
 #include "DAC.h"
+#include "Engine.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -85,6 +86,16 @@ int main() {
 	else {
 		Debug::writeLine("Failed to mount SD card");
 	}
+
+	//------ Engine Test
+
+	Engine* engine = new Engine();
+	engine->start();
+
+	//------------------
+
+
+
 
 	Bitmap* bitmap = new Bitmap("0:mmx1.bmp");
 	bitmap->load();

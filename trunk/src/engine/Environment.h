@@ -23,7 +23,7 @@ class Request;
 
 class Environment : public Synchronized, public Renderable {
 public:
-	Environment(uint32_t heightInTile, uint32_t widthInTile, uint32_t tileHeight, uint32_t tileWidth);
+	Environment(uint32_t width, uint32_t height, uint32_t tileWidth, uint32_t tileHeight);
 	virtual ~Environment();
 
 	// Abstract functions
@@ -67,6 +67,11 @@ private:
 	void renderTiles(VideoMemory* videoMemory);
 	void renderHero(VideoMemory* videoMemory);
 	void renderSprites(VideoMemory* videoMemory);
+
+	void updateBackground();
+	void updateTiles();
+	void updateHero();
+	void updateSprites();
 };
 
 #endif /* ENVIRONMENT_H_ */
