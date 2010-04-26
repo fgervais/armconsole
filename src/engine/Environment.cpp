@@ -191,7 +191,6 @@ void Environment::renderBackground(VideoMemory* videoMemory) {
 	uint32_t bufferLength = videoMemory->getWidth()*videoMemory->getHeight();
 
 	for (uint32_t i=0; i<bufferLength; i++) {
-		//*(lcd_ptr++) = 0x00BDE3F7;
 		*(lcd_ptr++) = 0x00F7E3BD;
 	}
 }
@@ -216,12 +215,6 @@ void Environment::renderTiles(VideoMemory* videoMemory) {
 		for(uint32_t j=jRenderStart; j<jRenderStop; j++) {
 			// Set the tile position - This is subject to change
 			if(tileMap[i][j] != 0) {
-				/*if(i == 10 && j == 10) {
-					Debug::writeLine("Rendering tile [10,10]");
-				}
-				else {
-					Debug::writeLine("Rendering other tile");
-				}*/
 				tileMap[i][j]->setPosition(j*tileWidth, i*tileHeight);
 				tileMap[i][j]->render(videoMemory);
 			}
