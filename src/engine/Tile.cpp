@@ -12,13 +12,13 @@
 #include "Bitmap.h"
 #include "Debug.h"
 
-Tile::Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame) {
+Tile::Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame, Environment* environment) {
 	this->height = height;
 	this->width = width;
 	this->frames = frames;
 	this->numberOfFrame = numberOfFrame;
 	this->currentFrame = 0;
-	this->environment = 0;
+	this->environment = environment;
 
 	// Ensure every bitmap are loaded into memory
 	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
@@ -51,10 +51,6 @@ void Tile::update() {
  * @param videoMemory The video memory
  */
 void Tile::render(VideoMemory* videoMemory) {
-	if(environment == 0) {
-		Debug::writeLine("I don't know the environment I belong to");
-		return;
-	}
 	VisibleArea* visibleArea = environment->getVisibleArea();
 
 	// Get x,y coordinates inside the visible area
@@ -77,11 +73,11 @@ void Tile::render(VideoMemory* videoMemory) {
 	 */
 	if(positionX < visibleArea->x1) {
 		renderMaskX1 = visibleArea->x1 - positionX;
-		renderPositionX = visibleArea->x1;
+		renderPositionX = 0;
 	}
 	if(positionY < visibleArea->y1) {
 		renderMaskY1 = visibleArea->y1 - positionY;
-		renderPositionY = visibleArea->y1;
+		renderPositionY = 0;
 	}
 	if((positionX+width) > visibleArea->x2) {
 		renderMaskX2 = visibleArea->x2 - positionX;
@@ -97,8 +93,9 @@ void Tile::render(VideoMemory* videoMemory) {
 	// Render the part of the tile inside the render mask
 	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
 		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
-			videoMemoryPointer[(i+renderPositionY)*videoMemoryWidth + (j+renderPositionX)]
-			                   = frames[currentFrame]->getData()[i*width + j];
+			// This is complicated to understand but I don't think we can simplify it
+			videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+							   = frames[currentFrame]->getData()[i*width + j];
 		}
 	}
 
