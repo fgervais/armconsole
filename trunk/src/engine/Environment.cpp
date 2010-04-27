@@ -62,7 +62,10 @@ Environment::~Environment() {
 
 void Environment::render(VideoMemory* videoMemory) {
 	// Render background
-	renderBackground(videoMemory);
+	//renderBackground(videoMemory);
+	if(background != 0) {
+		background->render(videoMemory);
+	}
 
 	// Render tiles
 	renderTiles(videoMemory);
@@ -81,14 +84,14 @@ void Environment::update() {
 	//visibleArea->x1 += heroVelocityX;
 	//visibleArea->x2 += heroVelocityX;
 
-	/*if(visibleArea->x2 < (width-1)) {
+	if(visibleArea->x2 < (width-1)) {
 		visibleArea->x1 += 5;
 		visibleArea->x2 += 5;
 	}
 	else {
 		visibleArea->x1 = 0;
-		visibleArea->x2 = 479;
-	}*/
+		visibleArea->x2 = 480;
+	}
 
 	// Update background
 	updateBackground();
@@ -139,8 +142,6 @@ uint8_t Environment::add(Sprite* sprite, uint32_t x, uint32_t y) {
 uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
 	if(x < widthInTile && y < heightInTile) {
 		tileMap[y][x] = tile;
-		// The tile needs to know its parent environment
-		tile->set(this);
 		//tile->setPosition(x*tileWidth, y*tileHeight);
 		return 0;
 	}
@@ -187,11 +188,15 @@ void Environment::set(VisibleArea* visibleArea) {
 
 void Environment::renderBackground(VideoMemory* videoMemory) {
 	// Set white background for now
-	uint32_t* lcd_ptr = videoMemory->getPointer();
+	/*uint32_t* lcd_ptr = videoMemory->getPointer();
 	uint32_t bufferLength = videoMemory->getWidth()*videoMemory->getHeight();
 
 	for (uint32_t i=0; i<bufferLength; i++) {
 		*(lcd_ptr++) = 0x00F7E3BD;
+	}*/
+
+	if(background != 0) {
+		background->render(videoMemory);
 	}
 }
 

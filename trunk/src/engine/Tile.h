@@ -18,7 +18,7 @@ class Bitmap;
 
 class Tile : public Synchronized, public Renderable {
 public:
-	Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
+	Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame, Environment* environment);
 	virtual ~Tile();
 
 	// Interface implementation
