@@ -39,31 +39,13 @@ void Level1::build() {
 	Tile* tile2 = new Tile(56, 32, brick, 1, this);
 
 	// Send the tiles to the environment (Base class)
-	add(tile1, 0, 7);
-	add(tile1, 1, 7);
-	add(tile1, 2, 7);
-	add(tile1, 3, 7);
-	add(tile1, 4, 7);
-	add(tile1, 5, 7);
-	add(tile1, 6, 7);
-	add(tile1, 7, 7);
-	add(tile1, 8, 7);
-	add(tile1, 9, 7);
-	add(tile1, 10, 7);
-	add(tile1, 11, 7);
+	for(uint8_t i=0; i<18; i++) {
+		add(tile1, i, 7);
+	}
 
-	add(tile2, 0, 8);
-	add(tile2, 1, 8);
-	add(tile2, 2, 8);
-	add(tile2, 3, 8);
-	add(tile2, 4, 8);
-	add(tile2, 5, 8);
-	add(tile2, 6, 8);
-	add(tile2, 7, 8);
-	add(tile2, 8, 8);
-	add(tile2, 9, 8);
-	add(tile2, 10, 8);
-	add(tile2, 11, 8);
+	for(uint8_t i=0; i<18; i++) {
+		add(tile2, i, 8);
+	}
 
 	// Create a new visible area for the entire screen
 	VisibleArea* visibleArea = new VisibleArea();

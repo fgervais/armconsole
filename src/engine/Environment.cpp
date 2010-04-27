@@ -62,10 +62,7 @@ Environment::~Environment() {
 
 void Environment::render(VideoMemory* videoMemory) {
 	// Render background
-	//renderBackground(videoMemory);
-	if(background != 0) {
-		background->render(videoMemory);
-	}
+	renderBackground(videoMemory);
 
 	// Render tiles
 	renderTiles(videoMemory);
@@ -85,8 +82,8 @@ void Environment::update() {
 	//visibleArea->x2 += heroVelocityX;
 
 	if(visibleArea->x2 < (width-1)) {
-		visibleArea->x1 += 5;
-		visibleArea->x2 += 5;
+		visibleArea->x1 += 10;
+		visibleArea->x2 += 10;
 	}
 	else {
 		visibleArea->x1 = 0;
