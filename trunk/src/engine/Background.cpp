@@ -53,10 +53,20 @@ void Background::render(VideoMemory* videoMemory) {
 	uint32_t videoMemoryWidth = videoMemory->getWidth();
 	uint32_t* videoMemoryPointer = videoMemory->getPointer();
 
-	for (uint32_t i=0; i<renderHeight; i++) {
+	/* Generic version */
+	/*for (uint32_t i=0; i<renderHeight; i++) {
 		for (uint32_t j=0; j<renderWidth; j++) {
 			videoMemoryPointer[i*videoMemoryWidth + j]
 			                   = bitmap->getData()[((i+renderMaskY1) % height)*width + ((j+renderMaskX1) % width)];
+		}
+	}*/
+
+	/* Optimized version */
+	uint32_t* image = bitmap->getData();
+	for (uint32_t i=0; i<renderHeight; i++) {
+		for (uint32_t j=0; j<renderWidth; j++) {
+			videoMemoryPointer[i*videoMemoryWidth + j]
+							   = image[(i+renderMaskY1)*width + ((j+renderMaskX1) & (width-1))];
 		}
 	}
 
