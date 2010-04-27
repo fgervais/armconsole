@@ -971,35 +971,51 @@ typedef struct
 
 
 /* General-purpose DMA Controller */
+
+/*
+ * General-purpose DMA Controller register structure
+ */
+typedef struct
+{
+	unsigned long GPDMA_INT_STAT;
+	unsigned long GPDMA_INT_TCSTAT;
+	unsigned long GPDMA_INT_TCCLR;
+	unsigned long GPDMA_INT_ERR_STAT;
+	unsigned long GPDMA_INT_ERR_CLR;
+	unsigned long GPDMA_RAW_INT_TCSTAT;
+	unsigned long GPDMA_RAW_INT_ERR_STAT;
+	unsigned long GPDMA_ENABLED_CHNS;
+	unsigned long GPDMA_SOFT_BREQ;
+	unsigned long GPDMA_SOFT_SREQ;
+	unsigned long GPDMA_SOFT_LBREQ;
+	unsigned long GPDMA_SOFT_LSREQ;
+	unsigned long GPDMA_CONFIG;
+	unsigned long GPDMA_SYNC;
+} GPDMA_Typedef;
+
+/* General-purpose DMA Controller base address */
 #define DMA_BASE_ADDR		0xFFE04000
-#define GPDMA_INT_STAT         (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x000))
-#define GPDMA_INT_TCSTAT       (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x004))
-#define GPDMA_INT_TCCLR        (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x008))
-#define GPDMA_INT_ERR_STAT     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x00C))
-#define GPDMA_INT_ERR_CLR      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x010))
-#define GPDMA_RAW_INT_TCSTAT   (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x014))
-#define GPDMA_RAW_INT_ERR_STAT (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x018))
-#define GPDMA_ENABLED_CHNS     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x01C))
-#define GPDMA_SOFT_BREQ        (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x020))
-#define GPDMA_SOFT_SREQ        (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x024))
-#define GPDMA_SOFT_LBREQ       (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x028))
-#define GPDMA_SOFT_LSREQ       (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x02C))
-#define GPDMA_CONFIG           (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x030))
-#define GPDMA_SYNC             (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x034))
 
-/* DMA channel 0 registers */
-#define GPDMA_CH0_SRC      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x100))
-#define GPDMA_CH0_DEST     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x104))
-#define GPDMA_CH0_LLI      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x108))
-#define GPDMA_CH0_CTRL     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x10C))
-#define GPDMA_CH0_CFG      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x110))
+/* General-purpose DMA Controller declaration */
+#define GPDMA			(((GPDMA_Typedef *)DMA_BASE_ADDR))
 
-/* DMA channel 1 registers */
-#define GPDMA_CH1_SRC      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x120))
-#define GPDMA_CH1_DEST     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x124))
-#define GPDMA_CH1_LLI      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x128))
-#define GPDMA_CH1_CTRL     (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x12C))
-#define GPDMA_CH1_CFG      (*(volatile unsigned long *)(DMA_BASE_ADDR + 0x130))
+/*
+ * General-purpose DMA Controller register structure
+ */
+typedef struct
+{
+	unsigned long GPDMA_CH_SRC;
+	unsigned long GPDMA_CH_DEST;
+	unsigned long GPDMA_CH_LLI;
+	unsigned long GPDMA_CH_CTRL;
+	unsigned long GPDMA_CH_CFG;
+} GPDMA_CH_Typedef;
+
+/* DMA channel 0 declaration */
+#define GPDMA_CH0		(((GPDMA_CH_Typedef *)(DMA_BASE_ADDR + 0x100)))
+
+/* DMA channel 1 declaration */
+#define GPDMA_CH1		(((GPDMA_CH_Typedef *)(DMA_BASE_ADDR + 0x120)))
 
 /* LCD Controller */
 

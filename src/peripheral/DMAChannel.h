@@ -8,6 +8,7 @@
 #ifndef DMACHANNEL_H_
 #define DMACHANNEL_H_
 
+#include "LPC23xx.h"
 #include "Peripheral.h"
 #include <stdint.h>
 
@@ -28,10 +29,16 @@ class DMAConfiguration;
 
 class DMAChannel: public Peripheral {
 public:
-	DMAChannel(uint8_t id);
+	DMAChannel(uint8_t id, GPDMA_CH_Typedef* dmaChRegisters);
 	virtual ~DMAChannel();
 
 	void configure(DMAConfiguration config);
+	void enable();
+	void disable();
+	uint8_t isEnabled();
+
+private:
+	GPDMA_CH_Typedef* dmaChRegisters;
 };
 
 #endif /* DMACHANNEL_H_ */

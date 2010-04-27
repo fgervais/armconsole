@@ -10,6 +10,9 @@
 #include "VideoMemory.h"
 #include "VisibleArea.h"
 #include "Bitmap.h"
+#include "LPC2478.h"
+#include "DMAChannel.h"
+#include "DMAConfiguration.h"
 
 Background::Background(Bitmap* bitmap, uint32_t width, uint32_t height, Environment* environment) {
 	this->bitmap = bitmap;
@@ -62,13 +65,25 @@ void Background::render(VideoMemory* videoMemory) {
 	}*/
 
 	/* Optimized version */
-	uint32_t* image = bitmap->getData();
+	/*uint32_t* image = bitmap->getData();
 	for (uint32_t i=0; i<renderHeight; i++) {
 		for (uint32_t j=0; j<renderWidth; j++) {
 			videoMemoryPointer[i*videoMemoryWidth + j]
 							   = image[(i+renderMaskY1)*width + ((j+renderMaskX1) & (width-1))];
 		}
+	}*/
+
+	/* DMA version */
+	DMAChannel* dma0 = LPC2478::getDMA0();
+
+	DMAConfiguration dmaConfig;
+
+	DMACCxLLI** lli = new DMACCxLLI*[height];
+	for(uint8_t i=0; i<height; i++) {
+		lli[i] = new DMACCxLLI();
 	}
+
+	dma0->configure(dmaConfig);
 
 }
 

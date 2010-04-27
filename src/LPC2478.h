@@ -17,6 +17,7 @@ class Gpio;
 class HostControllerDriver;
 class LCDControllerDriver;
 class DAC;
+class DMAChannel;
 
 /**
  * Software interface to the LPC2478 microcontroller.
@@ -37,18 +38,20 @@ public:
 	static HostControllerDriver* getHCD();
 	static LCDControllerDriver* getLCD();
 	static DAC* getDAC();
+	static DMAChannel* getDMA0();
 
 	static void delay(uint32_t usec);
 private:
 	static const uint32_t frequency = Fcclk;
 
-	static Gpio *gpio0;
-	static Gpio *gpio1;
-	static Gpio *gpio2;
-	static Gpio *gpio3;
-	static HostControllerDriver *hcd;
-	static LCDControllerDriver *lcd;
+	static Gpio* gpio0;
+	static Gpio* gpio1;
+	static Gpio* gpio2;
+	static Gpio* gpio3;
+	static HostControllerDriver* hcd;
+	static LCDControllerDriver* lcd;
 	static DAC* dac;
+	static DMAChannel* dma0;
 };
 
 #endif /* LPC2478_H_ */
