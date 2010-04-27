@@ -11,6 +11,7 @@
 #include "LCDControllerDriver.h"
 #include "BlueScreenSunLCD.h"
 #include "DAC.h"
+#include "DMAChannel.h"
 #include "irq.h"
 
 /* Static initialization. Required to make the compiler happy */
@@ -21,6 +22,7 @@ Gpio* LPC2478::gpio3 = 0;
 HostControllerDriver* LPC2478::hcd = 0;
 LCDControllerDriver* LPC2478::lcd = 0;
 DAC* LPC2478::dac = 0;
+DMAChannel* LPC2478::dma0 = 0;
 
 LPC2478::LPC2478() {
 
@@ -258,6 +260,22 @@ DAC* LPC2478::getDAC() {
 		dac = new DAC(DAC0);
 	}
 	return dac;
+}
+
+/**
+ * Get the General Purpose DMA channel 0 of the DMA Controller.
+ *
+ * @return DMA channel 0
+ */
+DMAChannel* LPC2478::getDMA0() {
+	if(dma0 == 0) {
+		PCONP |= (1 << 29);	// Enable GPDMA clock
+
+		GPDMA->GPDMA_CONFIG |= 1;	// Enable GPDMA
+
+		dma0 = new DMAChannel(0, GPDMA_CH0);
+	}
+	return dma0;
 }
 
 /**
