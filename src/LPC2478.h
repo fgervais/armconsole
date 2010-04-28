@@ -39,6 +39,7 @@ public:
 	static LCDControllerDriver* getLCD();
 	static DAC* getDAC();
 	static DMAChannel* getDMA0();
+	static DMAChannel* getDMA1();
 
 	static void delay(uint32_t usec);
 private:
@@ -52,6 +53,7 @@ private:
 	static LCDControllerDriver* lcd;
 	static DAC* dac;
 	static DMAChannel* dma0;
+	static DMAChannel* dma1;
 };
 
 #endif /* LPC2478_H_ */

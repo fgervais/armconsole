@@ -57,9 +57,9 @@ void Level1::build() {
 	// Send it to the environment (Base class)
 	set(visibleArea);
 
-	Bitmap* background_bitmap = new Bitmap("0:back1.bmp");
-	Background* background = new Background(background_bitmap, 256, 272, this);
-	background->setScrollSpeedMultipliers(0.5, 0.5);
+	Bitmap* background_bitmap = new Bitmap("0:back4.bmp");
+	Background* background = new Background(background_bitmap, 768, 272, this);
+	//background->setScrollSpeedMultipliers(0.5, 0.5);
 
 	set(background);
 }

@@ -21,7 +21,7 @@
 struct DMACCxLLI {
 	uint32_t DMACCxSrcAddr;
 	uint32_t DMACCxDestAddr;
-	DMACCxLLI* DMACCxLLI;
+	uint32_t DMACCxLLI;
 	uint32_t DMACCxControl;
 };
 

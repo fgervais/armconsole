@@ -117,12 +117,13 @@ void LCDControllerDriver::configure(LCDConfiguration config) {
 	lcdRegisters->LCD_INTMSK = 0;
 
 	/*
-	 * The BlueScreen SUN team change de default round-robin
+	 * The BlueScreen SUN team change the default round-robin
 	 * AHB1 access scheduler to a priority based one with
 	 * LCD getting the highest priority. I'll try using the
 	 * default stuff and we'll see how it goes.
 	 */
 	//AHBCFG1 = 0x12340144;
+	AHBCFG1 = 0x51243144;
 }
 
 void LCDControllerDriver::clearScreen() {
