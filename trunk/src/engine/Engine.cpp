@@ -31,9 +31,15 @@ void Engine::start() {
 	VideoMemory** videoPage = new VideoMemory*[2];
 
 	videoPage[0] = new VideoMemory((uint32_t*)0xA0000000,480,272);
-	videoPage[1] = new VideoMemory((uint32_t*)0xA007F800,480,272);
+	//videoPage[1] = new VideoMemory((uint32_t*)0xA007F800,480,272);
+	videoPage[1] = new VideoMemory((uint32_t*)0xA0080000,480,272);
 
 	uint8_t currentPage = 0;
+
+	LPC2478::getLCD()->setBaseAddress((uint32_t)(videoPage[0]->getPointer()));
+	LPC2478::getLCD()->setBackground(0x00DEC3BD);
+	LPC2478::getLCD()->setBaseAddress((uint32_t)(videoPage[1]->getPointer()));
+	LPC2478::getLCD()->setBackground(0x00DEC3BD);
 
 	// Start tick timer
 

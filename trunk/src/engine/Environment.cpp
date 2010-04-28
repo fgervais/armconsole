@@ -81,14 +81,26 @@ void Environment::update() {
 	//visibleArea->x1 += heroVelocityX;
 	//visibleArea->x2 += heroVelocityX;
 
-	if(visibleArea->x2 < (width-1)) {
+	static int8_t velocity = 10;
+
+	/*if(visibleArea->x2 < (width-1)) {
 		visibleArea->x1 += 10;
 		visibleArea->x2 += 10;
 	}
 	else {
 		visibleArea->x1 = 0;
 		visibleArea->x2 = 480;
+	}*/
+
+	if(visibleArea->x2+velocity > width) {
+		velocity = -10;
 	}
+	else if((int32_t)visibleArea->x1+velocity < 0) {
+		velocity = 10;
+	}
+
+	visibleArea->x1 += velocity;
+	visibleArea->x2 += velocity;
 
 	// Update background
 	updateBackground();

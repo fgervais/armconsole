@@ -16,6 +16,8 @@ class Bitmap;
 class Environment;
 class VideoMemory;
 
+struct DMACCxLLI;
+
 class Background : public Renderable {
 public:
 	Background(Bitmap* handle, uint32_t width, uint32_t height, Environment* environment);
@@ -29,7 +31,6 @@ public:
 	virtual void render(VideoMemory*);
 
 	void set(Environment* environment);
-	void setScrollSpeedMultipliers(float x, float y);
 
 private:
 	Bitmap* bitmap;
@@ -38,8 +39,7 @@ private:
 
 	Environment* environment;
 
-	float xSpeedMultiplier;
-	float ySpeedMultiplier;
+	DMACCxLLI** lli;
 };
 
 #endif /* BACKGROUND_H_ */

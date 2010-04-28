@@ -23,6 +23,7 @@ HostControllerDriver* LPC2478::hcd = 0;
 LCDControllerDriver* LPC2478::lcd = 0;
 DAC* LPC2478::dac = 0;
 DMAChannel* LPC2478::dma0 = 0;
+DMAChannel* LPC2478::dma1 = 0;
 
 LPC2478::LPC2478() {
 
@@ -276,6 +277,17 @@ DMAChannel* LPC2478::getDMA0() {
 		dma0 = new DMAChannel(0, GPDMA_CH0);
 	}
 	return dma0;
+}
+
+DMAChannel* LPC2478::getDMA1() {
+	if(dma1 == 0) {
+		PCONP |= (1 << 29);	// Enable GPDMA clock
+
+		GPDMA->GPDMA_CONFIG |= 1;	// Enable GPDMA
+
+		dma1 = new DMAChannel(0, GPDMA_CH1);
+	}
+	return dma1;
 }
 
 /**

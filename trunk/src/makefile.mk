@@ -38,7 +38,8 @@ TCHAIN = arm-eabi
 MCU      = arm7tdmi-s
 SUBMDL   = lpc2478
 
-USE_THUMB_MODE = YES
+#USE_THUMB_MODE = YES
+USE_THUMB_MODE = NO
 
 
 ## Exception-Vector placement not used so far in M3-examples
