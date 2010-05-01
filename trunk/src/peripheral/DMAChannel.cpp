@@ -17,12 +17,13 @@ DMAChannel::~DMAChannel() {
 }
 
 void DMAChannel::configure(DMAConfiguration config) {
+	// Clear any pending interrupt
 	GPDMA->GPDMA_INT_TCCLR = 0x01;
 	GPDMA->GPDMA_INT_ERR_CLR = 0x01;
 
 	dmaChRegisters->GPDMA_CH_SRC = config.lli->DMACCxSrcAddr;
 	dmaChRegisters->GPDMA_CH_DEST = config.lli->DMACCxDestAddr;
-	dmaChRegisters->GPDMA_CH_LLI = (uint32_t)config.lli->DMACCxLLI;
+	dmaChRegisters->GPDMA_CH_LLI = config.lli->DMACCxLLI;
 	dmaChRegisters->GPDMA_CH_CTRL = config.lli->DMACCxControl;
 }
 

@@ -13,8 +13,8 @@
 #include "Debug.h"
 
 Tile::Tile(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame, Environment* environment) {
-	this->height = height;
 	this->width = width;
+	this->height = height;
 	this->frames = frames;
 	this->numberOfFrame = numberOfFrame;
 	this->currentFrame = 0;
