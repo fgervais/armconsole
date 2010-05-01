@@ -133,7 +133,7 @@ uint8_t Environment::add(Sprite* sprite, uint32_t x, uint32_t y) {
 	if(numberOfSprite < spriteLimit) {
 		sprites[numberOfSprite] = sprite;
 		// Set the pixel position of the sprite
-		sprite->setPosition(x,y);
+		//sprite->setPosition(x,y);
 		numberOfSprite++;
 		return 0;
 	}
@@ -166,7 +166,7 @@ uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
  */
 void Environment::set(Hero* hero, uint32_t x, uint32_t y) {
 	this->hero = hero;
-	hero->setPosition(x,y);
+	//hero->setPosition(x,y);
 }
 
 /**

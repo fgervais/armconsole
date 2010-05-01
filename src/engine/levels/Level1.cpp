@@ -11,6 +11,7 @@
 #include "VisibleArea.h"
 #include "Debug.h"
 #include "Background.h"
+#include "Physics.h"
 
 Level1::Level1()
 	: Environment(960, 272, 56, 32) {
@@ -62,4 +63,9 @@ void Level1::build() {
 	//background->setScrollSpeedMultipliers(0.5, 0.5);
 
 	set(background);
+
+	// Start with a power of 2 gravitation acceleration since it's easy to play with
+	// ad 8 is close to earth acceleration anyway (which is ~9.81)
+	Physics* physics = new Physics(8);
+	set(physics);
 }

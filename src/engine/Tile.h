@@ -30,7 +30,6 @@ public:
 private:
 	uint32_t height;
 	uint32_t width;
-	uint32_t** handles;
 	Bitmap** frames;
 	uint32_t numberOfFrame;
 	uint32_t currentFrame;

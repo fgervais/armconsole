@@ -60,6 +60,7 @@ DISPLAY = ./display
 ENGINE = ./engine
 LEVELS = ./engine/levels
 FILESYSTEM = ./filesystem
+STATES = ./engine/states
 
 
 # List C source files here
@@ -89,6 +90,7 @@ CPPSRCARM += $(wildcard ./display/*.cpp)
 CPPSRCARM += $(wildcard ./engine/*.cpp)
 CPPSRCARM += $(wildcard ./engine/levels/*.cpp)
 CPPSRCARM += $(wildcard ./filesystem/*.cpp)
+CPPSRCARM += $(wildcard ./engine/states/*.cpp)
 
 
 # List Assembler source files here.
@@ -156,6 +158,7 @@ EXTRAINCDIRS += $(ENGINE)
 EXTRAINCDIRS += $(LEVELS)
 EXTRAINCDIRS += $(FILESYSTEM)/ff7e/src
 EXTRAINCDIRS += $(FILESYSTEM)
+EXTRAINCDIRS += $(STATES)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.

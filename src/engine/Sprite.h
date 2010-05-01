@@ -8,13 +8,14 @@
 #ifndef SPRITE_H_
 #define SPRITE_H_
 
-#include "Graphic.h"
+#include <stdint.h>
 
 class Environment;
+class State;
 
-class Sprite: public Graphic {
+class Sprite {
 public:
-	Sprite(uint32_t height, uint32_t width, uint32_t** handles, uint32_t numberOfFrame);
+	Sprite(uint32_t width, uint32_t height, State* initialState, Environment* environment);
 	virtual ~Sprite();
 
 	enum Direction { Up, Down, Left, Right };

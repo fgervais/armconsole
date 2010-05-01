@@ -171,9 +171,4 @@ void Background::set(Environment* environment) {
 	this->environment = environment;
 }
 
-/*void Background::setScrollSpeedMultipliers(float x, float y) {
-	this->xSpeedMultiplier = x;
-	this->ySpeedMultiplier = y;
-}*/
-
 /* PRIVATE FUNCTIONS */
