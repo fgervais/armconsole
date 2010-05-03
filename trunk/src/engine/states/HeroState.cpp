@@ -14,6 +14,7 @@ HeroState::HeroState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t 
 	this->frames = frames;
 	this->numberOfFrame = numberOfFrame;
 	this->currentFrame = 0;
+	this->loopFirstFrame = 0;
 
 	// Ensure every bitmap are loaded into memory
 	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
@@ -28,6 +29,26 @@ HeroState::~HeroState() {
 
 }
 
+/**
+ * Set the first frame of the frame loop.
+ *
+ * Sometime the first frame should be displayed only once when
+ * entering the state. In that case, the first frame of the
+ * loop should be set to the second frame i.e. frame1.
+ *
+ * The class default to frame0 for the loop first frame.
+ *
+ * @param frameNumber Loop first frame number.
+ */
+void HeroState::setLoopFirstFrame(uint32_t frameNumber) {
+	loopFirstFrame = frameNumber;
+}
+
+/**
+ * Reset the state.
+ *
+ * Currently only reset the frame counter to 0.
+ */
 void HeroState::reset() {
 	currentFrame = 0;
 }
@@ -47,6 +68,6 @@ void HeroState::update(Sprite* sprite) {
 		currentFrame++;
 	}
 	else {
-		currentFrame = 0;
+		currentFrame = loopFirstFrame;
 	}
 }
