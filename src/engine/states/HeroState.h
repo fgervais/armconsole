@@ -21,12 +21,19 @@ public:
 	virtual ~HeroState();
 
 	// Abstract singleton function
-	virtual HeroState* getInstance() = 0;
+	//virtual HeroState* getInstance() = 0;
 
 	// Finite State Machine functions
+	// All these does nothing by default
 	virtual void jump(Sprite*) {};
 	virtual void runLeft(Sprite*) {};
 	virtual void runRight(Sprite*) {};
+	virtual void stall(Sprite*) {};
+
+	// Accessors
+	uint32_t getWidth() { return width; }
+	uint32_t getHeight() { return height; }
+	void setLoopFirstFrame(uint32_t frameNumber);
 
 	Bitmap* getCurrentFrame() { return frames[currentFrame]; }
 	void reset();
@@ -38,6 +45,7 @@ private:
 	Bitmap** frames;
 	uint32_t numberOfFrame;
 	uint32_t currentFrame;
+	uint32_t loopFirstFrame;
 };
 
 #endif /* HEROSTATE_H_ */

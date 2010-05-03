@@ -22,9 +22,13 @@ public:
 
 	void set(Direction direction) { this->direction = direction; }
 
+	// Accessors
 	int32_t getVelocityX() { return xVelocity; };
 	int32_t getVelocityY() { return yVelocity; };
 	Direction getDirection() { return direction; }
+
+	void setVelocityX(int32_t velocity) { xVelocity = velocity; }
+	void setVelocityY(int32_t velocity) { yVelocity = velocity; }
 private:
 	Direction direction;
 
