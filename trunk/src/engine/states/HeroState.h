@@ -14,6 +14,7 @@
 
 class Sprite;
 class Bitmap;
+class VideoMemory;
 
 class HeroState {
 public:
@@ -38,6 +39,7 @@ public:
 	Bitmap* getCurrentFrame() { return frames[currentFrame]; }
 	void reset();
 	virtual void update(Sprite*);
+	virtual void render(Sprite*, VideoMemory*);
 
 private:
 	uint32_t height;
@@ -46,6 +48,8 @@ private:
 	uint32_t numberOfFrame;
 	uint32_t currentFrame;
 	uint32_t loopFirstFrame;
+	uint32_t positionX;
+	uint32_t positionY;
 };
 
 #endif /* HEROSTATE_H_ */

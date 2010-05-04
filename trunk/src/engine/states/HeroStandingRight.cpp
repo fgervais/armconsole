@@ -26,5 +26,6 @@ HeroState* HeroStandingRight::getInstance() {
 		frames[0] = new Bitmap("0:state/HeroStandingRight/1.bmp");
 		instance = new HeroStandingRight(35, 35, frames, 1);
 	}
+	instance->reset();
 	return instance;
 }

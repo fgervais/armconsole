@@ -68,6 +68,7 @@ SRC  = $(LOWLEVEL)/src/target.c
 SRC += $(LOWLEVEL)/src/irq.c
 #SRC += $(LOWLEVEL)/src/syscalls.c
 SRC += $(wildcard ./filesystem/ff7e/src/*.c)
+SRC += $(wildcard ./filesystem/ff7e/src/option/ccsbcs.c)
 
 
 # List C source files here which must be compiled in ARM-Mode.
