@@ -11,30 +11,41 @@
 #include <stdint.h>
 
 class Environment;
-class State;
+class HeroState;
+class VideoMemory;
 
 class Sprite {
 public:
-	Sprite(uint32_t width, uint32_t height, State* initialState, Environment* environment);
+	Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment);
 	virtual ~Sprite();
 
-	enum Direction { Up, Down, Left, Right };
-
-	void set(Direction direction) { this->direction = direction; }
-
 	// Accessors
-	int32_t getVelocityX() { return xVelocity; };
-	int32_t getVelocityY() { return yVelocity; };
-	Direction getDirection() { return direction; }
+	void setVelocity(uint32_t x, uint32_t y);
+	int32_t getVelocityX() { return velocityX; };
+	int32_t getVelocityY() { return velocityY; };
+	Environment* getEnvironment() { return environment; }
 
-	void setVelocityX(int32_t velocity) { xVelocity = velocity; }
-	void setVelocityY(int32_t velocity) { yVelocity = velocity; }
+	void setPosition(uint32_t x, uint32_t y);
+	uint32_t getPositionX() { return positionX; }
+	uint32_t getPositionY() { return positionY; }
+
+	uint32_t getWidth() { return width; };
+	uint32_t getHeight() { return height; };
+
+	virtual void update();
+	virtual void render(VideoMemory*);
 private:
-	Direction direction;
-
 	// For now the velocity is in pixel per frame.
-	int32_t xVelocity;
-	int32_t yVelocity;
+	int32_t velocityX;
+	int32_t velocityY;
+
+	uint32_t positionX;
+	uint32_t positionY;
+
+	uint32_t width;
+	uint32_t height;
+	HeroState* state;
+	Environment* environment;
 };
 
 #endif /* SPRITE_H_ */

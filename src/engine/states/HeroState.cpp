@@ -7,6 +7,11 @@
 
 #include "HeroState.h"
 #include "Bitmap.h"
+#include "VideoMemory.h"
+#include "Sprite.h"
+#include "Environment.h"
+#include "VisibleArea.h"
+#include "Debug.h"
 
 HeroState::HeroState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame) {
 	this->width = width;
@@ -69,5 +74,57 @@ void HeroState::update(Sprite* sprite) {
 	}
 	else {
 		currentFrame = loopFirstFrame;
+	}
+}
+
+void HeroState::render(Sprite* sprite, VideoMemory* videoMemory) {
+	VisibleArea* visibleArea = sprite->getEnvironment()->getVisibleArea();
+	uint32_t positionX = sprite->getPositionX();
+	uint32_t positionY = sprite->getPositionY();
+
+	// Get x,y coordinates inside the visible area
+	uint32_t renderPositionX = positionX - visibleArea->x1;
+	uint32_t renderPositionY = positionY - visibleArea->y1;
+
+	/*
+	 * These are used to subtract part of the image from the
+	 * rendering process.
+	 */
+	uint32_t renderMaskX1 = 0;
+	uint32_t renderMaskY1 = 0;
+	uint32_t renderMaskX2 = width;
+	uint32_t renderMaskY2 = height;
+
+	/*
+	 * These 4 following tests check if part of the image is outside
+	 * the visible area. If so, set the render mask so it won't
+	 * render the part outside the screen.
+	 */
+	if(positionX < visibleArea->x1) {
+		renderMaskX1 = visibleArea->x1 - positionX;
+		renderPositionX = 0;
+	}
+	if(positionY < visibleArea->y1) {
+		renderMaskY1 = visibleArea->y1 - positionY;
+		renderPositionY = 0;
+	}
+	if((positionX+width) > visibleArea->x2) {
+		renderMaskX2 = visibleArea->x2 - positionX;
+	}
+	if((positionY+height) > visibleArea->y2) {
+		renderMaskY2 = visibleArea->y2 - positionY;
+	}
+
+	// Draw the image on the screen
+	uint32_t videoMemoryWidth = videoMemory->getWidth();
+	uint32_t* videoMemoryPointer = videoMemory->getPointer();
+
+	// Render the part of the tile inside the render mask
+	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
+		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
+			// This is complicated to understand but I don't think we can simplify it
+			videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+							   = frames[currentFrame]->getData()[i*width + j];
+		}
 	}
 }

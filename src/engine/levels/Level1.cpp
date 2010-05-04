@@ -12,6 +12,9 @@
 #include "Debug.h"
 #include "Background.h"
 #include "Physics.h"
+#include "Sprite.h"
+#include "HeroState.h"
+#include "HeroStandingRight.h"
 
 Level1::Level1()
 	: Environment(960, 272, 56, 32) {
@@ -68,4 +71,9 @@ void Level1::build() {
 	// ad 8 is close to earth acceleration anyway (which is ~9.81)
 	Physics* physics = new Physics(8);
 	set(physics);
+
+	// Hero section
+	Sprite* hero = new Sprite(35, 35, HeroStandingRight::getInstance(), this);
+	set(hero, 240, 189);
+	Debug::writeLine("Done Loading hero");
 }

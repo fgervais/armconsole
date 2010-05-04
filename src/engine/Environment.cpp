@@ -76,21 +76,7 @@ void Environment::render(VideoMemory* videoMemory) {
 }
 
 void Environment::update() {
-	//int32_t heroVelocityX = hero->getVelocityX();
-
-	//visibleArea->x1 += heroVelocityX;
-	//visibleArea->x2 += heroVelocityX;
-
-	static int8_t velocity = 10;
-
-	/*if(visibleArea->x2 < (width-1)) {
-		visibleArea->x1 += 10;
-		visibleArea->x2 += 10;
-	}
-	else {
-		visibleArea->x1 = 0;
-		visibleArea->x2 = 480;
-	}*/
+	/*static int8_t velocity = 10;
 
 	if(visibleArea->x2+velocity > width) {
 		velocity = -10;
@@ -100,7 +86,23 @@ void Environment::update() {
 	}
 
 	visibleArea->x1 += velocity;
-	visibleArea->x2 += velocity;
+	visibleArea->x2 += velocity;*/
+
+	uint32_t heroMiddlePosition = hero->getPositionX() + (hero->getWidth() / 2);
+
+	// TODO: Fix hard coded values
+	if((heroMiddlePosition - 240) < 0) {
+		visibleArea->x1 = 0;
+		visibleArea->x2 = 480;
+	}
+	else if((heroMiddlePosition + 240) > width) {
+		visibleArea->x1 = width - 480;
+		visibleArea->x2 = width;
+	}
+	else {
+		visibleArea->x1 = heroMiddlePosition - 240;
+		visibleArea->x2 = heroMiddlePosition + 240;
+	}
 
 	// Update background
 	updateBackground();
@@ -164,9 +166,9 @@ uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
  * @param x X position in pixel
  * @param y Y position in pixel
  */
-void Environment::set(Hero* hero, uint32_t x, uint32_t y) {
+void Environment::set(Sprite* hero, uint32_t x, uint32_t y) {
 	this->hero = hero;
-	//hero->setPosition(x,y);
+	hero->setPosition(x,y);
 }
 
 /**
@@ -237,7 +239,7 @@ void Environment::renderTiles(VideoMemory* videoMemory) {
 }
 
 void Environment::renderHero(VideoMemory* videoMemory) {
-
+	hero->render(videoMemory);
 }
 
 void Environment::renderSprites(VideoMemory* videoMemory) {
@@ -259,7 +261,7 @@ void Environment::updateTiles() {
 }
 
 void Environment::updateHero() {
-
+	hero->update();
 }
 
 void Environment::updateSprites() {
