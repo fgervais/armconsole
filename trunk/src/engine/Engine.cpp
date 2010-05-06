@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "LPC2478.h"
 #include "LCDControllerDriver.h"
+#include "Sprite.h"
 
 Engine::Engine() {
 
@@ -45,9 +46,21 @@ void Engine::start() {
 
 	// Infinite game loop
 	Debug::writeLine("Starting the update and render loop");
+	uint8_t counter = 50;
 	while(1) {
 		// Switch to the other video page
 		currentPage ^= 1;
+
+		if(counter > 0) {
+			counter--;
+		}
+
+		if(counter == 40) {
+			environment->getHero()->runRight();
+		}
+		else if(counter == 0) {
+			//environment->getHero()->stop();
+		}
 
 		environment->update();
 		environment->render(videoPage[currentPage]);

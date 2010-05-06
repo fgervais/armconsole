@@ -37,10 +37,48 @@ void Sprite::setPosition(uint32_t x, uint32_t y) {
 	positionY = y;
 }
 
+void Sprite::setState(HeroState* state)  {
+	this->state = state;
+	// Do state entry initialization on the sprite
+	state->initialize(this);
+}
+
 void Sprite::update() {
+	positionX += velocityX;
+
 	state->update(this);
 }
 
 void Sprite::render(VideoMemory* videoMemory) {
 	state->render(this, videoMemory);
 }
+
+/**
+ * This function delegates the action to the current state.
+ */
+void Sprite::jump() {
+	state->jump(this);
+}
+
+/**
+ * This function delegates the action to the current state.
+ */
+void Sprite::runLeft() {
+	state->runLeft(this);
+}
+
+/**
+ * This function delegates the action to the current state.
+ */
+void Sprite::runRight() {
+	state->runRight(this);
+}
+
+/**
+ * This function delegates the action to the current state.
+ */
+void Sprite::stop() {
+	state->stop(this);
+}
+
+

@@ -21,15 +21,21 @@ public:
 	HeroState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
 	virtual ~HeroState();
 
+	/*
+	 * Since this function had to be static,
+	 * it cannot be an abstract function of
+	 * the base class.
+	 */
 	// Abstract singleton function
 	//virtual HeroState* getInstance() = 0;
 
 	// Finite State Machine functions
-	// All these does nothing by default
+	// All these do nothing by default
 	virtual void jump(Sprite*) {};
 	virtual void runLeft(Sprite*) {};
 	virtual void runRight(Sprite*) {};
-	virtual void stall(Sprite*) {};
+	virtual void stop(Sprite*) {};
+	virtual void initialize(Sprite*) {};
 
 	// Accessors
 	uint32_t getWidth() { return width; }
@@ -37,7 +43,8 @@ public:
 	void setLoopFirstFrame(uint32_t frameNumber);
 
 	Bitmap* getCurrentFrame() { return frames[currentFrame]; }
-	void reset();
+
+	virtual void reset();
 	virtual void update(Sprite*);
 	virtual void render(Sprite*, VideoMemory*);
 
