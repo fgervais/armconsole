@@ -6,6 +6,8 @@
  */
 
 #include "HeroStandingRight.h"
+#include "HeroRunningRight.h"
+#include "Sprite.h"
 #include "Bitmap.h"
 
 HeroState* HeroStandingRight::instance = 0;
@@ -28,4 +30,13 @@ HeroState* HeroStandingRight::getInstance() {
 	}
 	instance->reset();
 	return instance;
+}
+
+/* BASE CLASS FUNCTION OVERRIDE */
+void HeroStandingRight::runRight(Sprite* sprite) {
+	sprite->setState(HeroRunningRight::getInstance());
+}
+
+void HeroStandingRight::initialize(Sprite* sprite) {
+	sprite->setVelocity(0, 0);
 }

@@ -32,8 +32,16 @@ public:
 	uint32_t getWidth() { return width; };
 	uint32_t getHeight() { return height; };
 
+	void setState(HeroState* state);
+
 	virtual void update();
 	virtual void render(VideoMemory*);
+
+	// Action functions
+	void jump();
+	void runLeft();
+	void runRight();
+	void stop();
 private:
 	// For now the velocity is in pixel per frame.
 	int32_t velocityX;

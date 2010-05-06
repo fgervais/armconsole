@@ -12,13 +12,18 @@
 
 class HeroRunningRight: public HeroState {
 public:
+	static HeroState* getInstance();
+
+	// Base class function override
+	virtual void stop(Sprite*);
+	virtual void initialize(Sprite*);
+	virtual void update(Sprite*);
+
+private:
 	HeroRunningRight(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
 	virtual ~HeroRunningRight();
 
-	virtual HeroState* getInstance();
-
-private:
-	HeroState* instance;
+	static HeroState* instance;
 };
 
 #endif /* HERORUNNINGRIGHT_H_ */
