@@ -48,9 +48,12 @@ void Sprite::update() {
 	if(!environment->isOnGround(this)) {
 		stop();
 	}
+	else {
+		environment->move(this, positionX+velocityX, positionY+velocityY);
+	}
 
-	positionX += velocityX;
-	positionY += velocityY;
+	//positionX += velocityX;
+	//positionY += velocityY;
 
 	// Update the currently displayed frame
 	// And possibly some state specific things

@@ -37,7 +37,7 @@ public:
 	uint8_t isOnGround(Sprite*);
 	uint8_t isOnWall(Sprite*) { return 0; }
 	uint8_t isReachable(Sprite*, uint32_t x, uint32_t y) { return 0; }
-	uint8_t move(Sprite*, uint32_t x, uint32_t y);
+	uint8_t move(Sprite*, uint32_t desiredPositionX, uint32_t desiredPositionY);
 
 	VisibleArea* getVisibleArea() { return visibleArea; };
 	Sprite* getHero() { return hero; }
