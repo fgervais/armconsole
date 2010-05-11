@@ -34,7 +34,11 @@ public:
 	// Synchronized interface implementation
 	virtual void update();
 
-	void receive(Request request);
+	uint8_t isOnGround(Sprite*);
+	uint8_t isOnWall(Sprite*) { return 0; }
+	uint8_t isReachable(Sprite*, uint32_t x, uint32_t y) { return 0; }
+	uint8_t move(Sprite*, uint32_t x, uint32_t y);
+
 	VisibleArea* getVisibleArea() { return visibleArea; };
 	Sprite* getHero() { return hero; }
 

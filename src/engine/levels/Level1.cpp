@@ -43,11 +43,13 @@ void Level1::build() {
 	Tile* tile2 = new Tile(56, 32, brick, 1, this);
 
 	// Send the tiles to the environment (Base class)
-	for(uint8_t i=0; i<18; i++) {
+	//for(uint8_t i=0; i<18; i++) {
+	for(uint8_t i=0; i<15; i++) {
 		add(tile1, i, 7);
 	}
 
-	for(uint8_t i=0; i<18; i++) {
+	//for(uint8_t i=0; i<18; i++) {
+	for(uint8_t i=0; i<15; i++) {
 		add(tile2, i, 8);
 	}
 
