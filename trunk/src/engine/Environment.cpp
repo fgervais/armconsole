@@ -117,6 +117,29 @@ void Environment::update() {
 	updateSprites();
 }
 
+/**
+ * This function check whether the given sprite is on ground.
+ *
+ * @param sprite Sprite to check for ground status.
+ * @return 1 if on ground, 0 otherwise.
+ */
+uint8_t Environment::isOnGround(Sprite* sprite) {
+	// TODO: If the tile dimension would be a power of 2, it would make things easier
+
+	if((sprite->getPositionY()+sprite->getHeight()) % tileHeight == 0) {
+		uint32_t tileStartX = sprite->getPositionX() / tileWidth;
+		uint32_t tileEndX = (sprite->getPositionX() + sprite->getWidth()) / tileWidth;
+		uint32_t tileY = (sprite->getPositionY() + sprite->getHeight()) / tileHeight;
+
+		for(uint32_t x=tileStartX; x<=tileEndX; x++) {
+			if(tileMap[tileY][x] != 0) {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
 /*
  * PROTECTED FUNCTIONS
  */

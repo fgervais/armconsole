@@ -20,7 +20,7 @@ public:
 	virtual ~Sprite();
 
 	// Accessors
-	void setVelocity(uint32_t x, uint32_t y);
+	void setVelocity(int32_t x, int32_t y);
 	int32_t getVelocityX() { return velocityX; };
 	int32_t getVelocityY() { return velocityY; };
 	Environment* getEnvironment() { return environment; }

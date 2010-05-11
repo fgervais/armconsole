@@ -13,7 +13,7 @@
 HeroState* HeroRunningRight::instance = 0;
 
 HeroRunningRight::HeroRunningRight(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame)
-: HeroState(width, height, frames, numberOfFrame) {
+	: HeroState(width, height, frames, numberOfFrame) {
 
 
 }
@@ -51,7 +51,7 @@ void HeroRunningRight::stop(Sprite* sprite) {
 }
 
 void HeroRunningRight::initialize(Sprite* sprite) {
-	sprite->setVelocity(4, 0);
+	sprite->setVelocity(6, 0);
 }
 
 void HeroRunningRight::update(Sprite* sprite) {

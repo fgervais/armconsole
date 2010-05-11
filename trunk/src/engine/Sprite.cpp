@@ -9,6 +9,7 @@
 #include "Environment.h"
 #include "HeroState.h"
 #include "VideoMemory.h"
+#include "Debug.h"
 
 Sprite::Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment) {
 	this->width = width;
@@ -27,7 +28,7 @@ Sprite::~Sprite() {
 
 }
 
-void Sprite::setVelocity(uint32_t x, uint32_t y) {
+void Sprite::setVelocity(int32_t x, int32_t y) {
 	velocityX = x;
 	velocityY = y;
 }
@@ -44,8 +45,15 @@ void Sprite::setState(HeroState* state)  {
 }
 
 void Sprite::update() {
-	positionX += velocityX;
+	if(!environment->isOnGround(this)) {
+		stop();
+	}
 
+	positionX += velocityX;
+	positionY += velocityY;
+
+	// Update the currently displayed frame
+	// And possibly some state specific things
 	state->update(this);
 }
 
