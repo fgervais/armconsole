@@ -53,6 +53,9 @@ void Level1::build() {
 		add(tile2, i, 8);
 	}
 
+	// A little hill
+	add(tile1, 13, 6);
+
 	// Create a new visible area for the entire screen
 	VisibleArea* visibleArea = new VisibleArea();
 	visibleArea->x1 = 0;
