@@ -10,6 +10,7 @@
 #include "HeroRunningLeft.h"
 #include "HeroJumpingRight.h"
 #include "Sprite.h"
+#include "Hero.h"
 #include "Bitmap.h"
 
 HeroState* HeroStandingRight::instance = 0;
@@ -35,25 +36,25 @@ HeroState* HeroStandingRight::getInstance() {
 }
 
 /* BASE CLASS FUNCTION OVERRIDE */
-void HeroStandingRight::jump(Sprite* sprite) {
+void HeroStandingRight::jump(Hero* sprite) {
 	sprite->setVelocity(sprite->getVelocityX(), -8);
 	sprite->setState(HeroJumpingRight::getInstance());
 }
 
-void HeroStandingRight::runLeft(Sprite* sprite) {
+void HeroStandingRight::runLeft(Hero* sprite) {
 	//sprite->setState(HeroRunningLeft::getInstance());
 }
 
-void HeroStandingRight::runRight(Sprite* sprite) {
+void HeroStandingRight::runRight(Hero* sprite) {
 	sprite->setState(HeroRunningRight::getInstance());
 }
 
-void HeroStandingRight::update(Sprite* sprite) {
+void HeroStandingRight::update(Hero* sprite) {
 	if(!sprite->isOnGround()) {
 		sprite->setState(HeroJumpingRight::getInstance());
 	}
 }
 
-void HeroStandingRight::initialize(Sprite* sprite) {
+void HeroStandingRight::initialize(Hero* sprite) {
 	sprite->setVelocity(0, 0);
 }

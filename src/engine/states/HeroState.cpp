@@ -9,6 +9,7 @@
 #include "Bitmap.h"
 #include "VideoMemory.h"
 #include "Sprite.h"
+#include "Hero.h"
 #include "Environment.h"
 #include "VisibleArea.h"
 #include "Debug.h"
@@ -76,7 +77,7 @@ void HeroState::reset() {
  *
  * @param sprite Sprite which should be updated by the state.
  */
-void HeroState::update(Sprite* sprite) {
+void HeroState::update(Hero* sprite) {
 	if(currentFrame < (numberOfFrame-1)) {
 		currentFrame++;
 	}
@@ -85,7 +86,7 @@ void HeroState::update(Sprite* sprite) {
 	}
 }
 
-void HeroState::render(Sprite* sprite, VideoMemory* videoMemory) {
+void HeroState::render(Hero* sprite, VideoMemory* videoMemory) {
 	VisibleArea* visibleArea = sprite->getEnvironment()->getVisibleArea();
 	uint32_t positionX = sprite->getPositionX();
 	uint32_t positionY = sprite->getPositionY();
