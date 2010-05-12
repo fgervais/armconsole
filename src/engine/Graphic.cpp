@@ -43,8 +43,8 @@ void Graphic::update() {
 void Graphic::render(VideoMemory* videoMemory) {
 	VisibleArea* visibleArea = environment->getVisibleArea();
 
-	uint32_t renderPositionX = positionX - visibleArea->x1;
-	uint32_t renderPositionY = positionY - visibleArea->y1;
+	uint32_t renderPositionX = positionX - visibleArea->x;
+	uint32_t renderPositionY = positionY - visibleArea->y;
 
 	/*
 	 * These are used to subtract part of the image from the
@@ -60,19 +60,19 @@ void Graphic::render(VideoMemory* videoMemory) {
 	 * the visible area. If so, t set the render mask so it won't
 	 * render the part outside the screen.
 	 */
-	if(positionX < visibleArea->x1) {
-		renderMaskX1 = visibleArea->x1 - positionX;
-		renderPositionX = visibleArea->x1;
+	if(positionX < visibleArea->x) {
+		renderMaskX1 = visibleArea->x - positionX;
+		renderPositionX = visibleArea->x;
 	}
-	if(positionY < visibleArea->y1) {
-		renderMaskY1 = visibleArea->y1 - positionY;
-		renderPositionY = visibleArea->y1;
+	if(positionY < visibleArea->y) {
+		renderMaskY1 = visibleArea->y - positionY;
+		renderPositionY = visibleArea->y;
 	}
-	if((positionX+width) > visibleArea->x2) {
-		renderMaskX2 = (positionX+width) - visibleArea->x2;
+	if((positionX+width) > (visibleArea->x+visibleArea->width)) {
+		renderMaskX2 = (positionX+width) - (visibleArea->x+visibleArea->width);
 	}
-	if((positionY+height) > visibleArea->y2) {
-		renderMaskY2 = (positionY+height) - visibleArea->y2;
+	if((positionY+height) > (visibleArea->y+visibleArea->height)) {
+		renderMaskY2 = (positionY+height) - (visibleArea->y+visibleArea->height);
 	}
 
 	// Draw the image on the screen

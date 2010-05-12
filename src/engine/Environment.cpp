@@ -90,23 +90,14 @@ void Environment::update() {
 
 	int32_t heroMiddlePosition = hero->getPositionX() + (hero->getWidth() / 2);
 
-	// TODO: Fix hard coded values
-	// VisibleArea should contain Width and Height instead of x2, y2
-	visibleArea->x1 = heroMiddlePosition - 240;
-	visibleArea->x2 = heroMiddlePosition + 240;
+	visibleArea->x = heroMiddlePosition - (visibleArea->width/2);
 
-	if((heroMiddlePosition - 240) < 0) {
-		visibleArea->x1 = 0;
-		visibleArea->x2 = 480;
+	if((heroMiddlePosition - (int32_t)(visibleArea->width/2)) < 0) {
+		visibleArea->x = 0;
 	}
-	else if((heroMiddlePosition + 240) > (int32_t)width) {
-		visibleArea->x1 = width - 480;
-		visibleArea->x2 = width;
+	else if((heroMiddlePosition + (int32_t)(visibleArea->width/2)) > (int32_t)width) {
+		visibleArea->x = width - visibleArea->width;
 	}
-	/*else {
-		visibleArea->x1 = heroMiddlePosition - 240;
-		visibleArea->x2 = heroMiddlePosition + 240;
-	}*/
 
 	// Update background
 	updateBackground();
@@ -319,17 +310,17 @@ void Environment::renderBackground(VideoMemory* videoMemory) {
 }
 
 void Environment::renderTiles(VideoMemory* videoMemory) {
-	uint32_t iRenderStart = visibleArea->y1/tileHeight;
-	uint32_t iRenderStop = visibleArea->y2/tileHeight;
-	uint32_t jRenderStart = visibleArea->x1/tileWidth;
-	uint32_t jRenderStop = visibleArea->x2/tileWidth;
+	uint32_t iRenderStart = visibleArea->y/tileHeight;
+	uint32_t iRenderStop = (visibleArea->y+visibleArea->height)/tileHeight;
+	uint32_t jRenderStart = visibleArea->x/tileWidth;
+	uint32_t jRenderStop = (visibleArea->x+visibleArea->width)/tileWidth;
 
 	// If the division is not exact, we render one more tile
 	// This is similar to the ceiling mathematical function
-	if((visibleArea->y2%tileHeight) != 0) {
+	if(((visibleArea->y+visibleArea->height)%tileHeight) != 0) {
 		iRenderStop++;
 	}
-	if((visibleArea->x2%tileWidth) != 0) {
+	if(((visibleArea->x+visibleArea->width)%tileWidth) != 0) {
 		jRenderStop++;
 	}
 
@@ -358,8 +349,8 @@ void Environment::updateBackground() {
 }
 
 void Environment::updateTiles() {
-	for(uint32_t i=visibleArea->y1/tileHeight; i<visibleArea->y2/tileHeight; i++) {
-		for(uint32_t j=visibleArea->x1/tileWidth; j<(visibleArea->x2/tileWidth); j++) {
+	for(uint32_t i=visibleArea->y/tileHeight; i<(visibleArea->y+visibleArea->height)/tileHeight; i++) {
+		for(uint32_t j=visibleArea->x/tileWidth; j<(visibleArea->x+visibleArea->width)/tileWidth; j++) {
 			if(tileMap[i][j] != 0) {
 				tileMap[i][j]->update();
 			}

@@ -70,7 +70,7 @@ void Background::render(VideoMemory* videoMemory) {
 	 * We do this because the background normally scroll slower than the layer
 	 * where the hero is.
 	 */
-	uint32_t renderX1 = visibleArea->x1 >> 1;
+	uint32_t renderX1 = visibleArea->x >> 1;
 	//uint32_t renderY1 = visibleArea->y1 >> 1;
 
 	//uint32_t renderWidth = visibleArea->x2 - visibleArea->x1;
