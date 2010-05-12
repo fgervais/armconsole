@@ -8,6 +8,7 @@
 #include "HeroRunningRight.h"
 #include "HeroStandingRight.h"
 #include "HeroJumpingRight.h"
+#include "HeroRunningLeft.h"
 #include "Sprite.h"
 #include "Hero.h"
 #include "Bitmap.h"
@@ -53,7 +54,11 @@ void HeroRunningRight::jump(Hero* sprite) {
 	sprite->setState(HeroJumpingRight::getInstance());
 }
 
-void HeroRunningRight::stop(Hero* sprite) {
+void HeroRunningRight::runLeft(Hero* sprite) {
+	sprite->setState(HeroRunningLeft::getInstance());
+}
+
+void HeroRunningRight::stopRunning(Hero* sprite) {
 	sprite->setState(HeroStandingRight::getInstance());
 }
 
@@ -63,6 +68,8 @@ void HeroRunningRight::initialize(Hero* sprite) {
 		setFrameNumber(1);
 	}
 	else {
+		// This is the hard coded running speed
+		// could be (should be?) somewhere defined else?
 		sprite->setVelocity(6, 0);
 	}
 }

@@ -33,6 +33,7 @@ public:
 
 	uint8_t isOnGround();
 //private:
+	// TODO: This should switch back to private
 protected:
 	// Velocity is in pixel per frame.
 	int32_t velocityX;

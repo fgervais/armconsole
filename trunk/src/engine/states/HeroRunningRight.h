@@ -16,7 +16,8 @@ public:
 
 	// Base class function override
 	virtual void jump(Hero*);
-	virtual void stop(Hero*);
+	virtual void runLeft(Hero*);
+	virtual void stopRunning(Hero*);
 	virtual void initialize(Hero*);
 	virtual void update(Hero*);
 

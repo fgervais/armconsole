@@ -47,7 +47,7 @@ void Engine::start() {
 
 	// Infinite game loop
 	Debug::writeLine("Starting the update and render loop");
-	uint8_t counter = 100;
+	uint32_t counter = 200;
 	while(1) {
 		// Switch to the other video page
 		currentPage ^= 1;
@@ -56,12 +56,24 @@ void Engine::start() {
 			counter--;
 		}
 
-		if(counter == 95) {
+		if(counter == 195) {
+			environment->getHero()->runLeft();
+		}
+		else if(counter == 135) {
+			environment->getHero()->jump();
+			//environment->getHero()->runRight();
+		}
+		else if(counter == 100) {
 			environment->getHero()->runRight();
 		}
-		else if(counter == 25) {
+		else if(counter == 15) {
 			environment->getHero()->jump();
 		}
+		else if(counter == 0) {
+			environment->getHero()->stopRunning();
+		}
+
+
 
 		environment->update();
 		environment->render(videoPage[currentPage]);
@@ -70,6 +82,6 @@ void Engine::start() {
 		LPC2478::getLCD()->setBaseAddress((uint32_t)(videoPage[currentPage]->getPointer()));
 
 		// 1/25s synchronization
-		LPC2478::delay(1000000);
+		//LPC2478::delay(500000);
 	}
 }

@@ -88,22 +88,25 @@ void Environment::update() {
 	visibleArea->x1 += velocity;
 	visibleArea->x2 += velocity;*/
 
-	uint32_t heroMiddlePosition = hero->getPositionX() + (hero->getWidth() / 2);
+	int32_t heroMiddlePosition = hero->getPositionX() + (hero->getWidth() / 2);
 
 	// TODO: Fix hard coded values
 	// VisibleArea should contain Width and Height instead of x2, y2
+	visibleArea->x1 = heroMiddlePosition - 240;
+	visibleArea->x2 = heroMiddlePosition + 240;
+
 	if((heroMiddlePosition - 240) < 0) {
 		visibleArea->x1 = 0;
 		visibleArea->x2 = 480;
 	}
-	else if((heroMiddlePosition + 240) > width) {
+	else if((heroMiddlePosition + 240) > (int32_t)width) {
 		visibleArea->x1 = width - 480;
 		visibleArea->x2 = width;
 	}
-	else {
+	/*else {
 		visibleArea->x1 = heroMiddlePosition - 240;
 		visibleArea->x2 = heroMiddlePosition + 240;
-	}
+	}*/
 
 	// Update background
 	updateBackground();
