@@ -15,7 +15,10 @@ public:
 	static HeroState* getInstance();
 
 	// Base class function override
+	virtual void jump(Sprite*);
+	virtual void runLeft(Sprite*);
 	virtual void runRight(Sprite*);
+	virtual void update(Sprite*);
 	virtual void initialize(Sprite*);
 
 private:

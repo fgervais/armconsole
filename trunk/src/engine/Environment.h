@@ -41,6 +41,7 @@ public:
 
 	VisibleArea* getVisibleArea() { return visibleArea; };
 	Sprite* getHero() { return hero; }
+	Physics* getPhysics() { return physics; }
 
 protected:
 	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);

@@ -12,11 +12,13 @@
 
 class Physics {
 public:
-	Physics(uint32_t gravitation);
+	Physics(int32_t gravitation);
 	virtual ~Physics();
 
+	int32_t getGravitation() { return gravitation; }
+
 private:
-	uint32_t gravitation;
+	int32_t gravitation;
 };
 
 #endif /* PHYSICS_H_ */

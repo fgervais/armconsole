@@ -91,6 +91,7 @@ void Environment::update() {
 	uint32_t heroMiddlePosition = hero->getPositionX() + (hero->getWidth() / 2);
 
 	// TODO: Fix hard coded values
+	// VisibleArea should contain Width and Height instead of x2, y2
 	if((heroMiddlePosition - 240) < 0) {
 		visibleArea->x1 = 0;
 		visibleArea->x2 = 480;

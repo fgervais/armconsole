@@ -7,6 +7,7 @@
 
 #include "HeroRunningRight.h"
 #include "HeroStandingRight.h"
+#include "HeroJumpingRight.h"
 #include "Sprite.h"
 #include "Bitmap.h"
 
@@ -46,6 +47,11 @@ HeroState* HeroRunningRight::getInstance() {
 }
 
 /* BASE CLASS FUNCTION OVERRIDE */
+void HeroRunningRight::jump(Sprite* sprite) {
+	sprite->setVelocity(sprite->getVelocityX(), -8);
+	sprite->setState(HeroJumpingRight::getInstance());
+}
+
 void HeroRunningRight::stop(Sprite* sprite) {
 	sprite->setState(HeroStandingRight::getInstance());
 }
@@ -59,5 +65,8 @@ void HeroRunningRight::update(Sprite* sprite) {
 	HeroState::update(sprite);
 
 	// Do some more reset stuff specific to the subclass
+	if(!sprite->isOnGround()) {
+		sprite->setState(HeroJumpingRight::getInstance());
+	}
 
 }

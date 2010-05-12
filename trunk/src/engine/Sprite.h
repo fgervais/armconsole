@@ -16,7 +16,8 @@ class VideoMemory;
 
 class Sprite {
 public:
-	Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment);
+	//Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment);
+	Sprite(HeroState* initialState, Environment* environment);
 	virtual ~Sprite();
 
 	// Accessors
@@ -29,8 +30,8 @@ public:
 	uint32_t getPositionX() { return positionX; }
 	uint32_t getPositionY() { return positionY; }
 
-	uint32_t getWidth() { return width; };
-	uint32_t getHeight() { return height; };
+	uint32_t getWidth();
+	uint32_t getHeight();
 
 	void setState(HeroState* state);
 
@@ -41,7 +42,10 @@ public:
 	void jump();
 	void runLeft();
 	void runRight();
-	void stop();
+	void stopRunning();
+	void stopJumping();
+
+	uint8_t isOnGround();
 private:
 	// For now the velocity is in pixel per frame.
 	int32_t velocityX;
@@ -50,8 +54,8 @@ private:
 	uint32_t positionX;
 	uint32_t positionY;
 
-	uint32_t width;
-	uint32_t height;
+	//uint32_t width;
+	//uint32_t height;
 	HeroState* state;
 	Environment* environment;
 };
