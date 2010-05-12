@@ -64,10 +64,10 @@ void Level1::build() {
 
 	// Create a new visible area for the entire screen
 	VisibleArea* visibleArea = new VisibleArea();
-	visibleArea->x1 = 0;
-	visibleArea->y1 = 0;
-	visibleArea->x2 = 480;
-	visibleArea->y2 = 272;
+	visibleArea->x = 0;
+	visibleArea->y = 0;
+	visibleArea->width = 480;
+	visibleArea->height = 272;
 
 	// Send it to the environment (Base class)
 	set(visibleArea);

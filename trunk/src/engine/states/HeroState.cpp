@@ -92,8 +92,8 @@ void HeroState::render(Hero* sprite, VideoMemory* videoMemory) {
 	uint32_t positionY = sprite->getPositionY();
 
 	// Get x,y coordinates inside the visible area
-	uint32_t renderPositionX = positionX - visibleArea->x1;
-	uint32_t renderPositionY = positionY - visibleArea->y1;
+	uint32_t renderPositionX = positionX - visibleArea->x;
+	uint32_t renderPositionY = positionY - visibleArea->y;
 
 	/*
 	 * These are used to subtract part of the image from the
@@ -109,19 +109,19 @@ void HeroState::render(Hero* sprite, VideoMemory* videoMemory) {
 	 * the visible area. If so, set the render mask so it won't
 	 * render the part outside the screen.
 	 */
-	if(positionX < visibleArea->x1) {
-		renderMaskX1 = visibleArea->x1 - positionX;
+	if(positionX < visibleArea->x) {
+		renderMaskX1 = visibleArea->x - positionX;
 		renderPositionX = 0;
 	}
-	if(positionY < visibleArea->y1) {
-		renderMaskY1 = visibleArea->y1 - positionY;
+	if(positionY < visibleArea->y) {
+		renderMaskY1 = visibleArea->y - positionY;
 		renderPositionY = 0;
 	}
-	if((positionX+width) > visibleArea->x2) {
-		renderMaskX2 = visibleArea->x2 - positionX;
+	if((positionX+width) > (visibleArea->x+visibleArea->width)) {
+		renderMaskX2 = (visibleArea->x+visibleArea->width) - positionX;
 	}
-	if((positionY+height) > visibleArea->y2) {
-		renderMaskY2 = visibleArea->y2 - positionY;
+	if((positionY+height) > (visibleArea->y+visibleArea->height)) {
+		renderMaskY2 = (visibleArea->y+visibleArea->height) - positionY;
 	}
 
 	// Draw the image on the screen
