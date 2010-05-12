@@ -68,17 +68,16 @@ void Level1::build() {
 
 	Bitmap* background_bitmap = new Bitmap("0:back4.bmp");
 	Background* background = new Background(background_bitmap, 768, 272, this);
-	//background->setScrollSpeedMultipliers(0.5, 0.5);
 
 	set(background);
 
 	// Start with a power of 2 gravitation acceleration since it's easy to play with
 	// ad 8 is close to earth acceleration anyway (which is ~9.81)
-	Physics* physics = new Physics(8);
+	Physics* physics = new Physics(1);
 	set(physics);
 
 	// Hero section
-	Sprite* hero = new Sprite(35, 35, HeroStandingRight::getInstance(), this);
+	Sprite* hero = new Sprite(HeroStandingRight::getInstance(), this);
 	set(hero, 240, 189);
 	Debug::writeLine("Done Loading hero");
 }

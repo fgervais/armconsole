@@ -46,7 +46,7 @@ void Engine::start() {
 
 	// Infinite game loop
 	Debug::writeLine("Starting the update and render loop");
-	uint8_t counter = 50;
+	uint8_t counter = 100;
 	while(1) {
 		// Switch to the other video page
 		currentPage ^= 1;
@@ -55,11 +55,11 @@ void Engine::start() {
 			counter--;
 		}
 
-		if(counter == 40) {
+		if(counter == 95) {
 			environment->getHero()->runRight();
 		}
-		else if(counter == 0) {
-			//environment->getHero()->stop();
+		else if(counter == 25) {
+			environment->getHero()->jump();
 		}
 
 		environment->update();

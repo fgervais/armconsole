@@ -10,6 +10,8 @@
 
 #include "HeroState.h"
 
+class Sprite;
+
 class HeroJumpingRight: public HeroState {
 public:
 	static HeroState* getInstance();
@@ -17,7 +19,9 @@ public:
 	// Base class function override
 	virtual void runLeft(Sprite*);
 	virtual void runRight(Sprite*);
-	virtual void initialize(Sprite*);
+	virtual void stopRunning(Sprite*);
+	virtual void stopJumping(Sprite*);
+	//virtual void initialize(Sprite*);
 	virtual void update(Sprite*);
 
 private:

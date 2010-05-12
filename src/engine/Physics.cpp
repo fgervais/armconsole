@@ -7,9 +7,8 @@
 
 #include "Physics.h"
 
-Physics::Physics(uint32_t gravitation) {
+Physics::Physics(int32_t gravitation) {
 	this->gravitation = gravitation;
-
 }
 
 Physics::~Physics() {

@@ -36,6 +36,7 @@ private:
 	uint32_t positionX;
 	uint32_t positionY;
 	Environment* environment;
+	uint32_t friction;
 };
 
 #endif /* TILE_H_ */

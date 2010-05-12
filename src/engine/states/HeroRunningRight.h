@@ -15,6 +15,7 @@ public:
 	static HeroState* getInstance();
 
 	// Base class function override
+	virtual void jump(Sprite*);
 	virtual void stop(Sprite*);
 	virtual void initialize(Sprite*);
 	virtual void update(Sprite*);

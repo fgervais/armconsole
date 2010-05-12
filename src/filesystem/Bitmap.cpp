@@ -39,7 +39,7 @@ uint8_t Bitmap::load() {
 	f_err_code = f_open(&handle, path, FA_OPEN_EXISTING | FA_READ);
 
 	if(f_err_code == 0) {
-		Debug::writeLine("Bitmap File opened");
+		//Debug::writeLine("Bitmap File opened");
 	}
 	else {
 		Debug::writeLine("Failed to open file");

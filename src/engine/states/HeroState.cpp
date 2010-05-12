@@ -34,6 +34,14 @@ HeroState::~HeroState() {
 
 }
 
+uint32_t HeroState::getWidth() {
+	return width;
+}
+
+uint32_t HeroState::getHeight() {
+	return height;
+}
+
 /**
  * Set the first frame of the frame loop.
  *

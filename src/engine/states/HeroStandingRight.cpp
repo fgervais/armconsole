@@ -7,6 +7,8 @@
 
 #include "HeroStandingRight.h"
 #include "HeroRunningRight.h"
+#include "HeroRunningLeft.h"
+#include "HeroJumpingRight.h"
 #include "Sprite.h"
 #include "Bitmap.h"
 
@@ -33,8 +35,23 @@ HeroState* HeroStandingRight::getInstance() {
 }
 
 /* BASE CLASS FUNCTION OVERRIDE */
+void HeroStandingRight::jump(Sprite* sprite) {
+	sprite->setVelocity(sprite->getVelocityX(), -8);
+	sprite->setState(HeroJumpingRight::getInstance());
+}
+
+void HeroStandingRight::runLeft(Sprite* sprite) {
+	//sprite->setState(HeroRunningLeft::getInstance());
+}
+
 void HeroStandingRight::runRight(Sprite* sprite) {
 	sprite->setState(HeroRunningRight::getInstance());
+}
+
+void HeroStandingRight::update(Sprite* sprite) {
+	if(!sprite->isOnGround()) {
+		sprite->setState(HeroJumpingRight::getInstance());
+	}
 }
 
 void HeroStandingRight::initialize(Sprite* sprite) {
