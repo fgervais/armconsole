@@ -46,7 +46,7 @@ HeroState* HeroJumpingRight::getInstance() {
 
 void HeroJumpingRight::runLeft(Hero* sprite) {
 	sprite->setVelocity(-6, sprite->getVelocityY());
-	//sprite->setState(HeroJumpingLeft::getInstance());
+	sprite->setState(HeroJumpingLeft::getInstance());
 }
 
 void HeroJumpingRight::runRight(Hero* sprite) {

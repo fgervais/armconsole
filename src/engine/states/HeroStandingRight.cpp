@@ -42,7 +42,7 @@ void HeroStandingRight::jump(Hero* sprite) {
 }
 
 void HeroStandingRight::runLeft(Hero* sprite) {
-	//sprite->setState(HeroRunningLeft::getInstance());
+	sprite->setState(HeroRunningLeft::getInstance());
 }
 
 void HeroStandingRight::runRight(Hero* sprite) {
@@ -50,6 +50,7 @@ void HeroStandingRight::runRight(Hero* sprite) {
 }
 
 void HeroStandingRight::update(Hero* sprite) {
+	// This should happen only if the hero spawn in the air
 	if(!sprite->isOnGround()) {
 		sprite->setState(HeroJumpingRight::getInstance());
 	}

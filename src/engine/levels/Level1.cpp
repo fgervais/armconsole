@@ -16,6 +16,11 @@
 #include "Hero.h"
 #include "HeroState.h"
 #include "HeroStandingRight.h"
+#include "HeroStandingLeft.h"
+#include "HeroRunningLeft.h"
+#include "HeroRunningRight.h"
+#include "HeroJumpingLeft.h"
+#include "HeroJumpingRight.h"
 
 Level1::Level1()
 	: Environment(960, 272, 56, 32) {
@@ -78,8 +83,17 @@ void Level1::build() {
 	set(physics);
 
 	// Hero section
-	Hero* hero = new Hero(HeroStandingRight::getInstance(), this);
+	Debug::writeLine("Pre-loading hero states");
+	HeroStandingLeft::getInstance();
+	HeroStandingRight::getInstance();
+	HeroRunningLeft::getInstance();
+	HeroRunningRight::getInstance();
+	HeroJumpingLeft::getInstance();
+	HeroJumpingRight::getInstance();
+
+	Hero* hero = new Hero(HeroStandingLeft::getInstance(), this);
 	//set(hero, 240, 189);
-	set(hero, 240, 50);
+	//set(hero, 240, 50);
+	set(hero, 720, 50);
 	Debug::writeLine("Done Loading hero");
 }
