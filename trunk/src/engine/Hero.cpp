@@ -39,8 +39,6 @@ void Hero::setState(HeroState* state)  {
 }
 
 void Hero::update() {
-	//positionX += velocityX;
-	//positionY += velocityY;
 	environment->move(this, positionX+velocityX, positionY+velocityY);
 
 	// Update the currently displayed frame

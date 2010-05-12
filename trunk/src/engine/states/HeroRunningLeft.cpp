@@ -51,7 +51,7 @@ HeroState* HeroRunningLeft::getInstance() {
 
 /* BASE CLASS FUNCTION OVERRIDE */
 void HeroRunningLeft::jump(Hero* sprite) {
-	sprite->setVelocity(sprite->getVelocityX(), -8);
+	sprite->setVelocityY(-8);
 	sprite->setState(HeroJumpingLeft::getInstance());
 }
 
@@ -66,7 +66,7 @@ void HeroRunningLeft::stopRunning(Hero* sprite) {
 void HeroRunningLeft::initialize(Hero* sprite) {
 	if(sprite->getVelocityX() < 0) {
 		// If we are already moving left, skip the first frame
-		setFrameNumber(1);
+		currentFrame = 1;
 	}
 	else {
 		// This is the hard coded running speed

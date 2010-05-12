@@ -27,8 +27,24 @@ void Sprite::setVelocity(int32_t x, int32_t y) {
 	velocityY = y;
 }
 
+void Sprite::setVelocityX(int32_t x) {
+	velocityX = x;
+}
+
+void Sprite::setVelocityY(int32_t y) {
+	velocityY = y;
+}
+
 void Sprite::setPosition(uint32_t x, uint32_t y) {
 	positionX = x;
+	positionY = y;
+}
+
+void Sprite::setPositionX(uint32_t x) {
+	positionX = x;
+}
+
+void Sprite::setPositionY(uint32_t y) {
 	positionY = y;
 }
 

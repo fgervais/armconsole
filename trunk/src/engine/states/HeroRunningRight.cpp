@@ -50,7 +50,7 @@ HeroState* HeroRunningRight::getInstance() {
 
 /* BASE CLASS FUNCTION OVERRIDE */
 void HeroRunningRight::jump(Hero* sprite) {
-	sprite->setVelocity(sprite->getVelocityX(), -8);
+	sprite->setVelocityY(-8);
 	sprite->setState(HeroJumpingRight::getInstance());
 }
 
@@ -65,7 +65,7 @@ void HeroRunningRight::stopRunning(Hero* sprite) {
 void HeroRunningRight::initialize(Hero* sprite) {
 	if(sprite->getVelocityX() > 0) {
 		// If we are already moving right, skip the first frame
-		setFrameNumber(1);
+		currentFrame = 1;
 	}
 	else {
 		// This is the hard coded running speed

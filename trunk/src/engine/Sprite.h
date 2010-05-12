@@ -19,11 +19,15 @@ public:
 
 	// Accessors
 	void setVelocity(int32_t x, int32_t y);
+	void setVelocityX(int32_t x);
+	void setVelocityY(int32_t y);
 	int32_t getVelocityX() { return velocityX; };
 	int32_t getVelocityY() { return velocityY; };
 	Environment* getEnvironment() { return environment; }
 
 	void setPosition(uint32_t x, uint32_t y);
+	void setPositionX(uint32_t x);
+	void setPositionY(uint32_t y);
 	uint32_t getPositionX() { return positionX; }
 	uint32_t getPositionY() { return positionY; }
 
@@ -32,8 +36,6 @@ public:
 	virtual uint32_t getHeight() = 0;
 
 	uint8_t isOnGround();
-//private:
-	// TODO: This should switch back to private
 protected:
 	// Velocity is in pixel per frame.
 	int32_t velocityX;

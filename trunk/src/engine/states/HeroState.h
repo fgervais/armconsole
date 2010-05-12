@@ -51,16 +51,14 @@ public:
 	virtual void render(Hero*, VideoMemory*);
 
 protected:
-	// Used for manual frame update
-	uint32_t getFrameNumber() { return currentFrame; }
-	void setFrameNumber(uint32_t number) { currentFrame = number; }
+	// Subclass may need to update the current frame manually
+	uint32_t currentFrame;
 
 private:
 	uint32_t height;
 	uint32_t width;
 	Bitmap** frames;
 	uint32_t numberOfFrame;
-	uint32_t currentFrame;
 	uint32_t loopFirstFrame;
 	uint8_t frameFrozen;
 	uint32_t positionX;

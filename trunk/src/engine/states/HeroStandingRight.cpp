@@ -37,7 +37,7 @@ HeroState* HeroStandingRight::getInstance() {
 
 /* BASE CLASS FUNCTION OVERRIDE */
 void HeroStandingRight::jump(Hero* sprite) {
-	sprite->setVelocity(sprite->getVelocityX(), -8);
+	sprite->setVelocityY(-8);
 	sprite->setState(HeroJumpingRight::getInstance());
 }
 

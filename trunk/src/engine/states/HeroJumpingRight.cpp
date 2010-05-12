@@ -45,26 +45,26 @@ HeroState* HeroJumpingRight::getInstance() {
 }
 
 void HeroJumpingRight::runLeft(Hero* sprite) {
-	sprite->setVelocity(-6, sprite->getVelocityY());
+	sprite->setVelocityX(-6);
 	sprite->setState(HeroJumpingLeft::getInstance());
 }
 
 void HeroJumpingRight::runRight(Hero* sprite) {
-	sprite->setVelocity(6, sprite->getVelocityY());
+	sprite->setVelocityX(6);
 }
 
 void HeroJumpingRight::stopRunning(Hero* sprite) {
-	sprite->setVelocity(0, sprite->getVelocityY());
+	sprite->setVelocityX(0);
 }
 
 void HeroJumpingRight::stopJumping(Hero* sprite) {
-	sprite->setVelocity(sprite->getVelocityX(), 0);
+	sprite->setVelocityY(0);
 }
 
 void HeroJumpingRight::initialize(Hero* sprite) {
 	if(sprite->getVelocityY() >= 0) {
 		// If we are falling, we should start rendering at frame 3
-		setFrameNumber(3);
+		currentFrame = 3;
 	}
 }
 
@@ -72,8 +72,8 @@ void HeroJumpingRight::update(Hero* sprite) {
 	if(sprite->isOnGround()) {
 		// We need to display the landing frames before switching state
 		// but only if we are not running
-		if(getFrameNumber() < 6 && sprite->getVelocityX() == 0) {
-			setFrameNumber(getFrameNumber()+1);
+		if(currentFrame < 6 && sprite->getVelocityX() == 0) {
+			currentFrame++;
 		}
 		else {
 			if(sprite->getVelocityX() > 0) {
@@ -90,19 +90,19 @@ void HeroJumpingRight::update(Hero* sprite) {
 		// Manual frame update
 		// Going up
 		if(sprite->getVelocityY() < 0) {
-			if(getFrameNumber() < 2) {
-				setFrameNumber(getFrameNumber()+1);
+			if(currentFrame < 2) {
+				currentFrame++;
 			}
 		}
 		// Going down
 		else {
-			if(getFrameNumber() < 4) {
-				setFrameNumber(getFrameNumber()+1);
+			if(currentFrame < 4) {
+				currentFrame++;
 			}
 		}
 		// Update speed according to gravity
 		int32_t velocityY = sprite->getVelocityY() + sprite->getEnvironment()->getPhysics()->getGravitation();
-		sprite->setVelocity(sprite->getVelocityX(), velocityY);
+		sprite->setVelocityY(velocityY);
 
 	}
 }
