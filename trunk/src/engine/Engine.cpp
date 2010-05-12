@@ -13,6 +13,7 @@
 #include "LPC2478.h"
 #include "LCDControllerDriver.h"
 #include "Sprite.h"
+#include "Hero.h"
 
 Engine::Engine() {
 
@@ -69,6 +70,6 @@ void Engine::start() {
 		LPC2478::getLCD()->setBaseAddress((uint32_t)(videoPage[currentPage]->getPointer()));
 
 		// 1/25s synchronization
-		//LPC2478::delay(500000);
+		LPC2478::delay(1000000);
 	}
 }

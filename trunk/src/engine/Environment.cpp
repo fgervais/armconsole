@@ -270,7 +270,7 @@ uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
  * @param x X position in pixel
  * @param y Y position in pixel
  */
-void Environment::set(Sprite* hero, uint32_t x, uint32_t y) {
+void Environment::set(Hero* hero, uint32_t x, uint32_t y) {
 	this->hero = hero;
 	hero->setPosition(x,y);
 }

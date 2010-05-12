@@ -15,6 +15,7 @@
 class Sprite;
 class Bitmap;
 class VideoMemory;
+class Hero;
 
 class HeroState {
 public:
@@ -31,12 +32,12 @@ public:
 
 	// Finite State Machine functions
 	// All these do nothing by default
-	virtual void jump(Sprite*) {};
-	virtual void runLeft(Sprite*) {};
-	virtual void runRight(Sprite*) {};
-	virtual void stopRunning(Sprite*) {};
-	virtual void stopJumping(Sprite*) {};
-	virtual void initialize(Sprite*) {};
+	virtual void jump(Hero*) {};
+	virtual void runLeft(Hero*) {};
+	virtual void runRight(Hero*) {};
+	virtual void stopRunning(Hero*) {};
+	virtual void stopJumping(Hero*) {};
+	virtual void initialize(Hero*) {};
 
 	// Accessors
 	uint32_t getWidth();
@@ -46,8 +47,8 @@ public:
 	Bitmap* getCurrentFrame() { return frames[currentFrame]; }
 
 	virtual void reset();
-	virtual void update(Sprite*);
-	virtual void render(Sprite*, VideoMemory*);
+	virtual void update(Hero*);
+	virtual void render(Hero*, VideoMemory*);
 
 protected:
 	// Used for manual frame update

@@ -13,6 +13,7 @@
 #include "Background.h"
 #include "Physics.h"
 #include "Sprite.h"
+#include "Hero.h"
 #include "HeroState.h"
 #include "HeroStandingRight.h"
 
@@ -77,7 +78,8 @@ void Level1::build() {
 	set(physics);
 
 	// Hero section
-	Sprite* hero = new Sprite(HeroStandingRight::getInstance(), this);
-	set(hero, 240, 189);
+	Hero* hero = new Hero(HeroStandingRight::getInstance(), this);
+	//set(hero, 240, 189);
+	set(hero, 240, 50);
 	Debug::writeLine("Done Loading hero");
 }

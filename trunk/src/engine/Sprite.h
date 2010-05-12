@@ -11,13 +11,10 @@
 #include <stdint.h>
 
 class Environment;
-class HeroState;
-class VideoMemory;
 
 class Sprite {
 public:
-	//Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment);
-	Sprite(HeroState* initialState, Environment* environment);
+	Sprite(Environment* environment);
 	virtual ~Sprite();
 
 	// Accessors
@@ -30,33 +27,20 @@ public:
 	uint32_t getPositionX() { return positionX; }
 	uint32_t getPositionY() { return positionY; }
 
-	uint32_t getWidth();
-	uint32_t getHeight();
-
-	void setState(HeroState* state);
-
-	virtual void update();
-	virtual void render(VideoMemory*);
-
-	// Action functions
-	void jump();
-	void runLeft();
-	void runRight();
-	void stopRunning();
-	void stopJumping();
+	// Must be overridden by the subclasses
+	virtual uint32_t getWidth() = 0;
+	virtual uint32_t getHeight() = 0;
 
 	uint8_t isOnGround();
-private:
-	// For now the velocity is in pixel per frame.
+//private:
+protected:
+	// Velocity is in pixel per frame.
 	int32_t velocityX;
 	int32_t velocityY;
 
 	uint32_t positionX;
 	uint32_t positionY;
 
-	//uint32_t width;
-	//uint32_t height;
-	HeroState* state;
 	Environment* environment;
 };
 

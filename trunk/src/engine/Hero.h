@@ -10,10 +10,34 @@
 
 #include "Sprite.h"
 
-class Hero {
+#include <stdint.h>
+
+class Environment;
+class HeroState;
+class VideoMemory;
+
+class Hero : public Sprite {
 public:
-	Hero(uint32_t height, uint32_t width, uint32_t** handles, uint32_t numberOfFrame);
+	Hero(HeroState* initialState, Environment* environment);
 	virtual ~Hero();
+
+	// Accessors
+	virtual uint32_t getWidth();
+	virtual uint32_t getHeight();
+
+	void setState(HeroState* state);
+
+	virtual void update();
+	virtual void render(VideoMemory*);
+
+	// Action functions
+	void jump();
+	void runLeft();
+	void runRight();
+	void stopRunning();
+	void stopJumping();
+private:
+	HeroState* state;
 };
 
 #endif /* HERO_H_ */

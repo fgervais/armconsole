@@ -40,13 +40,13 @@ public:
 	uint8_t move(Sprite*, uint32_t desiredPositionX, uint32_t desiredPositionY);
 
 	VisibleArea* getVisibleArea() { return visibleArea; };
-	Sprite* getHero() { return hero; }
+	Hero* getHero() { return hero; }
 	Physics* getPhysics() { return physics; }
 
 protected:
 	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);
 	uint8_t add(Tile* tile, uint32_t x, uint32_t y);
-	void set(Sprite* hero, uint32_t x, uint32_t y);
+	void set(Hero* hero, uint32_t x, uint32_t y);
 	void set(Background* background);
 	void set(Physics* physics);
 	void set(VisibleArea* visibleArea);
@@ -64,7 +64,7 @@ private:
 	Sprite** sprites;
 	uint32_t spriteLimit;
 	uint32_t numberOfSprite;
-	Sprite* hero;
+	Hero* hero;
 	Background* background;
 	Physics* physics;
 	VisibleArea* visibleArea;

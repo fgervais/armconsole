@@ -11,6 +11,7 @@
 #include "HeroRunningRight.h"
 #include "Bitmap.h"
 #include "Sprite.h"
+#include "Hero.h"
 #include "Physics.h"
 #include "Environment.h"
 #include "Debug.h"
@@ -43,27 +44,35 @@ HeroState* HeroJumpingRight::getInstance() {
 	return instance;
 }
 
-void HeroJumpingRight::runLeft(Sprite* sprite) {
+void HeroJumpingRight::runLeft(Hero* sprite) {
 	sprite->setVelocity(-6, sprite->getVelocityY());
 	//sprite->setState(HeroJumpingLeft::getInstance());
 }
 
-void HeroJumpingRight::runRight(Sprite* sprite) {
+void HeroJumpingRight::runRight(Hero* sprite) {
 	sprite->setVelocity(6, sprite->getVelocityY());
 }
 
-void HeroJumpingRight::stopRunning(Sprite* sprite) {
+void HeroJumpingRight::stopRunning(Hero* sprite) {
 	sprite->setVelocity(0, sprite->getVelocityY());
 }
 
-void HeroJumpingRight::stopJumping(Sprite* sprite) {
+void HeroJumpingRight::stopJumping(Hero* sprite) {
 	sprite->setVelocity(sprite->getVelocityX(), 0);
 }
 
-void HeroJumpingRight::update(Sprite* sprite) {
+void HeroJumpingRight::initialize(Hero* sprite) {
+	if(sprite->getVelocityY() >= 0) {
+		// If we are falling, we should start rendering at frame 3
+		setFrameNumber(3);
+	}
+}
+
+void HeroJumpingRight::update(Hero* sprite) {
 	if(sprite->isOnGround()) {
 		// We need to display the landing frames before switching state
-		if(getFrameNumber() < 6) {
+		// but only if we are not running
+		if(getFrameNumber() < 6 && sprite->getVelocityX() == 0) {
 			setFrameNumber(getFrameNumber()+1);
 		}
 		else {
@@ -72,6 +81,7 @@ void HeroJumpingRight::update(Sprite* sprite) {
 			}
 			else {
 				sprite->setState(HeroStandingRight::getInstance());
+
 			}
 		}
 		//sprite->setVelocity(sprite->getVelocityX(), 0);
@@ -91,8 +101,6 @@ void HeroJumpingRight::update(Sprite* sprite) {
 			}
 		}
 		// Update speed according to gravity
-		//int32_t gravitation = sprite->getEnvironment()->getPhysics()->getGravitation();
-
 		int32_t velocityY = sprite->getVelocityY() + sprite->getEnvironment()->getPhysics()->getGravitation();
 		sprite->setVelocity(sprite->getVelocityX(), velocityY);
 

@@ -7,13 +7,8 @@
 
 #include "Sprite.h"
 #include "Environment.h"
-#include "HeroState.h"
-#include "VideoMemory.h"
-#include "Debug.h"
 
-//Sprite::Sprite(uint32_t width, uint32_t height, HeroState* initialState, Environment* environment) {
-Sprite::Sprite(HeroState* initialState, Environment* environment) {
-	this->state = initialState;
+Sprite::Sprite(Environment* environment) {
 	this->environment = environment;
 
 	// Variable init
@@ -35,72 +30,6 @@ void Sprite::setVelocity(int32_t x, int32_t y) {
 void Sprite::setPosition(uint32_t x, uint32_t y) {
 	positionX = x;
 	positionY = y;
-}
-
-uint32_t Sprite::getWidth() {
-	return state->getWidth();
-}
-
-uint32_t Sprite::getHeight() {
-	return state->getHeight();
-}
-
-void Sprite::setState(HeroState* state)  {
-	// State transition position adjustment
-	positionY += this->state->getHeight() - state->getHeight();
-
-	this->state = state;
-	// Do state entry initialization on the sprite
-	state->initialize(this);
-}
-
-void Sprite::update() {
-	//positionX += velocityX;
-	//positionY += velocityY;
-	environment->move(this, positionX+velocityX, positionY+velocityY);
-
-	// Update the currently displayed frame
-	// And possibly some state specific things
-	state->update(this);
-}
-
-void Sprite::render(VideoMemory* videoMemory) {
-	state->render(this, videoMemory);
-}
-
-/**
- * This function delegates the action to the current state.
- */
-void Sprite::jump() {
-	state->jump(this);
-}
-
-/**
- * This function delegates the action to the current state.
- */
-void Sprite::runLeft() {
-	state->runLeft(this);
-}
-
-/**
- * This function delegates the action to the current state.
- */
-void Sprite::runRight() {
-	state->runRight(this);
-}
-
-/**
- * This function delegates the action to the current state.
- */
-void Sprite::stopRunning() {
-	state->stopRunning(this);
-}
-
-/**
- * This function delegates the action to the current state.
- */
-void Sprite::stopJumping() {
-	state->stopJumping(this);
 }
 
 uint8_t Sprite::isOnGround() {

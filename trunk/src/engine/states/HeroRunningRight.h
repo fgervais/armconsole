@@ -15,10 +15,10 @@ public:
 	static HeroState* getInstance();
 
 	// Base class function override
-	virtual void jump(Sprite*);
-	virtual void stop(Sprite*);
-	virtual void initialize(Sprite*);
-	virtual void update(Sprite*);
+	virtual void jump(Hero*);
+	virtual void stop(Hero*);
+	virtual void initialize(Hero*);
+	virtual void update(Hero*);
 
 private:
 	HeroRunningRight(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
