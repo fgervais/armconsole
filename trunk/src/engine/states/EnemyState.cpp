@@ -1,19 +1,18 @@
 /*
- * HeroState.cpp
+ * EnemyState.cpp
  *
- *  Created on: Apr 30, 2010
+ *  Created on: May 13, 2010
  *      Author: fgervais
  */
 
-#include "HeroState.h"
+#include "EnemyState.h"
 #include "Bitmap.h"
 #include "VideoMemory.h"
-#include "Hero.h"
+#include "Enemy.h"
 #include "Environment.h"
 #include "VisibleArea.h"
-#include "Debug.h"
 
-HeroState::HeroState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame) {
+EnemyState::EnemyState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame) {
 	this->width = width;
 	this->height = height;
 	this->frames = frames;
@@ -27,18 +26,17 @@ HeroState::HeroState(uint32_t width, uint32_t height, Bitmap** frames, uint32_t 
 			frames[frameNumber]->load();
 		}
 	}
+}
+
+EnemyState::~EnemyState() {
 
 }
 
-HeroState::~HeroState() {
-
-}
-
-uint32_t HeroState::getWidth() {
+uint32_t EnemyState::getWidth() {
 	return width;
 }
 
-uint32_t HeroState::getHeight() {
+uint32_t EnemyState::getHeight() {
 	return height;
 }
 
@@ -53,7 +51,7 @@ uint32_t HeroState::getHeight() {
  *
  * @param frameNumber Loop first frame number.
  */
-void HeroState::setLoopFirstFrame(uint32_t frameNumber) {
+void EnemyState::setLoopFirstFrame(uint32_t frameNumber) {
 	loopFirstFrame = frameNumber;
 }
 
@@ -62,7 +60,7 @@ void HeroState::setLoopFirstFrame(uint32_t frameNumber) {
  *
  * Currently only reset the frame counter to 0.
  */
-void HeroState::reset() {
+void EnemyState::reset() {
 	currentFrame = 0;
 }
 
@@ -76,7 +74,7 @@ void HeroState::reset() {
  *
  * @param sprite Sprite which should be updated by the state.
  */
-void HeroState::update(Hero* sprite) {
+void EnemyState::update(Enemy* sprite) {
 	if(currentFrame < (numberOfFrame-1)) {
 		currentFrame++;
 	}
@@ -85,7 +83,7 @@ void HeroState::update(Hero* sprite) {
 	}
 }
 
-void HeroState::render(Hero* sprite, VideoMemory* videoMemory) {
+void EnemyState::render(Enemy* sprite, VideoMemory* videoMemory) {
 	VisibleArea* visibleArea = sprite->getEnvironment()->getVisibleArea();
 	uint32_t positionX = sprite->getPositionX();
 	uint32_t positionY = sprite->getPositionY();
