@@ -41,9 +41,6 @@ HeroState* HeroRunningLeft::getInstance() {
 		frames[9] = new Bitmap("0:state/HeroRunningLeft/10.bmp");
 		frames[10] = new Bitmap("0:state/HeroRunningLeft/11.bmp");
 		instance = new HeroRunningLeft(35, 35, frames, 11);
-		// The first frame is displayed only once when there is
-		// a state transition
-		instance->setLoopFirstFrame(1);
 	}
 	instance->reset();
 	return instance;
@@ -76,10 +73,18 @@ void HeroRunningLeft::initialize(Hero* sprite) {
 }
 
 void HeroRunningLeft::update(Hero* sprite) {
-	// Call base class function
-	HeroState::update(sprite);
+	// Update current frame
+	if(currentFrame < (numberOfFrame-1)) {
+		currentFrame++;
+	}
+	else {
+		// The first frame is displayed only once when we transition from
+		// a standing position
+		currentFrame = 1;
+	}
 
-	// Do some more reset stuff specific to the subclass
+	// If we loose contact with the ground, then we are falling
+	// In our case, falling and jumping is handled by the same state
 	if(!sprite->isOnGround()) {
 		sprite->setState(HeroJumpingLeft::getInstance());
 	}
