@@ -14,8 +14,17 @@
 
 class EnemyWalkingLeft: public EnemyState {
 public:
+	static EnemyState* getInstance();
+
+	// Base class function override
+	virtual void initialize(Enemy*);
+	virtual void update(Enemy*);
+
+private:
 	EnemyWalkingLeft(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
 	virtual ~EnemyWalkingLeft();
+
+	static EnemyState* instance;
 };
 
 #endif /* ENEMYWALKINGLEFT_H_ */
