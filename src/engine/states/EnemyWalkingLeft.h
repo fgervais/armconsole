@@ -24,7 +24,8 @@ private:
 	EnemyWalkingLeft(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame);
 	virtual ~EnemyWalkingLeft();
 
-	static EnemyState* instance;
+	//static EnemyState* instance;
+	static Bitmap** sharedFrames;
 };
 
 #endif /* ENEMYWALKINGLEFT_H_ */

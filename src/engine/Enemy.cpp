@@ -14,6 +14,7 @@ Enemy::Enemy(EnemyState* initialState, Environment* environment) : Sprite(enviro
 	this->state = initialState;
 
 	// Variable init
+	this->state->initialize(this);
 }
 
 Enemy::~Enemy() {

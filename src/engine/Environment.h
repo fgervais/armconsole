@@ -21,6 +21,13 @@ class Physics;
 class VisibleArea;
 class Request;
 
+struct SpriteContainer {
+	Sprite* sprite;
+	uint8_t active;
+	uint32_t spawnPositionX;
+	uint32_t spawnPositionY;
+};
+
 class Environment : public Synchronized, public Renderable {
 public:
 	Environment(uint32_t width, uint32_t height, uint32_t tileWidth, uint32_t tileHeight);
@@ -61,9 +68,9 @@ private:
 	uint32_t widthInTile;
 
 	Tile*** tileMap;
-	Sprite** sprites;
+	SpriteContainer*** spriteMap;
+	SpriteContainer** activeSprite;
 	uint32_t spriteLimit;
-	uint32_t numberOfSprite;
 	Hero* hero;
 	Background* background;
 	Physics* physics;
@@ -78,6 +85,9 @@ private:
 	void updateTiles();
 	void updateHero();
 	void updateSprites();
+
+	void activateSprites();
+	uint8_t activate(SpriteContainer*);
 };
 
 #endif /* ENVIRONMENT_H_ */
