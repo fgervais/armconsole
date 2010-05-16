@@ -71,6 +71,7 @@ void Engine::start() {
 		}
 		else if(counter == 0) {
 			environment->getHero()->stopRunning();
+			counter = 200;
 		}
 
 

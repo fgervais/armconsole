@@ -13,6 +13,7 @@
 #include "Background.h"
 #include "Physics.h"
 #include "Sprite.h"
+#include "Enemy.h"
 #include "Hero.h"
 #include "HeroState.h"
 #include "HeroStandingRight.h"
@@ -21,6 +22,8 @@
 #include "HeroRunningRight.h"
 #include "HeroJumpingLeft.h"
 #include "HeroJumpingRight.h"
+#include "EnemyWalkingLeft.h"
+#include "EnemyWalkingRight.h"
 
 Level1::Level1()
 	: Environment(960, 272, 56, 32) {
@@ -83,7 +86,7 @@ void Level1::build() {
 	set(physics);
 
 	// Hero section
-	Debug::writeLine("Pre-loading hero states");
+	Debug::writeLine("Loading hero");
 	HeroStandingLeft::getInstance();
 	HeroStandingRight::getInstance();
 	HeroRunningLeft::getInstance();
@@ -96,4 +99,17 @@ void Level1::build() {
 	//set(hero, 240, 50);
 	set(hero, 720, 50);
 	Debug::writeLine("Done Loading hero");
+
+	Debug::writeLine("Loading sprites");
+	Enemy** enemy = new Enemy*[32];
+	for(uint8_t i=0; i<32; i++) {
+		if(i<22) {
+			enemy[i] = new Enemy(EnemyWalkingRight::getInstance(), this);
+			//add(enemy, 500, 204);
+		}
+		else {
+			enemy[i] = new Enemy(EnemyWalkingLeft::getInstance(), this);
+		}
+		add(enemy[i], (i*25), 100);
+	}
 }

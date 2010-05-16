@@ -11,7 +11,8 @@
 #include "Environment.h"
 #include "Physics.h"
 
-EnemyState* EnemyWalkingRight::instance = 0;
+//EnemyState* EnemyWalkingRight::instance = 0;
+Bitmap** EnemyWalkingRight::sharedFrames = 0;
 
 EnemyWalkingRight::EnemyWalkingRight(uint32_t width, uint32_t height, Bitmap** frames, uint32_t numberOfFrame)
 : EnemyState(width, height, frames, numberOfFrame) {
@@ -23,14 +24,17 @@ EnemyWalkingRight::~EnemyWalkingRight() {
 }
 
 EnemyState* EnemyWalkingRight::getInstance() {
-	if(instance == 0) {
-		Bitmap** frames = new Bitmap*[4];
-		frames[0] = new Bitmap("0:state/EnemyWalkingRight/1.bmp");
-		frames[1] = new Bitmap("0:state/EnemyWalkingRight/2.bmp");
-		frames[2] = new Bitmap("0:state/EnemyWalkingRight/3.bmp");
-		frames[3] = new Bitmap("0:state/EnemyWalkingRight/4.bmp");
-		instance = new EnemyWalkingRight(22, 21, frames, 4);
+	//if(instance == 0) {
+	if(sharedFrames == 0) {
+		//Bitmap** frames = new Bitmap*[4];
+		sharedFrames = new Bitmap*[4];
+		sharedFrames[0] = new Bitmap("0:state/EnemyWalkingRight/1.bmp");
+		sharedFrames[1] = new Bitmap("0:state/EnemyWalkingRight/2.bmp");
+		sharedFrames[2] = new Bitmap("0:state/EnemyWalkingRight/3.bmp");
+		sharedFrames[3] = new Bitmap("0:state/EnemyWalkingRight/4.bmp");
+		//instance = new EnemyWalkingRight(22, 21, frames, 4);
 	}
+	EnemyWalkingRight* instance = new EnemyWalkingRight(22, 21, sharedFrames, 4);
 	instance->reset();
 	return instance;
 }
