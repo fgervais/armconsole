@@ -1,0 +1,24 @@
+Missing features :
+
+1- Sprite should be able to clip to another sprite.
+
+Take an energy bar for example, you should be able to instantiate an energy bar sprite 
+and then do something like energyBar.clipTo(heroInstance, offsetX, offsetY);
+Then it would be render at the hero position + the offset.
+
+2- There should be an Animation class
+
+This would avoid passing all those parameters to a state object when creating it.
+With that class we would only give a instance of Animation to the constructor.
+This class should give enough freedom to control the animation at the state will.
+
+3- Sprite should be able to have children
+
+Take for example the case where the hero fire a rocket. This rocket should be 
+the hero child Sprite.
+
+4- The collider class is inside the generic engine but it is a game specific
+file.
+
+There should be something to replace it that is not game dependant.
+
