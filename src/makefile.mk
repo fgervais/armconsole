@@ -57,10 +57,12 @@ CONFIGURATION = ./configuration
 EVENT = ./event
 USB = ./usb
 DISPLAY = ./display
-ENGINE = ./engine
-LEVELS = ./engine/levels
+GAME = ./game
+ENGINE = ./game/engine
+DEMO = ./game/megaman_demo
+LEVELS = ./game/megaman_demo/levels
+STATES = ./game/megaman_demo/states
 FILESYSTEM = ./filesystem
-STATES = ./engine/states
 
 
 # List C source files here
@@ -88,10 +90,12 @@ CPPSRCARM += $(wildcard ./configuration/*.cpp)
 CPPSRCARM += $(wildcard ./event/*.cpp)
 CPPSRCARM += $(wildcard ./usb/*.cpp)
 CPPSRCARM += $(wildcard ./display/*.cpp)
-CPPSRCARM += $(wildcard ./engine/*.cpp)
-CPPSRCARM += $(wildcard ./engine/levels/*.cpp)
+CPPSRCARM += $(wildcard ./game/*.cpp)
+CPPSRCARM += $(wildcard ./game/engine/*.cpp)
+CPPSRCARM += $(wildcard ./game/megaman_demo/*.cpp)
+CPPSRCARM += $(wildcard ./game/megaman_demo/levels/*.cpp)
+CPPSRCARM += $(wildcard ./game/megaman_demo/states/*.cpp)
 CPPSRCARM += $(wildcard ./filesystem/*.cpp)
-CPPSRCARM += $(wildcard ./engine/states/*.cpp)
 
 
 # List Assembler source files here.
@@ -155,11 +159,13 @@ EXTRAINCDIRS += $(CONFIGURATION)
 EXTRAINCDIRS += $(EVENT)
 EXTRAINCDIRS += $(USB)
 EXTRAINCDIRS += $(DISPLAY)
+EXTRAINCDIRS += $(GAME)
 EXTRAINCDIRS += $(ENGINE)
+EXTRAINCDIRS += $(DEMO)
 EXTRAINCDIRS += $(LEVELS)
+EXTRAINCDIRS += $(STATES)
 EXTRAINCDIRS += $(FILESYSTEM)/ff7e/src
 EXTRAINCDIRS += $(FILESYSTEM)
-EXTRAINCDIRS += $(STATES)
 
 # List any extra directories to look for library files here.
 # Each directory must be separated by a space.
