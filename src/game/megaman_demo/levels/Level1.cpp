@@ -95,6 +95,7 @@ void Level1::build() {
 	MegamanJumpingRight::getInstance();
 
 	Megaman* hero = new Megaman(MegamanStandingLeft::getInstance(), this);
+	hero->enableCollisionCheck();
 	//set(hero, 240, 189);
 	//set(hero, 240, 50);
 	set(hero, 720, 50);

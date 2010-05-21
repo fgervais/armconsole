@@ -29,7 +29,7 @@ Wave::~Wave() {
 /**
  * Load the wave file to memory.
  *
- * @return 0 if successful. 1 otherwise.
+ * @return 1 if successful. 0 otherwise.
  */
 uint8_t Wave::load() {
 	FRESULT f_err_code;
@@ -42,7 +42,7 @@ uint8_t Wave::load() {
 	}
 	else {
 		Debug::writeLine("Failed to open file");
-		return 1;
+		return 0;
 	}
 
 	riffHeader = new RIFFHeader();
@@ -54,7 +54,7 @@ uint8_t Wave::load() {
 	// For now only 16 bits wide sample are supported
 	if(waveHeader->bitPerSample != 16) {
 		Debug::writeLine("Unsupported file");
-		return 1;
+		return 0;
 	}
 
 	dataHeader = new DataHeader();
@@ -65,5 +65,5 @@ uint8_t Wave::load() {
 
 	f_close(&handle);
 	loaded = 1;
-	return 0;
+	return 1;
 }
