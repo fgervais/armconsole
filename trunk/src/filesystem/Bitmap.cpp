@@ -29,7 +29,7 @@ Bitmap::~Bitmap() {
 /**
  * Load the bitmap file to memory.
  *
- * @return 0 if successful. 1 otherwise.
+ * @return 1 if successful. 0 otherwise.
  */
 uint8_t Bitmap::load() {
 	FRESULT f_err_code;
@@ -43,7 +43,7 @@ uint8_t Bitmap::load() {
 	}
 	else {
 		Debug::writeLine("Failed to open file");
-		return 1;
+		return 0;
 	}
 
 	magic = new Magic();
@@ -51,7 +51,7 @@ uint8_t Bitmap::load() {
 
 	if(magic->content[0] != 'B' || magic->content[1] != 'M') {
 		Debug::writeLine("File invalid");
-		return 1;
+		return 0;
 	}
 
 	header = new Header();
@@ -91,5 +91,5 @@ uint8_t Bitmap::load() {
 
 	f_close(&handle);
 	loaded = 1;
-	return 0;
+	return 1;
 }

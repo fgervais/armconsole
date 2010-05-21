@@ -8,6 +8,8 @@
 #include "Megaman.h"
 #include "Environment.h"
 #include "MegamanState.h"
+#include "Debug.h"
+#include "LPC2478.h"
 
 Megaman::Megaman(MegamanState* initialState, Environment* environment) : Sprite(initialState, environment) {
 	this->state = initialState;
@@ -33,6 +35,10 @@ void Megaman::setState(MegamanState* state)  {
 void Megaman::update() {
 	environment->move(this, positionX+velocityX, positionY+velocityY);
 
+	if(collisionCheckEnabled) {
+		environment->checkCollision(this);
+	}
+
 	// Update the currently displayed frame
 	// And possibly some state specific things
 	state->update(this);
@@ -40,6 +46,16 @@ void Megaman::update() {
 
 void Megaman::collideWith(Collider* collider) {
 	collider->collideWith(this);
+}
+
+void Megaman::collideWith(Megaman*) {
+	Debug::writeLine("Megaman collided with Megaman");
+	LPC2478::delay(1000000);
+}
+
+void Megaman::collideWith(Metool*) {
+	Debug::writeLine("Megaman collided with Metool");
+	LPC2478::delay(1000000);
 }
 
 /**

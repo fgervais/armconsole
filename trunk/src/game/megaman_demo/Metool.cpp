@@ -8,6 +8,8 @@
 #include "Metool.h"
 #include "MetoolState.h"
 #include "Environment.h"
+#include "Debug.h"
+#include "LPC2478.h"
 
 Metool::Metool(MetoolState* initialState, Environment* environment) : Sprite(initialState, environment) {
 	this->state = initialState;
@@ -40,4 +42,14 @@ void Metool::update() {
 
 void Metool::collideWith(Collider* collider) {
 	collider->collideWith(this);
+}
+
+void Metool::collideWith(Megaman*) {
+	Debug::writeLine("Metool collided with Megaman");
+	LPC2478::delay(1000000);
+}
+
+void Metool::collideWith(Metool*) {
+	Debug::writeLine("Metool collided with Metool");
+	LPC2478::delay(1000000);
 }

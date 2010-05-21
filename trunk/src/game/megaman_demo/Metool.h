@@ -27,6 +27,8 @@ public:
 	// Base class override
 	virtual void update();
 	virtual void collideWith(Collider*);
+	virtual void collideWith(Megaman*);
+	virtual void collideWith(Metool*);
 private:
 	MetoolState* state;
 };
