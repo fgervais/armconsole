@@ -24,10 +24,12 @@ public:
 
 private:
 	MetoolWalkingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MetoolWalkingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MetoolWalkingRight();
 
 	//static MetoolState* instance;
 	static Bitmap** sharedFrames;
+	static Bitmap** sharedMasks;
 };
 
 #endif /* METOOLWALKINGRIGHT_H_ */

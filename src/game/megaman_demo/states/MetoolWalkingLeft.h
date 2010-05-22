@@ -25,10 +25,12 @@ public:
 
 private:
 	MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MetoolWalkingLeft();
 
 	//static MetoolState* instance;
 	static Bitmap** sharedFrames;
+	static Bitmap** sharedMasks;
 };
 
 #endif /* METOOLWALKINGLEFT_H_ */
