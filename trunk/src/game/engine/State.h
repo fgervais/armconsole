@@ -17,6 +17,7 @@ class VideoMemory;
 class State {
 public:
 	State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~State();
 
 	// Accessors
@@ -27,14 +28,17 @@ public:
 
 	virtual void reset();
 
-	virtual void update(Sprite*) {};
+	virtual void update(Sprite*) {}
 	virtual void render(Sprite*, VideoMemory*);
-	virtual void initialize(Sprite*) {};
+	virtual void initialize(Sprite*) {}
 
 protected:
 	// Subclass may need to update the current frame manually
 	uint32_t currentFrame;
 	uint32_t numberOfFrame;
+
+	//debug
+	Bitmap** animationMasks;
 
 private:
 	uint32_t animationHeight;

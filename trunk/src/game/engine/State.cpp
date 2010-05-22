@@ -19,11 +19,34 @@ State::State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animati
 	this->animationFrames = animationFrames;
 	this->numberOfFrame = numberOfFrame;
 	this->currentFrame = 0;
+	this->animationMasks = 0;
 
 	// Ensure every bitmap are loaded into memory
 	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
 		if(!(animationFrames[frameNumber]->isLoaded())) {
 			animationFrames[frameNumber]->load();
+		}
+	}
+}
+
+State::State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks) {
+	this->animationWidth = animationWidth;
+	this->animationHeight = animationHeight;
+	this->animationFrames = animationFrames;
+	this->numberOfFrame = numberOfFrame;
+	this->currentFrame = 0;
+	this->animationMasks = animationMasks;
+
+	// Ensure every bitmap are loaded into memory
+	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
+		if(!(animationFrames[frameNumber]->isLoaded())) {
+			animationFrames[frameNumber]->load();
+		}
+	}
+
+	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
+		if(!(animationMasks[frameNumber]->isLoaded())) {
+			animationMasks[frameNumber]->load();
 		}
 	}
 }
@@ -95,8 +118,16 @@ void State::render(Sprite* sprite, VideoMemory* videoMemory) {
 	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
 		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
 			// This is complicated to understand but I don't think we can simplify it
-			videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
-							   = animationFrames[currentFrame]->getData()[i*animationWidth + j];
+			if(animationMasks == 0) {
+				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+				                   = animationFrames[currentFrame]->getData()[i*animationWidth + j];
+			}
+			else {
+				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+				                   &= animationMasks[currentFrame]->getData()[i*animationWidth + j];
+				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+				                   |= animationFrames[currentFrame]->getData()[i*animationWidth + j];
+			}
 		}
 	}
 }

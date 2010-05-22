@@ -1,6 +1,6 @@
 Missing features :
 
-1- Sprite should be able to clip to another sprite.
+1- Sprite should be able to clip (stick) to another sprite.
 
 Take an energy bar for example, you should be able to instantiate an energy bar sprite 
 and then do something like energyBar.clipTo(heroInstance, offsetX, offsetY);
@@ -11,6 +11,7 @@ Then it would be render at the hero position + the offset.
 This would avoid passing all those parameters to a state object when creating it.
 With that class we would only give a instance of Animation to the constructor.
 This class should give enough freedom to control the animation at the state will.
+This class should (may?) include the rendering algorithm.
 
 3- Sprite should be able to have children
 
@@ -22,3 +23,6 @@ file.
 
 There should be something to replace it that is not game dependant.
 
+5- Sprite added to the environment should be able to be spawned only once.
+
+This about an energy canister that should never respawn.

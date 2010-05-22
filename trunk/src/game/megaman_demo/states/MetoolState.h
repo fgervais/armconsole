@@ -17,10 +17,11 @@ class Metool;
 class MetoolState : public State {
 public:
 	MetoolState(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MetoolState(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MetoolState();
 
 	virtual void update(Metool*) {}
-	virtual void initialize(Metool*) {};
+	virtual void initialize(Metool*) {}
 };
 
 #endif /* METOOLSTATE_H_ */

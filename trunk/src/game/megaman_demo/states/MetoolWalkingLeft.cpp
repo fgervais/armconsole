@@ -13,9 +13,15 @@
 
 //MetoolState* MetoolWalkingLeft::instance = 0;
 Bitmap** MetoolWalkingLeft::sharedFrames = 0;
+Bitmap** MetoolWalkingLeft::sharedMasks = 0;
 
 MetoolWalkingLeft::MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame)
 : MetoolState(animationWidth, animationHeight, animationFrames, numberOfFrame) {
+
+}
+
+MetoolWalkingLeft::MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
+: MetoolState(animationWidth, animationHeight, animationFrames, numberOfFrame, animationMasks) {
 
 }
 
@@ -28,13 +34,20 @@ MetoolState* MetoolWalkingLeft::getInstance() {
 	if(sharedFrames == 0) {
 		//Bitmap** frames = new Bitmap*[4];
 		sharedFrames = new Bitmap*[4];
-		sharedFrames[0] = new Bitmap("0:state/EnemyWalkingLeft/1.bmp");
-		sharedFrames[1] = new Bitmap("0:state/EnemyWalkingLeft/2.bmp");
-		sharedFrames[2] = new Bitmap("0:state/EnemyWalkingLeft/3.bmp");
-		sharedFrames[3] = new Bitmap("0:state/EnemyWalkingLeft/4.bmp");
+		sharedFrames[0] = new Bitmap("0:state/MetoolWalkingLeft/1.bmp");
+		sharedFrames[1] = new Bitmap("0:state/MetoolWalkingLeft/2.bmp");
+		sharedFrames[2] = new Bitmap("0:state/MetoolWalkingLeft/3.bmp");
+		sharedFrames[3] = new Bitmap("0:state/MetoolWalkingLeft/4.bmp");
 		//instance = new MetoolWalkingLeft(22, 21, frames, 4);
 	}
-	MetoolWalkingLeft* instance = new MetoolWalkingLeft(22, 21, sharedFrames, 4);
+	if(sharedMasks == 0) {
+		sharedMasks = new Bitmap*[4];
+		sharedMasks[0] = new Bitmap("0:state/MetoolWalkingLeft/mask1.bmp");
+		sharedMasks[1] = new Bitmap("0:state/MetoolWalkingLeft/mask2.bmp");
+		sharedMasks[2] = new Bitmap("0:state/MetoolWalkingLeft/mask3.bmp");
+		sharedMasks[3] = new Bitmap("0:state/MetoolWalkingLeft/mask4.bmp");
+	}
+	MetoolWalkingLeft* instance = new MetoolWalkingLeft(22, 21, sharedFrames, 4, sharedMasks);
 	instance->reset();
 	return instance;
 }

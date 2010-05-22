@@ -28,15 +28,15 @@ public:
 	//virtual HeroState* getInstance() = 0;
 
 	virtual void update(Megaman*) {}
-	virtual void initialize(Megaman*) {};
+	virtual void initialize(Megaman*) {}
 
 	// Finite State Machine functions
 	// All these do nothing by default
-	virtual void jump(Megaman*) {};
-	virtual void runLeft(Megaman*) {};
-	virtual void runRight(Megaman*) {};
-	virtual void stopRunning(Megaman*) {};
-	virtual void stopJumping(Megaman*) {};
+	virtual void jump(Megaman*) {}
+	virtual void runLeft(Megaman*) {}
+	virtual void runRight(Megaman*) {}
+	virtual void stopRunning(Megaman*) {}
+	virtual void stopJumping(Megaman*) {}
 };
 
 #endif /* MEGAMANSTATE_H_ */
