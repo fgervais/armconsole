@@ -18,6 +18,7 @@ class HostControllerDriver;
 class LCDControllerDriver;
 class DAC;
 class DMAChannel;
+class Timer;
 
 /**
  * Software interface to the LPC2478 microcontroller.
@@ -40,6 +41,10 @@ public:
 	static DAC* getDAC();
 	static DMAChannel* getDMA0();
 	static DMAChannel* getDMA1();
+	static Timer* getTimer0();
+	static Timer* getTimer1();
+	static Timer* getTimer2();
+	static Timer* getTimer3();
 
 	static void delay(uint32_t usec);
 private:
@@ -54,6 +59,10 @@ private:
 	static DAC* dac;
 	static DMAChannel* dma0;
 	static DMAChannel* dma1;
+	static Timer* timer0;
+	static Timer* timer1;
+	static Timer* timer2;
+	static Timer* timer3;
 };
 
 #endif /* LPC2478_H_ */

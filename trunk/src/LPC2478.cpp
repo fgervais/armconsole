@@ -12,6 +12,7 @@
 #include "BlueScreenSunLCD.h"
 #include "DAC.h"
 #include "DMAChannel.h"
+#include "Timer.h"
 #include "irq.h"
 
 /* Static initialization. Required to make the compiler happy */
@@ -24,6 +25,10 @@ LCDControllerDriver* LPC2478::lcd = 0;
 DAC* LPC2478::dac = 0;
 DMAChannel* LPC2478::dma0 = 0;
 DMAChannel* LPC2478::dma1 = 0;
+Timer* LPC2478::timer0 = 0;
+Timer* LPC2478::timer1 = 0;
+Timer* LPC2478::timer2 = 0;
+Timer* LPC2478::timer3 = 0;
 
 LPC2478::LPC2478() {
 
@@ -288,6 +293,46 @@ DMAChannel* LPC2478::getDMA1() {
 		dma1 = new DMAChannel(0, GPDMA_CH1);
 	}
 	return dma1;
+}
+
+Timer* LPC2478::getTimer0() {
+	if(timer0 == 0) {
+		// Send power
+		PCONP |= (1<<1);	// PCTIM0
+
+		timer0 = new Timer(TIMER0, 0);
+	}
+	return timer0;
+}
+
+Timer* LPC2478::getTimer1() {
+	if(timer1 == 0) {
+		// Send power
+		PCONP |= (1<<2);	// PCTIM1
+
+		timer1 = new Timer(TIMER1, 1);
+	}
+	return timer1;
+}
+
+Timer* LPC2478::getTimer2() {
+	if(timer2 == 0) {
+		// Send power
+		PCONP |= (1<<22);	// PCTIM2
+
+		timer2 = new Timer(TIMER2, 2);
+	}
+	return timer2;
+}
+
+Timer* LPC2478::getTimer3() {
+	if(timer3 == 0) {
+		// Send power
+		PCONP |= (1<<23);	// PCTIM3
+
+		timer3 = new Timer(TIMER3, 3);
+	}
+	return timer3;
 }
 
 /**

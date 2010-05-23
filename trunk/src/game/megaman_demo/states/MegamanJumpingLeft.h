@@ -10,6 +10,9 @@
 
 #include "MegamanState.h"
 
+class Wave;
+class AudioHelper;
+
 class MegamanJumpingLeft: public MegamanState {
 public:
 	static MegamanState* getInstance();
@@ -23,10 +26,12 @@ public:
 	virtual void update(Megaman*);
 
 private:
-	MegamanJumpingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MegamanJumpingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MegamanJumpingLeft();
 
 	static MegamanState* instance;
+
+	AudioHelper* audioHelper;
 };
 
 #endif /* MEGAMANJUMPINGLEFT_H_ */
