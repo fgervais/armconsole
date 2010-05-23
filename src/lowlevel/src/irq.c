@@ -16,6 +16,7 @@
 #include "irq.h"
 #include "LPC2478.h"
 #include "HostControllerDriver.h"
+#include "Timer.h"
 #include "Debug.h"
 
 /* Initialize the interrupt controller */
@@ -134,14 +135,14 @@ void armcore1_irq_handler( void ) {
 
 extern void disk_timerproc();
 void timer0_irq_handler( void ) {
-	T0IR |= 1;
+	TIMER0->IR |= 1;
 
 	// sd_spi_lpc200.c
 	disk_timerproc();
 }
 
 void timer1_irq_handler( void ) {
-
+	LPC2478::getTimer1()->overflowInterrupt();
 }
 
 void uart0_irq_handler( void ) {
@@ -225,11 +226,11 @@ void gpdma_irq_handler( void ) {
 }
 
 void timer2_irq_handler( void ) {
-
+	LPC2478::getTimer2()->overflowInterrupt();
 }
 
 void timer3_irq_handler( void ) {
-
+	LPC2478::getTimer3()->overflowInterrupt();
 }
 
 void uart2_irq_handler( void ) {

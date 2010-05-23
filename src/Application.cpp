@@ -66,10 +66,10 @@ int main() {
 	 * This is all C for now
 	 */
 	Debug::writeLine("Init Timer");
-	T0TCR = 0;				/* Disable Timer */
-	T0MR0 = 720000 - 1;		/* 72M / 100 = 720000 */
-	T0MCR = 0x3;			/* Clear TC and Interrupt on MR0 match */
-	T0TCR = 1;				/* Enable Timer */
+	TIMER0->TCR = 0;				/* Disable Timer */
+	TIMER0->MR0 = 720000 - 1;		/* 72M / 100 = 720000 */
+	TIMER0->MCR = 0x3;			/* Clear TC and Interrupt on MR0 match */
+	TIMER0->TCR = 1;				/* Enable Timer */
 	VICIntSelect &= ~(1 << TIMER0_INT); // IRQ Category (Not FIQ)
 	VICIntEnable |= (1 << TIMER0_INT);
 
@@ -103,7 +103,7 @@ int main() {
 		displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
 	}
 
-	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC());
+	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC(), LPC2478::getTimer1());
 	Wave* wave = new Wave("0:intro.wav");
 	wave->load();
 

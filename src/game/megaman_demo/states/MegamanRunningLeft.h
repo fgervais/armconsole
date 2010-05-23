@@ -22,7 +22,7 @@ public:
 	virtual void update(Megaman*);
 
 private:
-	MegamanRunningLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MegamanRunningLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MegamanRunningLeft();
 
 	static MegamanState* instance;

@@ -22,7 +22,7 @@ public:
 	virtual void initialize(Megaman*);
 
 private:
-	MegamanStandingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
+	MegamanStandingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~MegamanStandingLeft();
 
 	static MegamanState* instance;

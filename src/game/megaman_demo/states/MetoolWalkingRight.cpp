@@ -15,11 +15,6 @@
 Bitmap** MetoolWalkingRight::sharedFrames = 0;
 Bitmap** MetoolWalkingRight::sharedMasks = 0;
 
-MetoolWalkingRight::MetoolWalkingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame)
-: MetoolState(animationWidth, animationHeight, animationFrames, numberOfFrame) {
-
-}
-
 MetoolWalkingRight::MetoolWalkingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
 : MetoolState(animationWidth, animationHeight, animationFrames, numberOfFrame, animationMasks) {
 

@@ -16,7 +16,6 @@ class VideoMemory;
 
 class State {
 public:
-	State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
 	State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
 	virtual ~State();
 
@@ -37,13 +36,11 @@ protected:
 	uint32_t currentFrame;
 	uint32_t numberOfFrame;
 
-	//debug
-	Bitmap** animationMasks;
-
 private:
 	uint32_t animationHeight;
 	uint32_t animationWidth;
 	Bitmap** animationFrames;
+	Bitmap** animationMasks;
 };
 
 #endif /* STATE_H_ */

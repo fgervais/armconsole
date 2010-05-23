@@ -13,22 +13,6 @@
 #include "Environment.h"
 #include "VisibleArea.h"
 
-State::State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame) {
-	this->animationWidth = animationWidth;
-	this->animationHeight = animationHeight;
-	this->animationFrames = animationFrames;
-	this->numberOfFrame = numberOfFrame;
-	this->currentFrame = 0;
-	this->animationMasks = 0;
-
-	// Ensure every bitmap are loaded into memory
-	for(uint32_t frameNumber=0; frameNumber<numberOfFrame; frameNumber++) {
-		if(!(animationFrames[frameNumber]->isLoaded())) {
-			animationFrames[frameNumber]->load();
-		}
-	}
-}
-
 State::State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks) {
 	this->animationWidth = animationWidth;
 	this->animationHeight = animationHeight;

@@ -16,8 +16,8 @@
 
 MegamanState* MegamanRunningLeft::instance = 0;
 
-MegamanRunningLeft::MegamanRunningLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationanimationFrames, uint32_t numberOfFrame)
-: MegamanState(animationWidth, animationHeight, animationanimationFrames, numberOfFrame) {
+MegamanRunningLeft::MegamanRunningLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationanimationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
+: MegamanState(animationWidth, animationHeight, animationanimationFrames, numberOfFrame, animationMasks) {
 
 
 }
@@ -29,18 +29,31 @@ MegamanRunningLeft::~MegamanRunningLeft() {
 MegamanState* MegamanRunningLeft::getInstance() {
 	if(instance == 0) {
 		Bitmap** animationFrames = new Bitmap*[11];
-		animationFrames[0] = new Bitmap("0:state/HeroRunningLeft/1.bmp");
-		animationFrames[1] = new Bitmap("0:state/HeroRunningLeft/2.bmp");
-		animationFrames[2] = new Bitmap("0:state/HeroRunningLeft/3.bmp");
-		animationFrames[3] = new Bitmap("0:state/HeroRunningLeft/4.bmp");
-		animationFrames[4] = new Bitmap("0:state/HeroRunningLeft/5.bmp");
-		animationFrames[5] = new Bitmap("0:state/HeroRunningLeft/6.bmp");
-		animationFrames[6] = new Bitmap("0:state/HeroRunningLeft/7.bmp");
-		animationFrames[7] = new Bitmap("0:state/HeroRunningLeft/8.bmp");
-		animationFrames[8] = new Bitmap("0:state/HeroRunningLeft/9.bmp");
-		animationFrames[9] = new Bitmap("0:state/HeroRunningLeft/10.bmp");
-		animationFrames[10] = new Bitmap("0:state/HeroRunningLeft/11.bmp");
-		instance = new MegamanRunningLeft(35, 35, animationFrames, 11);
+		animationFrames[0] = new Bitmap("0:state/MegamanRunningLeft/1.bmp");
+		animationFrames[1] = new Bitmap("0:state/MegamanRunningLeft/2.bmp");
+		animationFrames[2] = new Bitmap("0:state/MegamanRunningLeft/3.bmp");
+		animationFrames[3] = new Bitmap("0:state/MegamanRunningLeft/4.bmp");
+		animationFrames[4] = new Bitmap("0:state/MegamanRunningLeft/5.bmp");
+		animationFrames[5] = new Bitmap("0:state/MegamanRunningLeft/6.bmp");
+		animationFrames[6] = new Bitmap("0:state/MegamanRunningLeft/7.bmp");
+		animationFrames[7] = new Bitmap("0:state/MegamanRunningLeft/8.bmp");
+		animationFrames[8] = new Bitmap("0:state/MegamanRunningLeft/9.bmp");
+		animationFrames[9] = new Bitmap("0:state/MegamanRunningLeft/10.bmp");
+		animationFrames[10] = new Bitmap("0:state/MegamanRunningLeft/11.bmp");
+
+		Bitmap** animationMasks = new Bitmap*[11];
+		animationMasks[0] = new Bitmap("0:state/MegamanRunningLeft/mask1.bmp");
+		animationMasks[1] = new Bitmap("0:state/MegamanRunningLeft/mask2.bmp");
+		animationMasks[2] = new Bitmap("0:state/MegamanRunningLeft/mask3.bmp");
+		animationMasks[3] = new Bitmap("0:state/MegamanRunningLeft/mask4.bmp");
+		animationMasks[4] = new Bitmap("0:state/MegamanRunningLeft/mask5.bmp");
+		animationMasks[5] = new Bitmap("0:state/MegamanRunningLeft/mask6.bmp");
+		animationMasks[6] = new Bitmap("0:state/MegamanRunningLeft/mask7.bmp");
+		animationMasks[7] = new Bitmap("0:state/MegamanRunningLeft/mask8.bmp");
+		animationMasks[8] = new Bitmap("0:state/MegamanRunningLeft/mask9.bmp");
+		animationMasks[9] = new Bitmap("0:state/MegamanRunningLeft/mask10.bmp");
+		animationMasks[10] = new Bitmap("0:state/MegamanRunningLeft/mask11.bmp");
+		instance = new MegamanRunningLeft(35, 35, animationFrames, 11, animationMasks);
 	}
 	instance->reset();
 	return instance;

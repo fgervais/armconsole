@@ -26,3 +26,9 @@ There should be something to replace it that is not game dependant.
 5- Sprite added to the environment should be able to be spawned only once.
 
 This about an energy canister that should never respawn.
+
+5- State instances should be dealt with differently
+
+The getInstance() thing is juste not clean. In fact all the state management
+is dirty now. I think the spirte should hold an instance to all it's states
+to fix many issues.

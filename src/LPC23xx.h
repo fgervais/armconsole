@@ -523,8 +523,45 @@ are for LPC24xx only. */
 #define EMC_STA_EXT_WAIT  (*(volatile unsigned long *)(EMC_BASE_ADDR + 0x880))
 
 
+/*
+ *TIMER register structure
+ */
+typedef struct
+{
+	unsigned long IR;
+	unsigned long TCR;
+	unsigned long TC;
+	unsigned long PR;
+	unsigned long PC;
+	unsigned long MCR;
+	unsigned long MR0;
+	unsigned long MR1;
+	unsigned long MR2;
+	unsigned long MR3;
+	unsigned long CCR;
+	unsigned long CR0;
+	unsigned long CR1;
+	unsigned long CR2;
+	unsigned long CR3;
+	unsigned long EMR;
+	unsigned long CTCR;
+} TIMER_Typedef;
+
+/* TIMER base address */
+#define TIMER0_BASE		0xE0004000
+#define TIMER1_BASE		0xE0008000
+#define TIMER2_BASE		0xE0070000
+#define TIMER3_BASE		0xE0074000
+
+/* TIMER declaration */
+#define TIMER0			(((TIMER_Typedef *)TIMER0_BASE))
+#define TIMER1			(((TIMER_Typedef *)TIMER1_BASE))
+#define TIMER2			(((TIMER_Typedef *)TIMER2_BASE))
+#define TIMER3			(((TIMER_Typedef *)TIMER3_BASE))
+
+
 /* Timer 0 */
-#define TMR0_BASE_ADDR		0xE0004000
+/*#define TMR0_BASE_ADDR		0xE0004000
 #define T0IR           (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x00))
 #define T0TCR          (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x04))
 #define T0TC           (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x08))
@@ -541,67 +578,17 @@ are for LPC24xx only. */
 #define T0CR2          (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x34))
 #define T0CR3          (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x38))
 #define T0EMR          (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x3C))
-#define T0CTCR         (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x70))
+#define T0CTCR         (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x70))*/
 
 /* Timer 1 */
-#define TMR1_BASE_ADDR		0xE0008000
-#define T1IR           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x00))
-#define T1TCR          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x04))
-#define T1TC           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x08))
-#define T1PR           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x0C))
-#define T1PC           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x10))
-#define T1MCR          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x14))
-#define T1MR0          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x18))
-#define T1MR1          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x1C))
-#define T1MR2          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x20))
-#define T1MR3          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x24))
-#define T1CCR          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x28))
-#define T1CR0          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x2C))
-#define T1CR1          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x30))
-#define T1CR2          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x34))
-#define T1CR3          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x38))
-#define T1EMR          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x3C))
-#define T1CTCR         (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x70))
+//#define TMR1_BASE_ADDR		0xE0008000
 
 /* Timer 2 */
-#define TMR2_BASE_ADDR		0xE0070000
-#define T2IR           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x00))
-#define T2TCR          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x04))
-#define T2TC           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x08))
-#define T2PR           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x0C))
-#define T2PC           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x10))
-#define T2MCR          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x14))
-#define T2MR0          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x18))
-#define T2MR1          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x1C))
-#define T2MR2          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x20))
-#define T2MR3          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x24))
-#define T2CCR          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x28))
-#define T2CR0          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x2C))
-#define T2CR1          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x30))
-#define T2CR2          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x34))
-#define T2CR3          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x38))
-#define T2EMR          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x3C))
-#define T2CTCR         (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x70))
+//#define TMR2_BASE_ADDR		0xE0070000
 
 /* Timer 3 */
-#define TMR3_BASE_ADDR		0xE0074000
-#define T3IR           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x00))
-#define T3TCR          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x04))
-#define T3TC           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x08))
-#define T3PR           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x0C))
-#define T3PC           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x10))
-#define T3MCR          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x14))
-#define T3MR0          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x18))
-#define T3MR1          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x1C))
-#define T3MR2          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x20))
-#define T3MR3          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x24))
-#define T3CCR          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x28))
-#define T3CR0          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x2C))
-#define T3CR1          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x30))
-#define T3CR2          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x34))
-#define T3CR3          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x38))
-#define T3EMR          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x3C))
-#define T3CTCR         (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x70))
+//#define TMR3_BASE_ADDR		0xE0074000
+
 
 
 /* Pulse Width Modulator (PWM) */

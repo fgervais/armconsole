@@ -14,14 +14,17 @@
 #include "Megaman.h"
 #include "Physics.h"
 #include "Environment.h"
+#include "Wave.h"
+#include "AudioHelper.h"
+#include "LPC2478.h"
 #include "Debug.h"
 
 MegamanState* MegamanJumpingRight::instance = 0;
 
-MegamanJumpingRight::MegamanJumpingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame)
-	: MegamanState(animationWidth, animationHeight, animationFrames, numberOfFrame) {
+MegamanJumpingRight::MegamanJumpingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
+	: MegamanState(animationWidth, animationHeight, animationFrames, numberOfFrame, animationMasks) {
 
-
+	audioHelper = new AudioHelper(LPC2478::getDAC(), LPC2478::getTimer1());
 }
 
 MegamanJumpingRight::~MegamanJumpingRight() {
@@ -31,14 +34,25 @@ MegamanJumpingRight::~MegamanJumpingRight() {
 MegamanState* MegamanJumpingRight::getInstance() {
 	if(instance == 0) {
 		Bitmap** animationFrames = new Bitmap*[7];
-		animationFrames[0] = new Bitmap("0:state/HeroJumpingRight/1.bmp");
-		animationFrames[1] = new Bitmap("0:state/HeroJumpingRight/2.bmp");
-		animationFrames[2] = new Bitmap("0:state/HeroJumpingRight/3.bmp");
-		animationFrames[3] = new Bitmap("0:state/HeroJumpingRight/4.bmp");
-		animationFrames[4] = new Bitmap("0:state/HeroJumpingRight/5.bmp");
-		animationFrames[5] = new Bitmap("0:state/HeroJumpingRight/6.bmp");
-		animationFrames[6] = new Bitmap("0:state/HeroJumpingRight/7.bmp");
-		instance = new MegamanJumpingRight(30, 46, animationFrames, 7);
+		animationFrames[0] = new Bitmap("0:state/MegamanJumpingRight/1.bmp");
+		animationFrames[1] = new Bitmap("0:state/MegamanJumpingRight/2.bmp");
+		animationFrames[2] = new Bitmap("0:state/MegamanJumpingRight/3.bmp");
+		animationFrames[3] = new Bitmap("0:state/MegamanJumpingRight/4.bmp");
+		animationFrames[4] = new Bitmap("0:state/MegamanJumpingRight/5.bmp");
+		animationFrames[5] = new Bitmap("0:state/MegamanJumpingRight/6.bmp");
+		animationFrames[6] = new Bitmap("0:state/MegamanJumpingRight/7.bmp");
+
+		Bitmap** animationMasks = new Bitmap*[7];
+		animationMasks[0] = new Bitmap("0:state/MegamanJumpingRight/mask1.bmp");
+		animationMasks[1] = new Bitmap("0:state/MegamanJumpingRight/mask2.bmp");
+		animationMasks[2] = new Bitmap("0:state/MegamanJumpingRight/mask3.bmp");
+		animationMasks[3] = new Bitmap("0:state/MegamanJumpingRight/mask4.bmp");
+		animationMasks[4] = new Bitmap("0:state/MegamanJumpingRight/mask5.bmp");
+		animationMasks[5] = new Bitmap("0:state/MegamanJumpingRight/mask6.bmp");
+		animationMasks[6] = new Bitmap("0:state/MegamanJumpingRight/mask7.bmp");
+
+
+		instance = new MegamanJumpingRight(30, 46, animationFrames, 7, animationMasks);
 	}
 	instance->reset();
 	return instance;
@@ -66,6 +80,9 @@ void MegamanJumpingRight::initialize(Megaman* sprite) {
 		// If we are falling, we should start rendering at frame 3
 		currentFrame = 3;
 	}
+	else {
+		audioHelper->play(sprite->getJumpSoundFX());
+	}
 }
 
 void MegamanJumpingRight::update(Megaman* sprite) {
@@ -83,6 +100,7 @@ void MegamanJumpingRight::update(Megaman* sprite) {
 				sprite->setState(MegamanStandingRight::getInstance());
 
 			}
+			audioHelper->play(sprite->getLandSoundFX());
 		}
 		//sprite->setVelocity(sprite->getVelocityX(), 0);
 	}

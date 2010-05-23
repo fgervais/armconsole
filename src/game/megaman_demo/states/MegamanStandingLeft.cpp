@@ -14,8 +14,8 @@
 
 MegamanState* MegamanStandingLeft::instance = 0;
 
-MegamanStandingLeft::MegamanStandingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationanimationFrames, uint32_t numberOfFrame)
-: MegamanState(animationWidth, animationHeight, animationanimationFrames, numberOfFrame) {
+MegamanStandingLeft::MegamanStandingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationanimationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
+: MegamanState(animationWidth, animationHeight, animationanimationFrames, numberOfFrame, animationMasks) {
 
 
 }
@@ -27,8 +27,11 @@ MegamanStandingLeft::~MegamanStandingLeft() {
 MegamanState* MegamanStandingLeft::getInstance() {
 	if(instance == 0) {
 		Bitmap** animationFrames = new Bitmap*[1];
-		animationFrames[0] = new Bitmap("0:state/HeroStandingLeft/1.bmp");
-		instance = new MegamanStandingLeft(35, 35, animationFrames, 1);
+		animationFrames[0] = new Bitmap("0:state/MegamanStandingLeft/1.bmp");
+
+		Bitmap** animationMasks = new Bitmap*[1];
+		animationMasks[0] = new Bitmap("0:state/MegamanStandingLeft/mask1.bmp");
+		instance = new MegamanStandingLeft(35, 35, animationFrames, 1, animationMasks);
 	}
 	instance->reset();
 	return instance;

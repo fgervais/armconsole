@@ -15,8 +15,8 @@
 
 MegamanState* MegamanStandingRight::instance = 0;
 
-MegamanStandingRight::MegamanStandingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame)
-	: MegamanState(animationWidth, animationHeight, animationFrames, numberOfFrame) {
+MegamanStandingRight::MegamanStandingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
+	: MegamanState(animationWidth, animationHeight, animationFrames, numberOfFrame, animationMasks) {
 
 
 }
@@ -27,9 +27,12 @@ MegamanStandingRight::~MegamanStandingRight() {
 
 MegamanState* MegamanStandingRight::getInstance() {
 	if(instance == 0) {
-		Bitmap** frames = new Bitmap*[1];
-		frames[0] = new Bitmap("0:state/HeroStandingRight/1.bmp");
-		instance = new MegamanStandingRight(35, 35, frames, 1);
+		Bitmap** animationFrames = new Bitmap*[1];
+		animationFrames[0] = new Bitmap("0:state/MegamanStandingRight/1.bmp");
+
+		Bitmap** animationMasks = new Bitmap*[1];
+		animationMasks[0] = new Bitmap("0:state/MegamanStandingRight/mask1.bmp");
+		instance = new MegamanStandingRight(35, 35, animationFrames, 1, animationMasks);
 	}
 	instance->reset();
 	return instance;
