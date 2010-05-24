@@ -11,7 +11,6 @@
 #include "MegamanState.h"
 
 class Wave;
-class AudioHelper;
 
 class MegamanJumpingLeft: public MegamanState {
 public:
@@ -30,8 +29,6 @@ private:
 	virtual ~MegamanJumpingLeft();
 
 	static MegamanState* instance;
-
-	AudioHelper* audioHelper;
 };
 
 #endif /* MEGAMANJUMPINGLEFT_H_ */

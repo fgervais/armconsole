@@ -24,13 +24,22 @@ public:
 
 	void setState(MetoolState* state);
 
+	// State accessor
+	MetoolState* getWalkingLeftState() { return metoolWalkingLeft; }
+	MetoolState* getWalkingRightState() { return metoolWalkingRight; }
+
 	// Base class override
 	virtual void update();
 	virtual void collideWith(Collider*);
 	virtual void collideWith(Megaman*);
 	virtual void collideWith(Metool*);
 private:
+	// Current state
 	MetoolState* state;
+
+	// Every possible Metool state
+	MetoolState* metoolWalkingLeft;
+	MetoolState* metoolWalkingRight;
 };
 
 #endif /* METOOL_H_ */

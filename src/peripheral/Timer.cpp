@@ -9,6 +9,7 @@
 #include "TimerConfiguration.h"
 #include "TimerOverflowListener.h"
 #include "irq.h"
+#include "Debug.h"
 
 Timer::Timer(TIMER_Typedef* timerRegisters, uint8_t id) : Peripheral(id) {
 	this->timerRegisters = timerRegisters;
@@ -26,13 +27,16 @@ Timer::~Timer() {
  * @brief Function called by the overflow interrupt.
  */
 void Timer::overflowInterrupt() {
+	// THIS IS GREAT BUT TOO SLOW
 	// Browse through every listeners and tell them that
 	// this object have an event pending
-	for(int32_t i=0; i<overflowListeners.size(); i++) {
-		if(overflowListeners.getElement(i) != 0) {
-			overflowListeners.getElement(i)->timerOverflowed(this);
-		}
-	}
+	//for(int32_t i=0; i<overflowListeners.size(); i++) {
+	//	if(overflowListeners.getElement(i) != 0) {
+	//		overflowListeners.getElement(i)->timerOverflowed(this);
+	//	}
+	//}
+
+	listener->timerOverflowed(this);
 }
 
 /**
@@ -69,7 +73,8 @@ uint8_t Timer::addEventListener(TimerOverflowListener* listener) {
 			configureOverflowInterrupt();
 			overflowiConfigured = 1;
 		}
-		overflowListeners.addElement(listener);
+		//overflowListeners.addElement(listener);
+		this->listener = listener;
 		return 0;
 	}
 	return 1;
@@ -86,6 +91,7 @@ void Timer::enable() {
  * @brief Disable the timer.
  */
 void Timer::disable() {
+	//timerRegisters->TCR = 2;
 	timerRegisters->TCR = 0;
 }
 
@@ -107,19 +113,16 @@ void Timer::configureOverflowInterrupt() {
 	// Better way to do this anyone?
 	uint8_t irqNumber = 0;
 	switch(getId()) {
-	case 1:
-		// Timer 1 is an advanced control timer and is not supported
-		break;
-	case 2:
+	case 0:
 		irqNumber = TIMER0_INT;
 		break;
-	case 3:
+	case 1:
 		irqNumber = TIMER1_INT;
 		break;
-	case 4:
+	case 2:
 		irqNumber = TIMER2_INT;
 		break;
-	case 5:
+	case 3:
 		irqNumber = TIMER3_INT;
 		break;
 	default:

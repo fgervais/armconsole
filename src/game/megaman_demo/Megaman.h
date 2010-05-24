@@ -42,7 +42,11 @@ public:
 	void stopRunning();
 	void stopJumping();
 private:
+	// Current state
 	MegamanState* state;
+
+	// Every possible Megaman state
+
 
 	// SoundFX
 	static Wave* jumpSoundFX;

@@ -18,13 +18,13 @@
 #include "AudioHelper.h"
 #include "LPC2478.h"
 #include "Debug.h"
+#include "Audio.h"
 
 MegamanState* MegamanJumpingRight::instance = 0;
 
 MegamanJumpingRight::MegamanJumpingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks)
 	: MegamanState(animationWidth, animationHeight, animationFrames, numberOfFrame, animationMasks) {
 
-	audioHelper = new AudioHelper(LPC2478::getDAC(), LPC2478::getTimer1());
 }
 
 MegamanJumpingRight::~MegamanJumpingRight() {
@@ -81,7 +81,7 @@ void MegamanJumpingRight::initialize(Megaman* sprite) {
 		currentFrame = 3;
 	}
 	else {
-		audioHelper->play(sprite->getJumpSoundFX());
+		Audio::playAsync(sprite->getJumpSoundFX());
 	}
 }
 
@@ -100,7 +100,7 @@ void MegamanJumpingRight::update(Megaman* sprite) {
 				sprite->setState(MegamanStandingRight::getInstance());
 
 			}
-			audioHelper->play(sprite->getLandSoundFX());
+			Audio::playAsync(sprite->getLandSoundFX());
 		}
 		//sprite->setVelocity(sprite->getVelocityX(), 0);
 	}

@@ -259,6 +259,9 @@ void Environment::checkCollision(Sprite* sprite) {
 				// Both sprite should be aware of the collision
 				//sprite->collideWith(activeSprite[activeSpriteIterator]->sprite);
 				//activeSprite[activeSpriteIterator]->sprite->collideWith(sprite);
+
+				// TODO: Remove me and use the two upper line.
+				// This is for demo purpose only
 				activeSprite[activeSpriteIterator]->active = 0;
 				activeSprite[activeSpriteIterator] = 0;
 			}
