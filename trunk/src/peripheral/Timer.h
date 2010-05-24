@@ -32,6 +32,7 @@ private:
 	TIMER_Typedef* timerRegisters;
 	Mode mode;
 	Vector<TimerOverflowListener*> overflowListeners;
+	TimerOverflowListener* listener;
 	uint8_t overflowiConfigured;
 
 	void counterMode();

@@ -142,6 +142,8 @@ void timer0_irq_handler( void ) {
 }
 
 void timer1_irq_handler( void ) {
+	TIMER1->IR |= 1;
+
 	LPC2478::getTimer1()->overflowInterrupt();
 }
 
@@ -226,10 +228,14 @@ void gpdma_irq_handler( void ) {
 }
 
 void timer2_irq_handler( void ) {
+	TIMER2->IR |= 1;
+
 	LPC2478::getTimer2()->overflowInterrupt();
 }
 
 void timer3_irq_handler( void ) {
+	TIMER3->IR |= 1;
+
 	LPC2478::getTimer3()->overflowInterrupt();
 }
 

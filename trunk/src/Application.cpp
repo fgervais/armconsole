@@ -103,7 +103,7 @@ int main() {
 		displayHelper->drawImage(100,50,bitmap->getData(),bitmap->getInfoHeader()->width,bitmap->getInfoHeader()->height);
 	}
 
-	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC(), LPC2478::getTimer1());
+	AudioHelper* audioHelper = new AudioHelper(LPC2478::getDAC());
 	Wave* wave = new Wave("0:intro.wav");
 	wave->load();
 

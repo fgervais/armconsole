@@ -19,6 +19,7 @@ class Timer;
 
 class AudioHelper : public TimerOverflowListener {
 public:
+	AudioHelper(DAC* dac);
 	AudioHelper(DAC* dac, Timer* timer);
 	virtual ~AudioHelper();
 
@@ -35,6 +36,7 @@ private:
 
 	// Flags
 	uint8_t stopped;
+	uint8_t asyncEnabled;
 
 	// Used in asynchronous mode
 	Wave* wavePlaying;
