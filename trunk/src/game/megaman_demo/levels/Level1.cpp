@@ -105,11 +105,11 @@ void Level1::build() {
 	Metool** enemy = new Metool*[32];
 	for(uint8_t i=0; i<32; i++) {
 		if(i<22) {
-			enemy[i] = new Metool(MetoolWalkingRight::getInstance(), this);
+			enemy[i] = new Metool(MetoolWalkingRight::createInstance(), this);
 			//add(enemy, 500, 204);
 		}
 		else {
-			enemy[i] = new Metool(MetoolWalkingLeft::getInstance(), this);
+			enemy[i] = new Metool(MetoolWalkingLeft::createInstance(), this);
 		}
 		add(enemy[i], (i*25), 100);
 	}
