@@ -17,16 +17,16 @@ class Sprite;
 
 class MetoolWalkingLeft: public MetoolState {
 public:
-	static MetoolState* getInstance();
+	virtual ~MetoolWalkingLeft();
+
+	static MetoolState* createInstance();
 
 	// Base class function override
 	virtual void initialize(Metool*);
 	virtual void update(Metool*);
 
 private:
-	MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame);
 	MetoolWalkingLeft(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
-	virtual ~MetoolWalkingLeft();
 
 	//static MetoolState* instance;
 	static Bitmap** sharedFrames;

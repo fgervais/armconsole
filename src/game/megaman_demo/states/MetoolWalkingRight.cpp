@@ -24,7 +24,7 @@ MetoolWalkingRight::~MetoolWalkingRight() {
 
 }
 
-MetoolState* MetoolWalkingRight::getInstance() {
+MetoolState* MetoolWalkingRight::createInstance() {
 	//if(instance == 0) {
 	if(sharedFrames == 0) {
 		//Bitmap** frames = new Bitmap*[4];
@@ -43,7 +43,7 @@ MetoolState* MetoolWalkingRight::getInstance() {
 		sharedMasks[3] = new Bitmap("0:state/MetoolWalkingRight/mask4.bmp");
 	}
 	MetoolWalkingRight* instance = new MetoolWalkingRight(22, 21, sharedFrames, 4, sharedMasks);
-	instance->reset();
+	//instance->reset();
 	return instance;
 }
 

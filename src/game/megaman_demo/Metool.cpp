@@ -8,6 +8,8 @@
 #include "Metool.h"
 #include "MetoolState.h"
 #include "Environment.h"
+#include "MetoolWalkingLeft.h"
+#include "MetoolWalkingRight.h"
 #include "Debug.h"
 #include "LPC2478.h"
 
@@ -16,6 +18,9 @@ Metool::Metool(MetoolState* initialState, Environment* environment) : Sprite(ini
 
 	// Unsafe?
 	this->state->initialize(this);
+
+	metoolWalkingLeft = MetoolWalkingLeft::createInstance();
+	metoolWalkingLeft = MetoolWalkingRight::createInstance();
 }
 
 Metool::~Metool() {

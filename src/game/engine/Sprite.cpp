@@ -65,7 +65,9 @@ uint32_t Sprite::getHeight() {
 
 void Sprite::setState(State* state)  {
 	// State transition position adjustment
-	positionY += this->state->getAnimationHeight() - state->getAnimationHeight();
+	if(this->state != 0) {
+		positionY += this->state->getAnimationHeight() - state->getAnimationHeight();
+	}
 
 	this->state = state;
 	// Do state entry initialization on the sprite
