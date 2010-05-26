@@ -34,10 +34,18 @@ Do the same thing for the hero but as you'll want to control it, you should add 
 
 Here is a list of all the important thing you should know in order of the engine to work correctly.
 
-Background : Should be on screen high (272px) and 256px wide and repeat itself 3 times in the same image file. The final background image resolution should be 768x272. Don't worry this is the trickiest limitation. We do that because background scrolling is the hardest task so we want our DMA transfer to be as efficient as possible.
+=== Background ===
 
-Tiles : Should have a power of 2 size.
+Should be on screen high (272px) and 256px wide and repeat itself 3 times in the same image file. The final background image resolution should be 768x272. Don't worry this is the trickiest limitation. We do that because background scrolling is the hardest task so we want our DMA transfer to be as efficient as possible.
 
-Images : Should be in Bitmap format 24bpp.
+=== Tiles ===
 
-Sound : Should be a 16bit wave file 32kHz. This might expand in the future to include 8bit and other sample rate.
+Should have a power of 2 size.
+
+=== Images ===
+
+Should be in Bitmap format 24bpp.
+
+=== Sound ===
+
+Should be a 16bit wave file 32kHz. This might expand in the future to include 8bit and other sample rate.
