@@ -1,0 +1,17 @@
+#summary This page contains information that should help you to better understand how the engine works and how you can use it for your own games.
+
+= Introduction =
+This game engine is designed to create side scroller games faster and easier. It will take care of the rendering process, the collision detection, the scrolling centered on the hero, enemy spawning etc. In the next section you'll find all the details that will hopefully put you in the game design process in no time.
+
+
+= Details =
+
+== Engine Modification ==
+
+There is only one class that you need to modify in the engine directory and it's the Collider class. In it you should add a line for every sprite that can collide. That should look like this :
+
+`virtual void collideWith(YourColliderClass*) {}`
+
+This is the function that will be called when your sprite collide with some other sprite. In the case where you want to take actions like let say decrease the energy level of your sprite, that's the function you will want to override. We'll look at that in detail the following sections.
+
+== Creating your game ==
