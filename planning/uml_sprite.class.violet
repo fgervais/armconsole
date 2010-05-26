@@ -45,6 +45,7 @@
     <void property="attributes"> 
      <void property="text"> 
       <string>- animationFrames : Bitmap*[]
+- animationMasks : Bitmap*[]
 - animationWidth : uint32_t
 - animationHeight : uint32_t
 # currentFrame : uint32_t
@@ -71,8 +72,8 @@ State</string>
    </object> 
    <object class="java.awt.geom.Point2D$Double"> 
     <void method="setLocation"> 
-     <double>876.0</double> 
-     <double>56.0</double> 
+     <double>882.0</double> 
+     <double>33.0</double> 
     </void> 
    </object> 
   </void> 
@@ -306,6 +307,7 @@ MegamanCollisionHandler</string>
     <void property="methods"> 
      <void property="text"> 
       <string>+ move(Sprite*) : uint8_t
++ isOnGround(Sorite*) : uint8_t
 + checkCollision(Sprite*)</string> 
      </void> 
     </void> 
@@ -317,8 +319,8 @@ MegamanCollisionHandler</string>
    </object> 
    <object class="java.awt.geom.Point2D$Double"> 
     <void method="setLocation"> 
-     <double>60.0</double> 
-     <double>140.0</double> 
+     <double>69.0</double> 
+     <double>142.0</double> 
     </void> 
    </object> 
   </void> 
