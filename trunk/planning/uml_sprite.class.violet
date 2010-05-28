@@ -19,7 +19,7 @@
      <void property="text"> 
       <string>+ Sprite(State* initialState, Environment*)
 + setState(State*)
-+ update()
++ update() =0
 + render(VideoMemory*)
 /* Accessors */
 + isOnGround() : uint8_t
@@ -367,6 +367,22 @@ MetoolState</string>
     </void> 
    </object> 
   </void> 
+  <void method="addNode"> 
+   <object id="NoteNode0" class="com.horstmann.violet.NoteNode"> 
+    <void property="text"> 
+     <void property="text"> 
+      <string>In the State pattern this is called
+the Context</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>90.0</double> 
+     <double>317.0</double> 
+    </void> 
+   </object> 
+  </void> 
   <void method="connect"> 
    <object class="com.horstmann.violet.ClassRelationshipEdge"> 
     <void property="bentStyle"> 
@@ -534,6 +550,11 @@ MetoolState</string>
    </object> 
    <object idref="ClassNode0"/> 
    <object idref="ClassNode8"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.NoteEdge"/> 
+   <object idref="ClassNode0"/> 
+   <object idref="NoteNode0"/> 
   </void> 
  </object> 
 </java> 
