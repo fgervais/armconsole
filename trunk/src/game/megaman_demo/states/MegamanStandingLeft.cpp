@@ -33,7 +33,7 @@ MegamanState* MegamanStandingLeft::getInstance() {
 		animationMasks[0] = new Bitmap("0:state/MegamanStandingLeft/mask1.bmp");
 		instance = new MegamanStandingLeft(35, 35, animationFrames, 1, animationMasks);
 	}
-	instance->reset();
+	//instance->reset();
 	return instance;
 }
 

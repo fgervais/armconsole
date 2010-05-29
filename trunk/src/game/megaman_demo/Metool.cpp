@@ -14,13 +14,16 @@
 #include "LPC2478.h"
 
 Metool::Metool(MetoolState* initialState, Environment* environment) : Sprite(initialState, environment) {
-	this->state = initialState;
+	// Keep a pointer to the initial state in case we need to re-spawn the sprite
+	//this->initialState = initialState;
+	this->currentState = initialState;
 
 	// Unsafe?
-	this->state->initialize(this);
+	this->currentState->initialize(this);
 
-	metoolWalkingLeft = MetoolWalkingLeft::createInstance();
-	metoolWalkingLeft = MetoolWalkingRight::createInstance();
+	// Initialize every possible Metool states
+	//metoolWalkingLeft = MetoolWalkingLeft::createInstance();
+	//metoolWalkingLeft = MetoolWalkingRight::createInstance();
 }
 
 Metool::~Metool() {
@@ -28,10 +31,10 @@ Metool::~Metool() {
 }
 
 void Metool::setState(MetoolState* state)  {
-	this->state = state;
+	this->currentState = state;
 
 	// Do state entry initialization on the sprite
-	state->initialize(this);
+	currentState->initialize(this);
 
 	// Send state to the superclass
 	Sprite::setState(state);
@@ -42,7 +45,7 @@ void Metool::update() {
 
 	// Update the currently displayed frame
 	// And possibly some state specific things
-	state->update(this);
+	currentState->update(this);
 }
 
 void Metool::collideWith(Collider* collider) {

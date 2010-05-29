@@ -23,9 +23,7 @@ public:
 	uint32_t getAnimationWidth();
 	uint32_t getAnimationHeight();
 
-	Bitmap* getCurrentFrame() { return animationFrames[currentFrame]; }
-
-	virtual void reset();
+	//virtual void reset();
 
 	virtual void update(Sprite*) {}
 	virtual void render(Sprite*, VideoMemory*);
@@ -33,7 +31,7 @@ public:
 
 protected:
 	// Subclass may need to update the current frame manually
-	uint32_t currentFrame;
+	//uint32_t currentFrame;	// This was used before the state handling change
 	uint32_t numberOfFrame;
 
 private:

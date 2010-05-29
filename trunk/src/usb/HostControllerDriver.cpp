@@ -59,7 +59,7 @@ void HostControllerDriver::init() {
 	ohciRegisters->HcRh.Status |= RH_HS_LPSC;
 
 	// A delay is needed here.
-	for(uint32_t i=0; i<1000000; i++);
+	LPC2478::delay(50000);	// 50 ms
 
 	// Set HCCA
 	ohciRegisters->HcHCCA = (uint32_t)hcca;
