@@ -16,8 +16,6 @@ class Metool;
 
 class MetoolWalkingRight: public MetoolState {
 public:
-	virtual ~MetoolWalkingRight();
-
 	static MetoolState* getInstance();
 
 	// Base class function override
@@ -26,6 +24,7 @@ public:
 
 private:
 	MetoolWalkingRight(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animationFrames, uint32_t numberOfFrame, Bitmap** animationMasks);
+	virtual ~MetoolWalkingRight();
 
 	static MetoolState* instance;
 	//static Bitmap** sharedFrames;
