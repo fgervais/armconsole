@@ -54,7 +54,7 @@ MegamanState* MegamanJumpingRight::getInstance() {
 
 		instance = new MegamanJumpingRight(30, 46, animationFrames, 7, animationMasks);
 	}
-	instance->reset();
+	//instance->reset();
 	return instance;
 }
 
@@ -78,7 +78,7 @@ void MegamanJumpingRight::stopJumping(Megaman* sprite) {
 void MegamanJumpingRight::initialize(Megaman* sprite) {
 	if(sprite->getVelocityY() >= 0) {
 		// If we are falling, we should start rendering at frame 3
-		currentFrame = 3;
+		sprite->setCurrentFrame(3);
 	}
 	else {
 		Audio::playAsync(sprite->getJumpSoundFX());
@@ -89,8 +89,8 @@ void MegamanJumpingRight::update(Megaman* sprite) {
 	if(sprite->isOnGround()) {
 		// We need to display the landing frames before switching state
 		// but only if we are not running
-		if(currentFrame < 6 && sprite->getVelocityX() == 0) {
-			currentFrame++;
+		if(sprite->getCurrentFrame() < 6 && sprite->getVelocityX() == 0) {
+			sprite->incCurrentFrame();
 		}
 		else {
 			if(sprite->getVelocityX() > 0) {
@@ -108,14 +108,14 @@ void MegamanJumpingRight::update(Megaman* sprite) {
 		// Manual frame update
 		// Going up
 		if(sprite->getVelocityY() < 0) {
-			if(currentFrame < 2) {
-				currentFrame++;
+			if(sprite->getCurrentFrame() < 2) {
+				sprite->incCurrentFrame();
 			}
 		}
 		// Going down
 		else {
-			if(currentFrame < 4) {
-				currentFrame++;
+			if(sprite->getCurrentFrame() < 4) {
+				sprite->incCurrentFrame();
 			}
 		}
 		// Update speed according to gravity

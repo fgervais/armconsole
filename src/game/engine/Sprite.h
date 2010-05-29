@@ -35,6 +35,10 @@ public:
 	uint32_t getPositionX() { return positionX; }
 	uint32_t getPositionY() { return positionY; }
 
+	void setCurrentFrame(uint32_t frameNumber) { currentFrame = frameNumber; }
+	void incCurrentFrame() { currentFrame++; }
+	uint32_t getCurrentFrame() { return currentFrame; }
+
 	uint32_t getWidth();
 	uint32_t getHeight();
 
@@ -62,6 +66,8 @@ protected:
 	uint8_t collisionCheckEnabled;
 private:
 	State* state;
+
+	uint32_t currentFrame;
 };
 
 #endif /* SPRITE_H_ */

@@ -18,7 +18,7 @@ State::State(uint32_t animationWidth, uint32_t animationHeight, Bitmap** animati
 	this->animationHeight = animationHeight;
 	this->animationFrames = animationFrames;
 	this->numberOfFrame = numberOfFrame;
-	this->currentFrame = 0;
+	//this->currentFrame = 0;
 	this->animationMasks = animationMasks;
 
 	// Ensure every bitmap are loaded into memory
@@ -52,9 +52,9 @@ uint32_t State::getAnimationHeight() {
  *
  * Currently only reset the frame counter to 0.
  */
-void State::reset() {
-	currentFrame = 0;
-}
+//void State::reset() {
+	//currentFrame = 0;
+//}
 
 void State::render(Sprite* sprite, VideoMemory* videoMemory) {
 	VisibleArea* visibleArea = sprite->getEnvironment()->getVisibleArea();
@@ -98,20 +98,16 @@ void State::render(Sprite* sprite, VideoMemory* videoMemory) {
 	uint32_t videoMemoryWidth = videoMemory->getWidth();
 	uint32_t* videoMemoryPointer = videoMemory->getPointer();
 
+	uint32_t currentFrame = sprite->getCurrentFrame();
+
 	// Render the part of the tile inside the render mask
 	for (uint32_t i=renderMaskY1; i<renderMaskY2; i++) {
 		for (uint32_t j=renderMaskX1; j<renderMaskX2; j++) {
 			// This is complicated to understand but I don't think we can simplify it
-			if(animationMasks == 0) {
-				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
-				                   = animationFrames[currentFrame]->getData()[i*animationWidth + j];
-			}
-			else {
-				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
-				                   &= animationMasks[currentFrame]->getData()[i*animationWidth + j];
-				videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
-				                   |= animationFrames[currentFrame]->getData()[i*animationWidth + j];
-			}
+			videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+							  &= animationMasks[currentFrame]->getData()[i*animationWidth + j];
+			videoMemoryPointer[((i-renderMaskY1)+renderPositionY)*videoMemoryWidth + ((j-renderMaskX1)+renderPositionX)]
+							   |= animationFrames[currentFrame]->getData()[i*animationWidth + j];
 		}
 	}
 }

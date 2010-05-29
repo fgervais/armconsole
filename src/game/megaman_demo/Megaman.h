@@ -31,7 +31,7 @@ public:
 	virtual void collideWith(Megaman*);
 	virtual void collideWith(Metool*);
 
-	// Accessors
+	// SoundFX accessors
 	Wave* getJumpSoundFX() { return jumpSoundFX; }
 	Wave* getLandSoundFX() { return landSoundFX; }
 
@@ -43,10 +43,8 @@ public:
 	void stopJumping();
 private:
 	// Current state
-	MegamanState* state;
-
-	// Every possible Megaman state
-
+	//MegamanState* initialState;
+	MegamanState* currentState;
 
 	// SoundFX
 	static Wave* jumpSoundFX;

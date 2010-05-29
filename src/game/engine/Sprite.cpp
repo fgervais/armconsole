@@ -18,6 +18,7 @@ Sprite::Sprite(State* initialState, Environment* environment) {
 	this->positionY = 0;
 	this->velocityX = 0;
 	this->velocityY = 0;
+	this->currentFrame = 0;
 	// Unsafe?
 	this->state->initialize(this);
 
@@ -70,6 +71,9 @@ void Sprite::setState(State* state)  {
 	}
 
 	this->state = state;
+
+	// On state change, reset the current frame
+	currentFrame = 0;
 	// Do state entry initialization on the sprite
 	state->initialize(this);
 }

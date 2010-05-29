@@ -25,8 +25,9 @@ public:
 	void setState(MetoolState* state);
 
 	// State accessor
-	MetoolState* getWalkingLeftState() { return metoolWalkingLeft; }
-	MetoolState* getWalkingRightState() { return metoolWalkingRight; }
+	//MetoolState* getWalkingLeftState() { return metoolWalkingLeft; }
+	//MetoolState* getWalkingRightState() { return metoolWalkingRight; }
+	//MetoolState* getInitialState() { return initialState; }
 
 	// Base class override
 	virtual void update();
@@ -35,11 +36,14 @@ public:
 	virtual void collideWith(Metool*);
 private:
 	// Current state
-	MetoolState* state;
+	//MetoolState* initialState;
+	MetoolState* currentState;
 
 	// Every possible Metool state
-	MetoolState* metoolWalkingLeft;
-	MetoolState* metoolWalkingRight;
+	//MetoolState* metoolWalkingLeft;
+	//MetoolState* metoolWalkingRight;
+
+
 };
 
 #endif /* METOOL_H_ */

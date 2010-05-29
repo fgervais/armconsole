@@ -55,7 +55,7 @@ MegamanState* MegamanRunningLeft::getInstance() {
 		animationMasks[10] = new Bitmap("0:state/MegamanRunningLeft/mask11.bmp");
 		instance = new MegamanRunningLeft(35, 35, animationFrames, 11, animationMasks);
 	}
-	instance->reset();
+	//instance->reset();
 	return instance;
 }
 
@@ -76,7 +76,7 @@ void MegamanRunningLeft::stopRunning(Megaman* sprite) {
 void MegamanRunningLeft::initialize(Megaman* sprite) {
 	if(sprite->getVelocityX() < 0) {
 		// If we are already moving left, skip the first frame
-		currentFrame = 1;
+		sprite->setCurrentFrame(1);
 	}
 	else {
 		// This is the hard coded running speed
@@ -87,13 +87,13 @@ void MegamanRunningLeft::initialize(Megaman* sprite) {
 
 void MegamanRunningLeft::update(Megaman* sprite) {
 	// Update current frame
-	if(currentFrame < (numberOfFrame-1)) {
-		currentFrame++;
+	if(sprite->getCurrentFrame() < (numberOfFrame-1)) {
+		sprite->incCurrentFrame();
 	}
 	else {
 		// The first frame is displayed only once when we transition from
 		// a standing position
-		currentFrame = 1;
+		sprite->setCurrentFrame(1);
 	}
 
 	// If we loose contact with the ground, then we are falling
