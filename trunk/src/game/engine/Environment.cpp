@@ -233,18 +233,20 @@ void Environment::checkCollision(Sprite* sprite) {
 
 	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
 		if(activeSprite[activeSpriteIterator] != 0) {
+			Sprite* possibleCollider = activeSprite[activeSpriteIterator]->sprite;
+
 			// Do not check a sprite with itself
-			if(sprite != activeSprite[activeSpriteIterator]->sprite) {
+			if(sprite != possibleCollider) {
 
 				// This algorithme is comming from gamedev.net
 				left1 = sprite->getPositionX();
-				left2 = activeSprite[activeSpriteIterator]->sprite->getPositionX();
+				left2 = possibleCollider->getPositionX();
 				right1 = left1 + sprite->getWidth();
-				right2 = left2 + activeSprite[activeSpriteIterator]->sprite->getWidth();
+				right2 = left2 + possibleCollider->getWidth();
 				top1 = sprite->getPositionY();
-				top2 = activeSprite[activeSpriteIterator]->sprite->getPositionY();
+				top2 = possibleCollider->getPositionY();
 				bottom1 = top1 + sprite->getHeight();
-				bottom2 = top2 + activeSprite[activeSpriteIterator]->sprite->getHeight();
+				bottom2 = top2 + possibleCollider->getHeight();
 
 				if (bottom1 < top2) continue;
 				if (top1 > bottom2) continue;
@@ -253,13 +255,28 @@ void Environment::checkCollision(Sprite* sprite) {
 				if (left1 > right2) continue;
 
 				// Both sprite should be aware of the collision
-				//sprite->collideWith(activeSprite[activeSpriteIterator]->sprite);
-				//activeSprite[activeSpriteIterator]->sprite->collideWith(sprite);
+				sprite->collideWith(possibleCollider);
+				possibleCollider->collideWith(sprite);
+			}
+		}
+	}
+}
 
-				// TODO: Remove me and use the two upper line.
-				// This is for demo purpose only
+/**
+ * Take a sprite out of the active sprite list.
+ *
+ * When a sprite is out of that list, update() and render() stop
+ * being called on these objects.
+ *
+ * @param sprite Sprite to be deactivated.
+ */
+void Environment::deactivate(Sprite* sprite) {
+	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
+		if(activeSprite[activeSpriteIterator] != 0) {
+			if(activeSprite[activeSpriteIterator]->sprite == sprite) {
 				activeSprite[activeSpriteIterator]->active = 0;
 				activeSprite[activeSpriteIterator] = 0;
+				break;	// Found it, quit loop
 			}
 		}
 	}

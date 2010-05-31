@@ -73,13 +73,13 @@ void Megaman::collideWith(Collider* collider) {
 }
 
 void Megaman::collideWith(Megaman*) {
-	Debug::writeLine("Megaman collided with Megaman");
-	LPC2478::delay(1000000);
+	//Debug::writeLine("Megaman collided with Megaman");
+	//LPC2478::delay(1000000);
 }
 
 void Megaman::collideWith(Metool*) {
-	Debug::writeLine("Megaman collided with Metool");
-	LPC2478::delay(1000000);
+	//Debug::writeLine("Megaman collided with Metool");
+	//LPC2478::delay(1000000);
 }
 
 /**
