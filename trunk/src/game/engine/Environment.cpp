@@ -268,6 +268,9 @@ void Environment::checkCollision(Sprite* sprite) {
  * When a sprite is out of that list, update() and render() stop
  * being called on these objects.
  *
+ * This could be used when a sprite dies and want to be removed from
+ * the screen.
+ *
  * @param sprite Sprite to be deactivated.
  */
 void Environment::deactivate(Sprite* sprite) {
@@ -275,6 +278,36 @@ void Environment::deactivate(Sprite* sprite) {
 		if(activeSprite[activeSpriteIterator] != 0) {
 			if(activeSprite[activeSpriteIterator]->sprite == sprite) {
 				activeSprite[activeSpriteIterator]->active = 0;
+				activeSprite[activeSpriteIterator] = 0;
+				break;	// Found it, quit loop
+			}
+		}
+	}
+}
+
+/**
+ * Take a sprite out of the active sprite list and prevent it from
+ * spawning ever again.
+ *
+ * The sprite will be removed from the sprite spawn map so it won't
+ * spawn again.
+ *
+ * This could be used with things like energy cannister.
+ * You would want these cannisters to spawn and respawn until the
+ * hero collides with it. Then you would use this function on the
+ * energy cannister.
+ *
+ * @param sprite
+ */
+void Environment::deactivateAndStopSpawning(Sprite* sprite) {
+	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
+		if(activeSprite[activeSpriteIterator] != 0) {
+			if(activeSprite[activeSpriteIterator]->sprite == sprite) {
+				SpriteContainer* container = activeSprite[activeSpriteIterator];
+				// Stop spawning
+				spriteSpawnMap[container->spawnPositionY/tileHeight][container->spawnPositionX/tileWidth] = 0;
+				// Deactivate
+				container->active = 0;
 				activeSprite[activeSpriteIterator] = 0;
 				break;	// Found it, quit loop
 			}
