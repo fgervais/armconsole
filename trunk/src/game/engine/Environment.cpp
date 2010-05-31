@@ -50,24 +50,20 @@ Environment::Environment(uint32_t width, uint32_t height, uint32_t tileWidth, ui
 		}
 	}
 
-	spriteMap = new SpriteContainer**[heightInTile];
+	spriteSpawnMap = new SpriteContainer**[heightInTile];
 	for(uint32_t i=0; i<widthInTile; i++) {
-		spriteMap[i] = new SpriteContainer*[widthInTile];
+		spriteSpawnMap[i] = new SpriteContainer*[widthInTile];
 	}
 
 	// Initialize the tile array
 	for(uint32_t i=0; i<heightInTile; i++) {
 		for(uint32_t j=0; j<widthInTile; j++) {
-			spriteMap[i][j] = 0;
+			spriteSpawnMap[i][j] = 0;
 		}
 	}
 
-	// Sprite limit without the Hero
-	// TODO: Should the spriteLimit be stored somewhere else?
-	spriteLimit = 32;
-
-	activeSprite = new SpriteContainer*[spriteLimit];
-	for(uint32_t i=0; i<spriteLimit; i++) {
+	activeSprite = new SpriteContainer*[SPRITE_LIMIT];
+	for(uint32_t i=0; i<SPRITE_LIMIT; i++) {
 		activeSprite[i] = 0;
 	}
 
@@ -235,7 +231,7 @@ void Environment::checkCollision(Sprite* sprite) {
 	uint32_t top1, top2;
 	uint32_t bottom1, bottom2;
 
-	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<spriteLimit; activeSpriteIterator++) {
+	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
 		if(activeSprite[activeSpriteIterator] != 0) {
 			// Do not check a sprite with itself
 			if(sprite != activeSprite[activeSpriteIterator]->sprite) {
@@ -274,26 +270,62 @@ void Environment::checkCollision(Sprite* sprite) {
  */
 
 /**
- * Add a sprite in the environment.
+ * Add a sprite to the active sprite list.
+ *
+ * By using this function, your sprite won't be spawned by the environment.
+ * It will go directly in the active sprite list. As with all the other
+ * active sprite, the environment will call update() and render() on every cycle.
+ *
+ * @param sprite Sprite to be activated
+ * @return 1 if added successfully, 0 otherwise.
+ */
+uint8_t Environment::activate(Sprite* sprite) {
+	// For now the sprite needs to be in a container even if,
+	// for this special case, it doesn't serve any purpose.
+	SpriteContainer* container = new SpriteContainer();
+	container->sprite = sprite;
+	container->active = 0;
+	// Won't be spawned so lets put 0s here
+	container->spawnPositionX = 0;
+	container->spawnPositionY = 0;
+
+	// Add sprite to the active sprite list if space remains
+	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
+		if(activeSprite[activeSpriteIterator] == 0) {
+			activeSprite[activeSpriteIterator] = container;
+			container->active = 1;
+			return 1;
+		}
+	}
+	// If there is not place for the sprite, we won't need this container
+	delete container;
+	return 0;
+}
+
+/**
+ * Add a sprite to the sprite spawn map.
+ *
+ * The environment will start spawning the sprite at this location until
+ * the stopSpawning() function is called.
  *
  * Note that there's a sprite limit.
  *
  * @param sprite Spite to be added
- * @param x X position in pixel
- * @param y Y position in pixel
+ * @param spawnPositionX X spawn position in pixel
+ * @param spawnPositionY Y spawn position in pixel
  * @return 1 if the sprite is successfully added. 0 otherwise.
  */
-uint8_t Environment::add(Sprite* sprite, uint32_t x, uint32_t y) {
-	if(x < width && y < height) {
+uint8_t Environment::startSpawning(Sprite* sprite, uint32_t spawnPositionX, uint32_t spawnPositionY) {
+	if(spawnPositionX < width && spawnPositionY < height) {
 		SpriteContainer* container = new SpriteContainer();
 		// Add some more information to the sprite so we can spawn it
 		// again and again in the same area
 		container->sprite = sprite;
 		container->active = 0;
-		container->spawnPositionX = x;
-		container->spawnPositionY = y;
+		container->spawnPositionX = spawnPositionX;
+		container->spawnPositionY = spawnPositionY;
 
-		spriteMap[y/tileHeight][x/tileWidth] = container;
+		spriteSpawnMap[spawnPositionY/tileHeight][spawnPositionX/tileWidth] = container;
 		return 1;
 	}
 	return 0;
@@ -322,9 +354,8 @@ uint8_t Environment::add(Tile* tile, uint32_t x, uint32_t y) {
  * @param x X position in pixel
  * @param y Y position in pixel
  */
-void Environment::set(Sprite* hero, uint32_t x, uint32_t y) {
+void Environment::set(Sprite* hero) {
 	this->hero = hero;
-	hero->setPosition(x,y);
 }
 
 /**
@@ -403,7 +434,7 @@ void Environment::renderHero(VideoMemory* videoMemory) {
 }
 
 void Environment::renderSprites(VideoMemory* videoMemory) {
-	for(uint32_t i=0; i<spriteLimit; i++) {
+	for(uint32_t i=0; i<SPRITE_LIMIT; i++) {
 		if(activeSprite[i] != 0) {
 			if((activeSprite[i]->sprite->getPositionX()+activeSprite[i]->sprite->getWidth()) > visibleArea->x && activeSprite[i]->sprite->getPositionX() < (visibleArea->x + visibleArea->width)) {
 				if((activeSprite[i]->sprite->getPositionY()+activeSprite[i]->sprite->getHeight()) > visibleArea->y && activeSprite[i]->sprite->getPositionY() < (visibleArea->y + visibleArea->height)) {
@@ -434,7 +465,7 @@ void Environment::updateHero() {
 }
 
 void Environment::updateSprites() {
-	for(uint32_t i=0; i<spriteLimit; i++) {
+	for(uint32_t i=0; i<SPRITE_LIMIT; i++) {
 		if(activeSprite[i] != 0) {
 			// If the sprite is inside the visible area, update it
 			if((activeSprite[i]->sprite->getPositionX()+activeSprite[i]->sprite->getWidth()) > visibleArea->x && activeSprite[i]->sprite->getPositionX() < (visibleArea->x + visibleArea->width)) {
@@ -481,8 +512,8 @@ void Environment::activateSprites() {
 	if(hero->getPositionY() < 0) {
 		if(visibleAreaInTileY1 > 0) {
 			for(uint32_t j=visibleAreaInTileX1; j<=visibleAreaInTileX2; j++) {
-				if(spriteMap[visibleAreaInTileY1-1][j] != 0) {
-					activate(spriteMap[visibleAreaInTileY1-1][j]);
+				if(spriteSpawnMap[visibleAreaInTileY1-1][j] != 0) {
+					activate(spriteSpawnMap[visibleAreaInTileY1-1][j]);
 				}
 			}
 		}
@@ -491,8 +522,8 @@ void Environment::activateSprites() {
 	if(hero->getVelocityY() > 0) {
 		if(visibleAreaInTileY2 < (heightInTile-1)) {
 			for(uint32_t j=visibleAreaInTileX1; j<=visibleAreaInTileX2; j++) {
-				if(spriteMap[visibleAreaInTileY2+1][j] != 0) {
-					activate(spriteMap[visibleAreaInTileY2+1][j]);
+				if(spriteSpawnMap[visibleAreaInTileY2+1][j] != 0) {
+					activate(spriteSpawnMap[visibleAreaInTileY2+1][j]);
 				}
 			}
 		}
@@ -502,8 +533,8 @@ void Environment::activateSprites() {
 	if(hero->getVelocityX() < 0) {
 		if(visibleAreaInTileX1 > 0) {
 			for(uint32_t i=visibleAreaInTileY1; i<=visibleAreaInTileY2; i++) {
-				if(spriteMap[i][visibleAreaInTileX1-1] != 0 && spriteMap[i][visibleAreaInTileX1-1]->active == 0) {
-					activate(spriteMap[i][visibleAreaInTileX1-1]);
+				if(spriteSpawnMap[i][visibleAreaInTileX1-1] != 0 && spriteSpawnMap[i][visibleAreaInTileX1-1]->active == 0) {
+					activate(spriteSpawnMap[i][visibleAreaInTileX1-1]);
 				}
 			}
 		}
@@ -512,23 +543,26 @@ void Environment::activateSprites() {
 	if(hero->getVelocityX() > 0) {
 		if(visibleAreaInTileX2 < (widthInTile-1)) {
 			for(uint32_t i=visibleAreaInTileY1; i<=visibleAreaInTileY2; i++) {
-				if(spriteMap[i][visibleAreaInTileX2+1] != 0 && spriteMap[i][visibleAreaInTileX2+1]->active == 0) {
-					activate(spriteMap[i][visibleAreaInTileX2+1]);
+				if(spriteSpawnMap[i][visibleAreaInTileX2+1] != 0 && spriteSpawnMap[i][visibleAreaInTileX2+1]->active == 0) {
+					activate(spriteSpawnMap[i][visibleAreaInTileX2+1]);
 				}
 			}
 		}
 	}
 }
 
+
 uint8_t Environment::activate(SpriteContainer* container) {
 	container->sprite->setPosition(container->spawnPositionX, container->spawnPositionY);
 	// Add sprite to the active sprite list if space remains
-	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<spriteLimit; activeSpriteIterator++) {
+	for(uint32_t activeSpriteIterator=0; activeSpriteIterator<SPRITE_LIMIT; activeSpriteIterator++) {
 		if(activeSprite[activeSpriteIterator] == 0) {
 			activeSprite[activeSpriteIterator] = container;
 			container->active = 1;
 			return 1;
 		}
 	}
+	// If there is not place for the sprite, we won't need this container
+	delete container;
 	return 0;
 }
