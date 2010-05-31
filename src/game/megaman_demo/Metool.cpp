@@ -53,11 +53,12 @@ void Metool::collideWith(Collider* collider) {
 }
 
 void Metool::collideWith(Megaman*) {
-	Debug::writeLine("Metool collided with Megaman");
-	LPC2478::delay(1000000);
+	//Debug::writeLine("Metool collided with Megaman");
+	//LPC2478::delay(1000000);
+	environment->deactivate(this);
 }
 
 void Metool::collideWith(Metool*) {
-	Debug::writeLine("Metool collided with Metool");
-	LPC2478::delay(1000000);
+	//Debug::writeLine("Metool collided with Metool");
+	//LPC2478::delay(1000000);
 }
