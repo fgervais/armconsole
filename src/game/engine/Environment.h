@@ -8,6 +8,9 @@
 #ifndef ENVIRONMENT_H_
 #define ENVIRONMENT_H_
 
+// Maximum number of active sprite at the same time
+#define SPRITE_LIMIT 32
+
 #include "Synchronized.h"
 #include "Renderable.h"
 #include <stdint.h>
@@ -47,14 +50,18 @@ public:
 	uint8_t move(Sprite*, uint32_t desiredPositionX, uint32_t desiredPositionY);
 	void checkCollision(Sprite*);
 
+	void deactivate(Sprite*);
+	void deactivateAndStopSpawning(Sprite*);
+
 	VisibleArea* getVisibleArea() { return visibleArea; };
 	Sprite* getHero() { return hero; }
 	Physics* getPhysics() { return physics; }
 
 protected:
-	uint8_t add(Sprite* sprite, uint32_t x, uint32_t y);
+	uint8_t activate(Sprite*);
+	uint8_t startSpawning(Sprite* sprite, uint32_t spawnPositionX, uint32_t spawnPositionY);
 	uint8_t add(Tile* tile, uint32_t x, uint32_t y);
-	void set(Sprite* hero, uint32_t x, uint32_t y);
+	void set(Sprite* hero);
 	void set(Background* background);
 	void set(Physics* physics);
 	void set(VisibleArea* visibleArea);
@@ -69,9 +76,8 @@ private:
 	uint32_t widthInTile;
 
 	Tile*** tileMap;
-	SpriteContainer*** spriteMap;
+	SpriteContainer*** spriteSpawnMap;
 	SpriteContainer** activeSprite;
-	uint32_t spriteLimit;
 	Sprite* hero;
 	Background* background;
 	Physics* physics;

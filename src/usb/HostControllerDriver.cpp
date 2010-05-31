@@ -85,12 +85,12 @@ void HostControllerDriver::init() {
  */
 void HostControllerDriver::hcInterrupt() {
 	//debug
-	while(1) {
+	//while(1) {
 		FIO1->FIOCLR = (1 << 12);
-		for(uint32_t i=0; i<1000000; i++);
+		LPC2478::delay(500000);
 		FIO1->FIOSET = (1 << 12);
-		for(uint32_t i=0; i<1000000; i++);
-	}
+		LPC2478::delay(500000);
+	//}
 
 	// Clear any active interrupt
 	ohciRegisters->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;

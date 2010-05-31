@@ -73,8 +73,8 @@ void Background::render(VideoMemory* videoMemory) {
 	uint32_t renderX1 = visibleArea->x >> 1;
 	//uint32_t renderY1 = visibleArea->y1 >> 1;
 
-	//uint32_t renderWidth = visibleArea->x2 - visibleArea->x1;
-	//uint32_t renderHeight = visibleArea->y2 - visibleArea->y1;
+	//uint32_t renderWidth = visibleArea->width;
+	//uint32_t renderHeight = visibleArea->height;
 
 	// These are safe initial guess
 	//uint32_t renderMaskX1 = renderX1 % width;

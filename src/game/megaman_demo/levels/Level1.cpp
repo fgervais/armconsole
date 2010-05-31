@@ -98,9 +98,10 @@ void Level1::build() {
 
 	Megaman* hero = new Megaman(MegamanStandingLeft::getInstance(), this);
 	hero->enableCollisionCheck();
+	hero->setPosition(720, 50);
 	//set(hero, 240, 189);
 	//set(hero, 240, 50);
-	set(hero, 720, 50);
+	set(hero);
 	Debug::writeLine("Done Loading hero");
 
 	Debug::writeLine("Loading sprites");
@@ -113,6 +114,11 @@ void Level1::build() {
 		else {
 			enemy[i] = new Metool(MetoolWalkingLeft::getInstance(), this);
 		}
-		add(enemy[i], (i*25), 100);
+		startSpawning(enemy[i], (i*25), 100);
 	}
+
+	// Try a sprite activated directly without being spawned by the environment
+	Metool* lonely_metool = new Metool(MetoolWalkingRight::getInstance(), this);
+	lonely_metool->setPosition(600, 50);
+	activate(lonely_metool);
 }
