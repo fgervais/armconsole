@@ -46,7 +46,7 @@ int main() {
 
 	// USB debug section
 	HostControllerDriver* hcd = LPC2478::getHCD();
-	hcd->init();
+	//hcd->init();
 	//IntEnable();
 
 	LCDConfiguration lcdConfig;

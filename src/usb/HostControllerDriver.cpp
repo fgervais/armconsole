@@ -8,11 +8,12 @@
 #include "HostControllerDriver.h"
 #include "LPC2478.h"
 #include "irq.h"
+#include "Debug.h"
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
 
-	//init();
+	init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
@@ -49,7 +50,12 @@ void HostControllerDriver::init() {
 	// Initiate a software reset
 	ohciRegisters->HcCommandStatus |= OHCI_HCR;
 
-	// Let the default (0x2EDF) Frame Interval
+	// Software reset is completed within 10 us
+
+	// Software reset reset HcFmInterval register to the default (0x2EDF)
+
+	// We are now in the UsbSuspend state and must not stay in it for
+	// more than 2 ms or the UsbResume state will have to be entered.
 
 	// Switch to UsbOperational state
 	ohciRegisters->HcControl =
@@ -84,13 +90,66 @@ void HostControllerDriver::init() {
  * a USB interrupt.
  */
 void HostControllerDriver::hcInterrupt() {
-	//debug
-	//while(1) {
-		FIO1->FIOCLR = (1 << 12);
-		LPC2478::delay(500000);
-		FIO1->FIOSET = (1 << 12);
-		LPC2478::delay(500000);
-	//}
+	// Change to the root hub status registers
+	if(ohciRegisters->HcInterruptStatus & OHCI_INTR_RHSC) {
+		// Connect status change on port 0
+		if(ohciRegisters->HcRh.PortStatus[0] & RH_PS_CSC) {
+			// Acknowledge status change (clear change bit)
+			ohciRegisters->HcRh.PortStatus[0] |= RH_PS_CSC;
+
+			// Device connected
+			if(ohciRegisters->HcRh.PortStatus[0] & RH_PS_CCS) {
+				Debug::writeLine("Device connected on port 0");
+				LPC2478::delay(1000000);
+
+				// Low speed device attached
+				if(ohciRegisters->HcRh.PortStatus[0] & RH_PS_LSDA) {
+					Debug::writeLine("Low speed device");
+					LPC2478::delay(1000000);
+				}
+				else {
+					Debug::writeLine("Full speed device");
+					LPC2478::delay(1000000);
+				}
+			}
+			// Device disconnected
+			else {
+				Debug::writeLine("Device disconnected on port 0");
+				LPC2478::delay(1000000);
+			}
+		}
+		// Connect status change on port 1
+		else if(ohciRegisters->HcRh.PortStatus[1] & RH_PS_CSC) {
+			// Acknowledge status change (clear change bit)
+			ohciRegisters->HcRh.PortStatus[1] |= RH_PS_CSC;
+
+			// Device connected
+			if(ohciRegisters->HcRh.PortStatus[1] & RH_PS_CCS) {
+				Debug::writeLine("Device connected on port 1");
+				LPC2478::delay(1000000);
+
+				// Low speed device attached
+				if(ohciRegisters->HcRh.PortStatus[1] & RH_PS_LSDA) {
+					Debug::writeLine("Low speed device");
+					LPC2478::delay(1000000);
+				}
+				else {
+					Debug::writeLine("Full speed device");
+					LPC2478::delay(1000000);
+				}
+			}
+			// Device disconnected
+			else {
+				Debug::writeLine("Device disconnected on port 1");
+				LPC2478::delay(1000000);
+			}
+		}
+		else {
+			Debug::writeLine("Unknown root hub interrupt source");
+			LPC2478::delay(1000000);
+		}
+
+	}
 
 	// Clear any active interrupt
 	((volatile OHCI_Typedef*)ohciRegisters)->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
