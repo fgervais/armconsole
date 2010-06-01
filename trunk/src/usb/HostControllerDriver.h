@@ -16,6 +16,8 @@
 #include "LPC23xx.h"
 #include <stdint.h>
 
+class UsbDevice;
+
 struct HcEd {                       /* ----------- HostController EndPoint Descriptor ------------- */
     volatile  uint32_t  Control;              /* Endpoint descriptor control                              */
     volatile  uint32_t  TailTd;               /* Physical address of tail in Transfer descriptor list     */
@@ -38,17 +40,30 @@ struct Hcca {                       /* ----------- Host Controller Communication
     volatile  uint32_t  Unknown[4];           /* Unused                                                   */
 };
 
+struct RootHubPort {
+	UsbDevice* device;
+	// Port flags
+	uint8_t deviceConnected;
+	uint8_t deviceEnumerated;
+};
+
 class HostControllerDriver {
 public:
 	HostControllerDriver(OHCI_Typedef* ohciRegisters);
 	virtual ~HostControllerDriver();
 
-	void init();
+	uint8_t deviceConnected(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceConnected; }
+	uint8_t deviceEnumerated(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceEnumerated; }
+	void enumerateDevice(uint32_t hubPortNumber);
 
 	void hcInterrupt();
 private:
 	Hcca* hcca;
 	OHCI_Typedef* ohciRegisters;
+
+	RootHubPort rootHubPort[MAX_ROOT_PORTS];
+
+	void init();
 };
 
 #endif /* HOSTCONTROLLERDRIVER_H_ */

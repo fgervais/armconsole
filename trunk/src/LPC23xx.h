@@ -1165,7 +1165,7 @@ typedef struct
 		unsigned long	DescriptorA;
 		unsigned long	DescriptorB;
 		unsigned long	Status;
-#define MAX_ROOT_PORTS	2	/* maximum OHCI root hub ports (RH_A_NDP) */
+#define MAX_ROOT_PORTS	1	/* maximum OHCI root hub ports (RH_A_NDP) */
 		unsigned long	PortStatus [MAX_ROOT_PORTS];
 	} HcRh;
 } OHCI_Typedef;

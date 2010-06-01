@@ -47,7 +47,7 @@ int main() {
 	// USB debug section
 	HostControllerDriver* hcd = LPC2478::getHCD();
 	//hcd->init();
-	//IntEnable();
+	IntEnable();
 
 	LCDConfiguration lcdConfig;
 	lcdConfig.bufferBaseAddress = 0xA0000000;
@@ -58,6 +58,8 @@ int main() {
 
 	// Set background
 	lcd->setBackground(0x00FFFFFF);
+
+	while(1);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 
