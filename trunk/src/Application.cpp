@@ -45,7 +45,8 @@ int main() {
 	GpioPin *led = gpio1->getPin(12);
 
 	// USB debug section
-	//HostControllerDriver* hcd = LPC2478::getHCD();
+	HostControllerDriver* hcd = LPC2478::getHCD();
+	hcd->init();
 	//IntEnable();
 
 	LCDConfiguration lcdConfig;

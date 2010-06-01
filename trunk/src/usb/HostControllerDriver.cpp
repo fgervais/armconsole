@@ -12,7 +12,7 @@
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
 
-	init();
+	//init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
@@ -65,7 +65,7 @@ void HostControllerDriver::init() {
 	ohciRegisters->HcHCCA = (uint32_t)hcca;
 
 	// Clear any active interrupt
-	ohciRegisters->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
+	((volatile OHCI_Typedef*)ohciRegisters)->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
 
 	// Enable interrupts
 	ohciRegisters->HcInterruptEnable =
@@ -93,6 +93,6 @@ void HostControllerDriver::hcInterrupt() {
 	//}
 
 	// Clear any active interrupt
-	ohciRegisters->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
+	((volatile OHCI_Typedef*)ohciRegisters)->HcInterruptStatus |= ohciRegisters->HcInterruptStatus;
 
 }
