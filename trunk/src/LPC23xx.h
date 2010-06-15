@@ -193,12 +193,12 @@ these registers are known as "VICVectPriority(x)". */
 /* FIO register structure */
 typedef struct
 {
-	unsigned long FIODIR;
-	unsigned long RESERVED0[3];
-	unsigned long FIOMASK;
-	unsigned long FIOPIN;
-	unsigned long FIOSET;
-	unsigned long FIOCLR;
+	volatile unsigned long FIODIR;
+	volatile unsigned long RESERVED0[3];
+	volatile unsigned long FIOMASK;
+	volatile unsigned long FIOPIN;
+	volatile unsigned long FIOSET;
+	volatile unsigned long FIOCLR;
 } FIO_TypeDef;
 
 /* FIO base address */
@@ -528,23 +528,23 @@ are for LPC24xx only. */
  */
 typedef struct
 {
-	unsigned long IR;
-	unsigned long TCR;
-	unsigned long TC;
-	unsigned long PR;
-	unsigned long PC;
-	unsigned long MCR;
-	unsigned long MR0;
-	unsigned long MR1;
-	unsigned long MR2;
-	unsigned long MR3;
-	unsigned long CCR;
-	unsigned long CR0;
-	unsigned long CR1;
-	unsigned long CR2;
-	unsigned long CR3;
-	unsigned long EMR;
-	unsigned long CTCR;
+	volatile unsigned long IR;
+	volatile unsigned long TCR;
+	volatile unsigned long TC;
+	volatile unsigned long PR;
+	volatile unsigned long PC;
+	volatile unsigned long MCR;
+	volatile unsigned long MR0;
+	volatile unsigned long MR1;
+	volatile unsigned long MR2;
+	volatile unsigned long MR3;
+	volatile unsigned long CCR;
+	volatile unsigned long CR0;
+	volatile unsigned long CR1;
+	volatile unsigned long CR2;
+	volatile unsigned long CR3;
+	volatile unsigned long EMR;
+	volatile unsigned long CTCR;
 } TIMER_Typedef;
 
 /* TIMER base address */
@@ -964,20 +964,20 @@ typedef struct
  */
 typedef struct
 {
-	unsigned long GPDMA_INT_STAT;
-	unsigned long GPDMA_INT_TCSTAT;
-	unsigned long GPDMA_INT_TCCLR;
-	unsigned long GPDMA_INT_ERR_STAT;
-	unsigned long GPDMA_INT_ERR_CLR;
-	unsigned long GPDMA_RAW_INT_TCSTAT;
-	unsigned long GPDMA_RAW_INT_ERR_STAT;
-	unsigned long GPDMA_ENABLED_CHNS;
-	unsigned long GPDMA_SOFT_BREQ;
-	unsigned long GPDMA_SOFT_SREQ;
-	unsigned long GPDMA_SOFT_LBREQ;
-	unsigned long GPDMA_SOFT_LSREQ;
-	unsigned long GPDMA_CONFIG;
-	unsigned long GPDMA_SYNC;
+	volatile unsigned long GPDMA_INT_STAT;
+	volatile unsigned long GPDMA_INT_TCSTAT;
+	volatile unsigned long GPDMA_INT_TCCLR;
+	volatile unsigned long GPDMA_INT_ERR_STAT;
+	volatile unsigned long GPDMA_INT_ERR_CLR;
+	volatile unsigned long GPDMA_RAW_INT_TCSTAT;
+	volatile unsigned long GPDMA_RAW_INT_ERR_STAT;
+	volatile unsigned long GPDMA_ENABLED_CHNS;
+	volatile unsigned long GPDMA_SOFT_BREQ;
+	volatile unsigned long GPDMA_SOFT_SREQ;
+	volatile unsigned long GPDMA_SOFT_LBREQ;
+	volatile unsigned long GPDMA_SOFT_LSREQ;
+	volatile unsigned long GPDMA_CONFIG;
+	volatile unsigned long GPDMA_SYNC;
 } GPDMA_Typedef;
 
 /* General-purpose DMA Controller base address */
@@ -991,11 +991,11 @@ typedef struct
  */
 typedef struct
 {
-	unsigned long GPDMA_CH_SRC;
-	unsigned long GPDMA_CH_DEST;
-	unsigned long GPDMA_CH_LLI;
-	unsigned long GPDMA_CH_CTRL;
-	unsigned long GPDMA_CH_CFG;
+	volatile unsigned long GPDMA_CH_SRC;
+	volatile unsigned long GPDMA_CH_DEST;
+	volatile unsigned long GPDMA_CH_LLI;
+	volatile unsigned long GPDMA_CH_CTRL;
+	volatile unsigned long GPDMA_CH_CFG;
 } GPDMA_CH_Typedef;
 
 /* DMA channel 0 declaration */
@@ -1011,34 +1011,34 @@ typedef struct
  */
 typedef struct
 {
-	unsigned long LCD_TIMH;
-	unsigned long LCD_TIMV;
-	unsigned long LCD_POL;
-	unsigned long LCD_LE;
-	unsigned long LCD_UPBASE;
-	unsigned long LCD_LPBASE;
-	unsigned long LCD_CTRL;
-	unsigned long LCD_INTMSK;
-	unsigned long LCD_INTRAW;
-	unsigned long LCD_INTSTAT;
-	unsigned long LCD_INTCLR;
-	unsigned long LCD_UPCURR;
-	unsigned long LCD_LPCURR;
-	unsigned long RESERVED0[115];
-	unsigned long LCD_PAL[256];
-	unsigned long RESERVED1[128];
-	unsigned long CRSR_IMG[256];
-	unsigned long CRSR_CTRL;
-	unsigned long CRSR_CFG;
-	unsigned long CRSR_PAL0;
-	unsigned long CRSR_PAL1;
-	unsigned long CRSR_XY;
-	unsigned long CRSR_CLIP;
-	unsigned long RESERVED2[2];
-	unsigned long CRSR_INTMSK;
-	unsigned long CRSR_INTCLR;
-	unsigned long CRSR_INTRAW;
-	unsigned long CRSR_INTSTAT;
+	volatile unsigned long LCD_TIMH;
+	volatile unsigned long LCD_TIMV;
+	volatile unsigned long LCD_POL;
+	volatile unsigned long LCD_LE;
+	volatile unsigned long LCD_UPBASE;
+	volatile unsigned long LCD_LPBASE;
+	volatile unsigned long LCD_CTRL;
+	volatile unsigned long LCD_INTMSK;
+	volatile unsigned long LCD_INTRAW;
+	volatile unsigned long LCD_INTSTAT;
+	volatile unsigned long LCD_INTCLR;
+	volatile unsigned long LCD_UPCURR;
+	volatile unsigned long LCD_LPCURR;
+	volatile unsigned long RESERVED0[115];
+	volatile unsigned long LCD_PAL[256];
+	volatile unsigned long RESERVED1[128];
+	volatile unsigned long CRSR_IMG[256];
+	volatile unsigned long CRSR_CTRL;
+	volatile unsigned long CRSR_CFG;
+	volatile unsigned long CRSR_PAL0;
+	volatile unsigned long CRSR_PAL1;
+	volatile unsigned long CRSR_XY;
+	volatile unsigned long CRSR_CLIP;
+	volatile unsigned long RESERVED2[2];
+	volatile unsigned long CRSR_INTMSK;
+	volatile unsigned long CRSR_INTCLR;
+	volatile unsigned long CRSR_INTRAW;
+	volatile unsigned long CRSR_INTSTAT;
 } LCD_Typedef;
 
 /* LCD controller base address */
@@ -1143,30 +1143,30 @@ typedef struct
  */
 typedef struct
 {
-	unsigned long HcRevision;
-	unsigned long HcControl;
-	unsigned long HcCommandStatus;
-	unsigned long HcInterruptStatus;
-	unsigned long HcInterruptEnable;
-	unsigned long HcInterruptDisable;
-	unsigned long HcHCCA;
-	unsigned long HcPeriodCurrentED;
-	unsigned long HcControlHeadED;
-	unsigned long HcControlCurrentED;
-	unsigned long HcBulkHeadED;
-	unsigned long HcBulkCurrentED;
-	unsigned long HcDoneHead;
-	unsigned long HcFmInterval;
-	unsigned long HcFmRemaining;
-	unsigned long HcFmNumber;
-	unsigned long HcPeriodicStart;
-	unsigned long HcLSThreshold;
-	struct	ohci_roothub_regs {
-		unsigned long	DescriptorA;
-		unsigned long	DescriptorB;
-		unsigned long	Status;
+	volatile unsigned long HcRevision;
+	volatile unsigned long HcControl;
+	volatile unsigned long HcCommandStatus;
+	volatile unsigned long HcInterruptStatus;
+	volatile unsigned long HcInterruptEnable;
+	volatile unsigned long HcInterruptDisable;
+	volatile unsigned long HcHCCA;
+	volatile unsigned long HcPeriodCurrentED;
+	volatile unsigned long HcControlHeadED;
+	volatile unsigned long HcControlCurrentED;
+	volatile unsigned long HcBulkHeadED;
+	volatile unsigned long HcBulkCurrentED;
+	volatile unsigned long HcDoneHead;
+	volatile unsigned long HcFmInterval;
+	volatile unsigned long HcFmRemaining;
+	volatile unsigned long HcFmNumber;
+	volatile unsigned long HcPeriodicStart;
+	volatile unsigned long HcLSThreshold;
+	volatile struct	ohci_roothub_regs {
+		volatile unsigned long	DescriptorA;
+		volatile unsigned long	DescriptorB;
+		volatile unsigned long	Status;
 #define MAX_ROOT_PORTS	1	/* maximum OHCI root hub ports (RH_A_NDP) */
-		unsigned long	PortStatus [MAX_ROOT_PORTS];
+		volatile unsigned long	PortStatus [MAX_ROOT_PORTS];
 	} HcRh;
 } OHCI_Typedef;
 

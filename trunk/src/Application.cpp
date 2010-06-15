@@ -44,11 +44,6 @@ int main() {
 
 	GpioPin *led = gpio1->getPin(12);
 
-	// USB debug section
-	HostControllerDriver* hcd = LPC2478::getHCD();
-	//hcd->init();
-	IntEnable();
-
 	LCDConfiguration lcdConfig;
 	lcdConfig.bufferBaseAddress = 0xA0000000;
 	lcdConfig.height = 272;
@@ -58,6 +53,17 @@ int main() {
 
 	// Set background
 	lcd->setBackground(0x00FFFFFF);
+
+	Debug::writeLine("Platform initialized");
+
+	// USB debug section
+	HostControllerDriver* hcd = LPC2478::getHCD();
+	//hcd->init();
+	Debug::writeLine("Please connect a USB device");
+	IntEnable();
+	while(!hcd->deviceConnected(0));
+	Debug::writeLine("Device connected in port 0");
+	hcd->enumerateDevice(0);
 
 	while(1);
 

@@ -21,7 +21,7 @@
 #define PLL_NValue			1
 #define CCLKDivValue		4
 #define USBCLKDivValue		6
-#define LCDCLKDivValue		8
+#define LCDCLKDivValue		9
 #define Fcclk				72000000
 #define Fcco				288000000
 /* APB clock frequence , must be 1/2/4 multiples of ( Fcclk/4 ). */
