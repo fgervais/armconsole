@@ -12,6 +12,7 @@
 #include "irq.h"
 #include "GpioPin.h"
 #include "Gpio.h"
+#include "UsbDescriptors.h"
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
@@ -20,16 +21,25 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 
 	// Reset root hub ports
 	for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++) {
-		rootHubPort[hubPortNumber].device = 0;
 		rootHubPort[hubPortNumber].deviceConnected = 0;
 		rootHubPort[hubPortNumber].deviceEnumerated = 0;
+	}
+
+	// Initialize devices
+	for(uint32_t deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
+		device[deviceNumber] = 0;
 	}
 
 	init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
-
+	/* Free memory */
+	for(uint32_t deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
+		if(device[deviceNumber] != 0) {
+			delete device[deviceNumber];
+		}
+	}
 }
 
 void HostControllerDriver::init() {
@@ -113,11 +123,22 @@ void HostControllerDriver::init() {
 		| OHCI_INTR_UE
 		| OHCI_INTR_SO
 		| OHCI_INTR_RD
-		| OHCI_INTR_FNO
+		//| OHCI_INTR_FNO
 		| OHCI_INTR_OC;
 
 	VICIntSelect &= ~(1 << USB_INT); // IRQ Category (Not FIQ)
 	VICIntEnable |= (1 << USB_INT);
+}
+
+void HostControllerDriver::portReset(uint32_t hubPortNumber) {
+	// Set port reset
+	ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRS;
+	// Wait until reset is done
+	while(ohciRegisters->HcRh.PortStatus[hubPortNumber] & RH_PS_PRS);
+	Debug::writeLine("Port reset done");
+	// Clear port reset status change
+	ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRSC;
+	LPC2478::delay(100000);
 }
 
 void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
@@ -126,21 +147,13 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			Debug::writeLine("Enumerating device");
 			// USB 2.0 spec says at least 50ms delay before port reset
 			LPC2478::delay(100000);
-			// Set port reset
-			ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRS;
-			// Wait until reset is done
-			while(ohciRegisters->HcRh.PortStatus[hubPortNumber] & RH_PS_PRS)
-				Debug::writeLine("Port reset");
-			Debug::writeLine("Port reset done");
-			// Clear port reset status change
-			ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRSC;
-			LPC2478::delay(100000);
+			portReset(hubPortNumber);
 
 			// Get first 8 bytes of device descriptor
 
 			// Endpoint 0, Address 0
 			ctrlEd->Control = (8 << 16);	// Max packet size = 8 (Minimum value)
-			getDescriptor(0x0100, 0x0008, userBuffer);	// device descriptor
+			getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, userBuffer);
 			Debug::writeLine("Descriptor received");
 
 			if(userBuffer[7] != 0) {
@@ -150,6 +163,41 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 				}
 			}
 
+			// Set the maximum packet size
+			ctrlEd->Control = (userBuffer[7] << 16);
+
+			// Reset the device to be in a known state
+			portReset(hubPortNumber);
+
+			uint32_t deviceNumber;
+			// Find an empty space
+			for(deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
+				if(device[deviceNumber] == 0) {
+					break;
+				}
+			}
+			// If there no empty space, quit
+			if(deviceNumber == MAXIMUM_NUMBER_OF_DEVICE) {
+				// TODO: Should return an error or something
+				return;
+			}
+
+			// Create the new logical device
+			device[deviceNumber] = new UsbDevice(deviceNumber);
+
+			// Get the whole device descriptor
+			getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+
+			//device[deviceNumber]->deviceDescriptor = *(DeviceDescriptor*)userBuffer;
+
+			device[deviceNumber]->deviceDescriptor.idVendor	= (userBuffer[9] << 8) | userBuffer[8];
+			device[deviceNumber]->deviceDescriptor.idProduct = (userBuffer[11] << 8) | userBuffer[10];
+
+			if(device[deviceNumber]->deviceDescriptor.idVendor == 0x045e) { // Xbox receiver
+				if(device[deviceNumber]->deviceDescriptor.idProduct == 0x0719) { // Xbox receiver
+					Debug::writeLine("Xbox wireless receiver connected");
+				}
+			}
 		}
 	}
 }
@@ -236,12 +284,9 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 		ohciRegisters->HcCommandStatus |= (1<<1);	// Control list filled
 		ohciRegisters->HcControl       |= (1<<4);	// Control list Enabled
 	//}
-
-	//while(ohciRegisters->HcCommandStatus & (1<<1));
-	//Debug::writeLine("Control list processing started");
+	// TODO: Add something for interrupt transfer
 
 	// Wait until transfer is completed
-	Debug::writeLine("Waiting for transfer completion");
 	while(!transferCompleted);
 
 	// Return completion code

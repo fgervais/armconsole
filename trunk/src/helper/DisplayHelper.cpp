@@ -54,7 +54,7 @@ void DisplayHelper::drawImage(uint32_t x, uint32_t y, uint32_t* imageBase, uint3
  * @param y Y Start position
  * @param string String to print
  */
-void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string) {
+void DisplayHelper::drawString(uint32_t x, uint32_t y, const char* string) {
 	drawString(x,y,string,0x00000000, 0x00FFFFFF);
 }
 
@@ -71,7 +71,7 @@ void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string) {
  * @param fontColor Color of the font
  * @param bgColor Color of the background
  */
-void DisplayHelper::drawString(uint32_t x, uint32_t y, char* string, uint32_t fontColor, uint32_t bgColor) {
+void DisplayHelper::drawString(uint32_t x, uint32_t y, const char* string, uint32_t fontColor, uint32_t bgColor) {
 	uint32_t nrows = lcd->getHeight();
 	uint32_t ncols = lcd->getWidth();
 	uint32_t* lcd_ptr = (uint32_t*)lcd->getBufferBase();
