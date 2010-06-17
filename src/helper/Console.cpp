@@ -35,6 +35,8 @@ Console::~Console() {
 		delete[] text[i];
 	}
 	delete[] text;
+
+	delete displayHelper;
 }
 
 /**

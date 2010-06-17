@@ -17,10 +17,12 @@
 
 #include "LPC23xx.h"
 #include <stdint.h>
+#include "UsbDevice.h"
 
-class UsbDevice;
+// The maximum number of device handled by the HCD
+#define MAXIMUM_NUMBER_OF_DEVICE	2
 
-#define  FRAME_INTERVAL		0x2EDF		/* 12000 bits per frame (-1) */
+#define FRAME_INTERVAL		0x2EDF		/* 12000 bits per frame (-1) */
 
 // Completion codes
 #define CC_NOERROR	0
@@ -53,7 +55,6 @@ struct Hcca {                      	 	/* ----------- Host Controller Communicati
 };
 
 struct RootHubPort {
-	UsbDevice* device;
 	// Port flags
 	uint8_t deviceConnected;
 	uint8_t deviceEnumerated;
@@ -82,11 +83,13 @@ private:
 	OHCI_Typedef* ohciRegisters;
 
 	volatile RootHubPort rootHubPort[MAX_ROOT_PORTS];
+	UsbDevice* device[MAXIMUM_NUMBER_OF_DEVICE];
 
 	// Global flags
 	volatile uint8_t transferCompleted;
 
 	void init();
+	void portReset(uint32_t hubPortNumber);
 
 	// USB control functions
 	void getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer);
