@@ -77,14 +77,10 @@ void HostControllerDriver::init() {
 	// Initiate a software reset
 	ohciRegisters->HcCommandStatus |= OHCI_HCR;
 
-#define  FI                     0x2EDF           /* 12000 bits per frame (-1) */
-#define  DEFAULT_FMINTERVAL     ((((6 * (FI - 210)) / 7) << 16) | FI)
-	//ohciRegisters->HcPeriodicStart = (FI * 9) / 10;
-	ohciRegisters->HcFmInterval = DEFAULT_FMINTERVAL;
+	ohciRegisters->HcPeriodicStart = (FRAME_INTERVAL * 9) / 10;
+	ohciRegisters->HcFmInterval = ((((6 * (FRAME_INTERVAL - 210)) / 7) << 16) | FRAME_INTERVAL);
 
 	// Software reset is completed within 10 us
-
-	// Software reset reset HcFmInterval register to the default (0x2EDF)
 
 	// We are now in the UsbSuspend state and must not stay in it for
 	// more than 2 ms or the UsbResume state will have to be entered.
@@ -149,6 +145,9 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 
 			if(userBuffer[7] != 0) {
 				Debug::writeLine("Got the max packet size");
+				if(userBuffer[7] == 8) {
+					Debug::writeLine("Got the right packet size");
+				}
 			}
 
 		}

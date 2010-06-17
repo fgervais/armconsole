@@ -100,118 +100,41 @@ Gpio* LPC2478::getGpio3() {
 HostControllerDriver* LPC2478::getHCD() {
 	if(hcd == 0) {
 		uint32_t  pinsel;
-		uint32_t  pinmode;
 
 		PCONP |= (1 << 31);
 		// Disable the USB interrupt source
 		VICIntEnClr = (1 << USB_INT);
 		// Enable USB host clock
-		OTG_CLK_CTRL = 0x1F;
+		OTG_CLK_CTRL = 0x19;
 		// Wait until USB host clock is stable
-		while ((OTG_CLK_STAT & 0x1F) == 0);
+		while ((OTG_CLK_STAT & 0x19) == 0);
 
-		// The USB device controller signals are mapped to the U2 port
-		//USBPortSel &= ~0x03;
-		//USBPortSel |= 0x01;
-
+		// U1 = host, U2 = device
 		USBPortSel = 0x03;
 
-		//OTG_CLK_CTRL = 0x11;
-		//while ((OTG_CLK_STAT & 0x11) == 0);
+		OTG_CLK_CTRL = 0x11;
+		while ((OTG_CLK_STAT & 0x11) == 0);
 
 		/* Configure USB pins */
 
 		/*
-		 * P0[12] = USB_PPWR2          01
-		 * P0[13] = USB_UP_LED2        01
-		 * P0[14] = USB_CONNECT2       10
+		 * P0[29] = USB_D+1				01
+		 * P0[30] = USB_D-1				01
 		 */
-		/*pinsel = PINSEL0;
-		pinsel &= 0xC0FFFFFF;
-		pinsel |= 0x15000000;
-		PINSEL0 = pinsel;
-
-		pinmode = PINMODE0;
-		pinmode &= 0xCFFFFFFF;
-		pinmode |= 0x30000000;
-		PINMODE0 = pinmode;*/
-
-		/*
-		 * P0[29] = USB_D+1
-		 * P0[30] = USB_D-1
-		 * P0[31] = USB_D+2
-		 */
-		/*pinsel = PINSEL1;
-		pinsel &= 0x03FFFFFF;
-		pinsel |= 0x54000000;
-		PINSEL1 = pinsel;*/
+		pinsel = PINSEL1;
+		pinsel &= 0xC3FFFFFF;
+		pinsel |= 0x14000000;
+		PINSEL1 = pinsel;
 
 		/*
 		 * P1[18] = USB_UP_LED1        01
 		 * P1[19] = USB_PPWR1          10
-		 * P1[22] = USB_PWRD1          10
-		 * P1[27] = USB_OVRCR1         10
-		 * P1[30] = USB_VBUS           10
 		 * P1[31] = USB_OVRCR2         01
 		 */
-		/*pinsel = PINSEL3;
-		pinsel &= 0x0F3F3F0F;
-		pinsel |= 0x60802090;
-		PINSEL3 = pinsel;*/
-
-		/* P0.13 - USB2_UP_LED */
-		PINSEL0 &= ~(0x3<<26);
-		PINSEL0 |= (0x1<<26);
-
-		/* P0.29 - USB1_D+ */
-		PINSEL1 &= ~(0x3<<26);
-		PINSEL1 |= (0x1<<26);
-
-		/* P0.30 - USB1_D- */
-		PINSEL1 &= ~(0x3<<28);
-		PINSEL1 |= (0x1<<28);
-
-		/* P0.31 - USB2_D- */
-		PINSEL1 &= ~(0x3<<30);
-		PINSEL1 |= (0x1<<30);
-
-
-		/* P1.18 - USB1_UP_LED */
-		PINSEL3 &= ~(0x3<<4);
-		PINSEL3 |= (0x1<<4);
-
-		/* P1.19 - USB1_PPWR */
-		PINSEL3 &= ~(0x3<<6);
-		PINSEL3 |= (0x2<<6);
-		//IODIR1 |= 1<<19;
-		//IOCLR1 = 1<<19;
-
-		/* P1.22 - USB1_PWRD */
-	//	PINSEL3 &= ~(0x3<<12);
-	//	PINSEL3 |= (0x2<<12);
-
-		/* P1.27 - USB1_OVRCR */
-	//	PINSEL3 &= ~(0x3<<22);
-	//	PINSEL3 |= (0x2<<22);
-
-		/* P1.30 - USB2_PWRD */
-		//PINSEL3 &= ~(0x3<<28);
-		//PINSEL3 |= (0x1<<28); /* maybe VBUS? */
-
-		/* P1.30 - VBUS */
-		PINSEL3 &= ~(0x3<<28);
-		PINSEL3 |= (0x2<<28);
-
-		/* P1.31 - USB2_OVRCR */
-		PINSEL3 &= ~(0x3<<30);
-		PINSEL3 |= (0x1<<30);
-
-		/* Configure port 1 as host */
-		//OTG_STAT_CTRL = 0x1;
-		OTG_STAT_CTRL = 0x3;
-
-		/* In all configurations, disable the pullups on P1.27 and P1.30 */
-		PINMODE3 = 0x20800000;
+		pinsel = PINSEL3;
+		pinsel &= 0x3FFFFF0F;
+		pinsel |= 0x40000090;
+		PINSEL3 = pinsel;
 
 		hcd = new HostControllerDriver(OHCI);
 	}
