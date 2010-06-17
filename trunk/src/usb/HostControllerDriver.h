@@ -20,6 +20,8 @@
 
 class UsbDevice;
 
+#define  FRAME_INTERVAL		0x2EDF		/* 12000 bits per frame (-1) */
+
 // Completion codes
 #define CC_NOERROR	0
 
