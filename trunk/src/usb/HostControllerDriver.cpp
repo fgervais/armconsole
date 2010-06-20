@@ -23,6 +23,7 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++) {
 		rootHubPort[hubPortNumber].deviceConnected = 0;
 		rootHubPort[hubPortNumber].deviceEnumerated = 0;
+		rootHubPort[hubPortNumber].lowSpeed = 0;
 	}
 
 	// Initialize devices
@@ -89,6 +90,7 @@ void HostControllerDriver::init() {
 
 	ohciRegisters->HcPeriodicStart = (FRAME_INTERVAL * 9) / 10;
 	ohciRegisters->HcFmInterval = ((((6 * (FRAME_INTERVAL - 210)) / 7) << 16) | FRAME_INTERVAL);
+	ohciRegisters->HcLSThreshold = 0x628;
 
 	// Software reset is completed within 10 us
 
@@ -153,6 +155,9 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 
 			// Endpoint 0, Address 0
 			ctrlEd->Control = (8 << 16);	// Max packet size = 8 (Minimum value)
+			if(rootHubPort[hubPortNumber].lowSpeed) {
+				ctrlEd->Control |= (1 << 13);	// Low speed endpoint
+			}
 			getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, userBuffer);
 			Debug::writeLine("Descriptor received");
 
@@ -165,6 +170,9 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 
 			// Set the maximum packet size
 			ctrlEd->Control = (userBuffer[7] << 16);
+			if(rootHubPort[hubPortNumber].lowSpeed) {
+				ctrlEd->Control |= (1 << 13);	// Low speed endpoint
+			}
 
 			// Reset the device to be in a known state
 			portReset(hubPortNumber);
@@ -258,6 +266,8 @@ uint8_t HostControllerDriver::outTransaction(HcEd* ed, uint8_t* transmitBuffer, 
 uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_t* transmitBuffer, uint32_t transactionLength) {
 	Debug::writeLine("Launching transaction");
 
+	// TODO: A lot of that stuff doesn't work for something else than control transactions
+
 	uint32_t dataToggle = ((token == PID_SETUP) ? 2 : 3);
 
 	headTd->Control = (1 << 18)	// Data packet may be smaller than the buffer
@@ -284,7 +294,6 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 		ohciRegisters->HcCommandStatus |= (1<<1);	// Control list filled
 		ohciRegisters->HcControl       |= (1<<4);	// Control list Enabled
 	//}
-	// TODO: Add something for interrupt transfer
 
 	// Wait until transfer is completed
 	while(!transferCompleted);
@@ -317,9 +326,11 @@ void HostControllerDriver::hcInterrupt() {
 					// Low speed device attached
 					if(ohciRegisters->HcRh.PortStatus[hubPortNumber] & RH_PS_LSDA) {
 						Debug::writeLine("Low speed device");
+						rootHubPort[hubPortNumber].lowSpeed = 1;
 					}
 					else {
 						Debug::writeLine("Full speed device");
+						rootHubPort[hubPortNumber].lowSpeed = 0;
 					}
 				}
 				// Device disconnected
@@ -327,6 +338,7 @@ void HostControllerDriver::hcInterrupt() {
 					Debug::writeLine("Device disconnected");
 					rootHubPort[hubPortNumber].deviceConnected = 0;
 					rootHubPort[hubPortNumber].deviceEnumerated = 0;
+					rootHubPort[hubPortNumber].lowSpeed = 0;
 				}
 			}
 		}
