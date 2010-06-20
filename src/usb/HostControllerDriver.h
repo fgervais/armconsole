@@ -58,6 +58,7 @@ struct RootHubPort {
 	// Port flags
 	uint8_t deviceConnected;
 	uint8_t deviceEnumerated;
+	uint8_t lowSpeed;
 };
 
 class HostControllerDriver {
