@@ -26,6 +26,8 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 		rootHubPort[hubPortNumber].deviceConnected = 0;
 		rootHubPort[hubPortNumber].deviceEnumerated = 0;
 		rootHubPort[hubPortNumber].lowSpeed = 0;
+		// It
+		rootHubPort[hubPortNumber].deviceAddressesStart = hubPortNumber + 1;
 	}
 
 	// Initialize devices
@@ -146,6 +148,7 @@ void HostControllerDriver::portReset(uint32_t hubPortNumber) {
 
 void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 	uint8_t completionCode;
+	uint8_t timeout;
 
 	if(hubPortNumber < MAX_ROOT_PORTS) {
 		if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
@@ -183,12 +186,18 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			rootHubPort[hubPortNumber].device = new UsbDevice(hubPortNumber);
 
 			// Get the whole device descriptor
-			completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+			timeout = 3;
+			do {
+				Debug::writeLine("Getting descriptor");;
+				completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+			} while(completionCode != CC_NOERROR && --timeout > 0);
+
 			if(completionCode == CC_NOERROR) {
 				Debug::writeLine("Descriptor received");
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
+				return;
 			}
 
 			rootHubPort[hubPortNumber].device->setDeviceDescriptor(new DeviceDescriptor(userBuffer));
@@ -207,14 +216,47 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 				Debug::writeLine("Unknown USB device");
 			}
 
+			timeout = 3;
+			do {
+				Debug::writeLine("Setting address");
+				completionCode = setAddress(rootHubPort[hubPortNumber].deviceAddressesStart);
+			} while(completionCode != CC_NOERROR && --timeout > 0);
+
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Address set");
+			}
+			else {
+				Debug::writeLine("Error with set_address");
+				return;
+			}
+
+			// Set the new address
+			ctrlEd->Control |= (rootHubPort[hubPortNumber].deviceAddressesStart);
+
+			// Device must finish the Set Address request within 2ms
+			LPC2478::delay(2000);
+
+			timeout = 3;
+			do {
+				Debug::writeLine("Setting configuration");
+				completionCode = setConfiguration(0x01);
+			} while(completionCode != CC_NOERROR && --timeout > 0);
+
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Configuration set");
+			}
+			else {
+				Debug::writeLine("Error with set_configuration");
+				return;
+			}
+
 			rootHubPort[hubPortNumber].deviceEnumerated = 1;
 		}
 	}
 }
 
 void HostControllerDriver::periodicTask() {
-	/*for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++)*/ {
-		uint32_t hubPortNumber=0;
+	for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++) {
 		// Device disconnected
 		if(!rootHubPort[hubPortNumber].deviceConnected && rootHubPort[hubPortNumber].device != 0) {
 			delete rootHubPort[hubPortNumber].device;
@@ -230,28 +272,60 @@ uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16
 	return controlRead(0x80, 0x06, descriptorTypeIndex, 0x0000, descriptorLength, receiveBuffer);
 }
 
+uint8_t HostControllerDriver::setAddress(uint16_t address) {
+	return controlWrite(0x00, 0x05, address, 0x0000, 0x0000);
+}
+
+uint8_t HostControllerDriver::setConfiguration(uint8_t configuration) {
+	return controlWrite(0x00, 0x09, configuration, 0x0000, 0x0000);
+}
+
 uint8_t HostControllerDriver::controlRead(uint8_t bmRequestType, uint8_t bRequest,
 		uint16_t wValue, uint16_t wIndex, uint16_t wLength, uint8_t* receiveBuffer) {
 
 	uint8_t completionCode;
 
 	// Setup stage
-	Debug::writeLine("Starting setup stage");
 	completionCode = setupTransaction(ctrlEd, bmRequestType, bRequest, wValue, wIndex, wLength);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in setup stage");
 		return completionCode;
 	}
 	// Data stage
-	Debug::writeLine("Starting data stage");
 	completionCode = inTransaction(ctrlEd, receiveBuffer, wLength);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in data stage");
 		return completionCode;
 	}
 	// Status stage
-	Debug::writeLine("Starting status stage");
 	completionCode = outTransaction(ctrlEd, (uint8_t*)0, 0);
+	if(completionCode != CC_NOERROR) {
+		Debug::writeLine("Error in status stage");
+		return completionCode;
+	}
+	return completionCode;
+}
+
+uint8_t HostControllerDriver::controlWrite(uint8_t bmRequestType, uint8_t bRequest,
+		uint16_t wValue, uint16_t wIndex, uint16_t wLength) {
+
+	uint8_t completionCode;
+
+	// Setup stage
+	completionCode = setupTransaction(ctrlEd, bmRequestType, bRequest, wValue, wIndex, wLength);
+	if(completionCode != CC_NOERROR) {
+		Debug::writeLine("Error in setup stage");
+		return completionCode;
+	}
+	// Status stage
+	/*
+	 * The status stage should always be in the opposite direction of the last
+	 * transaction. As there is not Data Stage, the last transaction was in the
+	 * OUT direction so the Status Stage send an IN token.
+	 * We should get NAK or the DATA1 PID. When we get the DATA1 PID the controller
+	 * automatically sends the closing ACK.
+	 */
+	completionCode = inTransaction(ctrlEd, (uint8_t*)0, 0);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in status stage");
 		return completionCode;
@@ -284,8 +358,6 @@ uint8_t HostControllerDriver::outTransaction(HcEd* ed, uint8_t* transmitBuffer, 
 }
 
 uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_t* transmitBuffer, uint32_t transactionLength) {
-	Debug::writeLine("Launching transaction");
-
 	// TODO: A lot of that stuff doesn't work for something else than control transactions
 
 	uint32_t dataToggle = ((token == PID_SETUP) ? 2 : 3);
@@ -366,7 +438,6 @@ void HostControllerDriver::hcInterrupt() {
 	}
 	// Writeback done head
 	else if(ohciRegisters->HcInterruptStatus & OHCI_INTR_WDH) {
-		Debug::writeLine("Transfer completed");
 		transferCompleted = 1;
 	}
 	else if(ohciRegisters->HcInterruptStatus & OHCI_INTR_FNO) {
