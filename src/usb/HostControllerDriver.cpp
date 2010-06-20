@@ -12,7 +12,8 @@
 #include "irq.h"
 #include "GpioPin.h"
 #include "Gpio.h"
-#include "UsbDescriptors.h"
+#include "UsbDevice.h"
+#include "DeviceDescriptor.h"
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
@@ -21,6 +22,7 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 
 	// Reset root hub ports
 	for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++) {
+		rootHubPort[hubPortNumber].device = 0;
 		rootHubPort[hubPortNumber].deviceConnected = 0;
 		rootHubPort[hubPortNumber].deviceEnumerated = 0;
 		rootHubPort[hubPortNumber].lowSpeed = 0;
@@ -137,13 +139,14 @@ void HostControllerDriver::portReset(uint32_t hubPortNumber) {
 	ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRS;
 	// Wait until reset is done
 	while(ohciRegisters->HcRh.PortStatus[hubPortNumber] & RH_PS_PRS);
-	Debug::writeLine("Port reset done");
 	// Clear port reset status change
 	ohciRegisters->HcRh.PortStatus[hubPortNumber] |= RH_PS_PRSC;
 	LPC2478::delay(100000);
 }
 
 void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
+	uint8_t completionCode;
+
 	if(hubPortNumber < MAX_ROOT_PORTS) {
 		if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
 			Debug::writeLine("Enumerating device");
@@ -158,14 +161,13 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			if(rootHubPort[hubPortNumber].lowSpeed) {
 				ctrlEd->Control |= (1 << 13);	// Low speed endpoint
 			}
-			getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, userBuffer);
-			Debug::writeLine("Descriptor received");
-
-			if(userBuffer[7] != 0) {
-				Debug::writeLine("Got the max packet size");
-				if(userBuffer[7] == 8) {
-					Debug::writeLine("Got the right packet size");
-				}
+			completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, userBuffer);
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Descriptor received");
+			}
+			else {
+				Debug::writeLine("Error with get_descriptor request");
+				return;
 			}
 
 			// Set the maximum packet size
@@ -177,44 +179,58 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			// Reset the device to be in a known state
 			portReset(hubPortNumber);
 
-			uint32_t deviceNumber;
-			// Find an empty space
-			for(deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
-				if(device[deviceNumber] == 0) {
-					break;
-				}
-			}
-			// If there no empty space, quit
-			if(deviceNumber == MAXIMUM_NUMBER_OF_DEVICE) {
-				// TODO: Should return an error or something
-				return;
-			}
-
 			// Create the new logical device
-			device[deviceNumber] = new UsbDevice(deviceNumber);
+			rootHubPort[hubPortNumber].device = new UsbDevice(hubPortNumber);
 
 			// Get the whole device descriptor
-			getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+			completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Descriptor received");
+			}
+			else {
+				Debug::writeLine("Error with get_descriptor request");
+			}
 
-			//device[deviceNumber]->deviceDescriptor = *(DeviceDescriptor*)userBuffer;
+			rootHubPort[hubPortNumber].device->setDeviceDescriptor(new DeviceDescriptor(userBuffer));
 
-			device[deviceNumber]->deviceDescriptor.idVendor	= (userBuffer[9] << 8) | userBuffer[8];
-			device[deviceNumber]->deviceDescriptor.idProduct = (userBuffer[11] << 8) | userBuffer[10];
-
-			if(device[deviceNumber]->deviceDescriptor.idVendor == 0x045e) { // Xbox receiver
-				if(device[deviceNumber]->deviceDescriptor.idProduct == 0x0719) { // Xbox receiver
+			if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idVendor == 0x045e) { // Xbox receiver
+				if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idProduct == 0x0719) { // Xbox receiver
 					Debug::writeLine("Xbox wireless receiver connected");
 				}
 			}
+			else if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idVendor == 0x046d) { // Mouse
+				if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idProduct == 0xc018) { // Mouse
+					Debug::writeLine("Logitech mouse connected");
+				}
+			}
+			else {
+				Debug::writeLine("Unknown USB device");
+			}
+
+			rootHubPort[hubPortNumber].deviceEnumerated = 1;
 		}
 	}
 }
 
-void HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
-	controlRead(0x80, 0x06, descriptorTypeIndex, 0x0000, descriptorLength, receiveBuffer);
+void HostControllerDriver::periodicTask() {
+	/*for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++)*/ {
+		uint32_t hubPortNumber=0;
+		// Device disconnected
+		if(!rootHubPort[hubPortNumber].deviceConnected && rootHubPort[hubPortNumber].device != 0) {
+			delete rootHubPort[hubPortNumber].device;
+			rootHubPort[hubPortNumber].device = 0;
+		}
+		else if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
+			enumerateDevice(hubPortNumber);
+		}
+	}
 }
 
-void HostControllerDriver::controlRead(uint8_t bmRequestType, uint8_t bRequest,
+uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
+	return controlRead(0x80, 0x06, descriptorTypeIndex, 0x0000, descriptorLength, receiveBuffer);
+}
+
+uint8_t HostControllerDriver::controlRead(uint8_t bmRequestType, uint8_t bRequest,
 		uint16_t wValue, uint16_t wIndex, uint16_t wLength, uint8_t* receiveBuffer) {
 
 	uint8_t completionCode;
@@ -224,19 +240,23 @@ void HostControllerDriver::controlRead(uint8_t bmRequestType, uint8_t bRequest,
 	completionCode = setupTransaction(ctrlEd, bmRequestType, bRequest, wValue, wIndex, wLength);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in setup stage");
+		return completionCode;
 	}
 	// Data stage
 	Debug::writeLine("Starting data stage");
 	completionCode = inTransaction(ctrlEd, receiveBuffer, wLength);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in data stage");
+		return completionCode;
 	}
 	// Status stage
 	Debug::writeLine("Starting status stage");
 	completionCode = outTransaction(ctrlEd, (uint8_t*)0, 0);
 	if(completionCode != CC_NOERROR) {
 		Debug::writeLine("Error in status stage");
+		return completionCode;
 	}
+	return completionCode;
 }
 
 uint8_t HostControllerDriver::setupTransaction(HcEd* ed, uint8_t bmRequestType, uint8_t bRequest,

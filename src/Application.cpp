@@ -61,11 +61,10 @@ int main() {
 	//hcd->init();
 	Debug::writeLine("Please connect a USB device");
 	IntEnable();
-	while(!hcd->deviceConnected(0));
-	Debug::writeLine("Device connected in port 0");
-	hcd->enumerateDevice(0);
-
-	while(1);
+	while(1) {
+		hcd->periodicTask();
+		LPC2478::delay(100000);
+	}
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 

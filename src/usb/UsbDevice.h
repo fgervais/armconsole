@@ -9,17 +9,20 @@
 #define USBDEVICE_H_
 
 #include <stdint.h>
-#include "UsbDescriptors.h"
+
+class DeviceDescriptor;
 
 class UsbDevice {
 public:
 	UsbDevice(uint8_t address);
 	virtual ~UsbDevice();
 
-	DeviceDescriptor deviceDescriptor;
+	void setDeviceDescriptor(DeviceDescriptor*);
+	DeviceDescriptor* getDeviceDescriptor() { return deviceDescriptor; }
 
 private:
 	uint8_t address;
+	DeviceDescriptor* deviceDescriptor;
 };
 
 #endif /* USBDEVICE_H_ */
