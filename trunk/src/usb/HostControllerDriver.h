@@ -17,7 +17,13 @@
 
 #include "LPC23xx.h"
 #include <stdint.h>
-#include "UsbDevice.h"
+
+// Forward declaration
+class UsbDevice;
+
+// Device descriptor
+#define DEVICE_DESCRIPTOR_INDEX         0x0100
+#define DEVICE_DESCRIPTOR_LENGTH        0x12
 
 // The maximum number of device handled by the HCD
 #define MAXIMUM_NUMBER_OF_DEVICE	2
@@ -55,6 +61,7 @@ struct Hcca {                      	 	/* ----------- Host Controller Communicati
 };
 
 struct RootHubPort {
+	UsbDevice* device;
 	// Port flags
 	uint8_t deviceConnected;
 	uint8_t deviceEnumerated;
@@ -69,6 +76,7 @@ public:
 	uint8_t deviceConnected(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceConnected; }
 	uint8_t deviceEnumerated(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceEnumerated; }
 	void enumerateDevice(uint32_t hubPortNumber);
+	void periodicTask();
 
 	void hcInterrupt();
 private:
@@ -93,18 +101,18 @@ private:
 	void portReset(uint32_t hubPortNumber);
 
 	// USB control functions
-	void getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer);
+	uint8_t getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer);
 	void setAddress();
 	void setConfiguration();
 
-	void controlRead(uint8_t bmRequestType,
+	uint8_t controlRead(uint8_t bmRequestType,
 			uint8_t bRequest,
 			uint16_t wValue,
 			uint16_t wIndex,
 			uint16_t wLength,
 			uint8_t* receiveBuffer);
 
-	void controlWrite(uint8_t bmRequestType,
+	uint8_t controlWrite(uint8_t bmRequestType,
 			uint8_t bRequest,
 			uint16_t wValue,
 			uint16_t wIndex,
