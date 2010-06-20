@@ -66,6 +66,7 @@ struct RootHubPort {
 	uint8_t deviceConnected;
 	uint8_t deviceEnumerated;
 	uint8_t lowSpeed;
+	uint8_t deviceAddressesStart;
 };
 
 class HostControllerDriver {
@@ -102,8 +103,8 @@ private:
 
 	// USB control functions
 	uint8_t getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer);
-	void setAddress();
-	void setConfiguration();
+	uint8_t setAddress(uint16_t address);
+	uint8_t setConfiguration(uint8_t configuration);
 
 	uint8_t controlRead(uint8_t bmRequestType,
 			uint8_t bRequest,
