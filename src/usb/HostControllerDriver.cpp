@@ -14,6 +14,10 @@
 #include "Gpio.h"
 #include "UsbDevice.h"
 #include "DeviceDescriptor.h"
+#include "ConfigurationDescriptor.h"
+#include "InterfaceDescriptor.h"
+#include "EndpointDescriptor.h"
+#include <cstdio>
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 	this->ohciRegisters = ohciRegisters;
@@ -186,14 +190,14 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			rootHubPort[hubPortNumber].device = new UsbDevice(hubPortNumber);
 
 			// Get the whole device descriptor
-			timeout = 3;
+			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
-				Debug::writeLine("Getting descriptor");;
+				Debug::writeLine("Getting device descriptor");;
 				completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {
-				Debug::writeLine("Descriptor received");
+				Debug::writeLine("Device descriptor received");
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
@@ -216,7 +220,7 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 				Debug::writeLine("Unknown USB device");
 			}
 
-			timeout = 3;
+			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Setting address");
 				completionCode = setAddress(rootHubPort[hubPortNumber].deviceAddressesStart);
@@ -236,7 +240,45 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			// Device must finish the Set Address request within 2ms
 			LPC2478::delay(2000);
 
-			timeout = 3;
+			// Get the configuration descriptor
+			timeout = ENUMERATION_QUERY_TIMEOUT;
+			do {
+				Debug::writeLine("Getting configuration descriptor");
+				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, 0x09, userBuffer);
+			} while(completionCode != CC_NOERROR && --timeout > 0);
+
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Configuration descriptor received");
+			}
+			else {
+				Debug::writeLine("Error with get_descriptor request");
+				return;
+			}
+			// We queried the configuration descriptor only to get this value
+			uint16_t wTotalLength = (userBuffer[3] << 8) | userBuffer[2];
+
+			// Now get the whole configuration descriptor tree
+			timeout = ENUMERATION_QUERY_TIMEOUT;
+			do {
+				Debug::writeLine("Getting configuration tree");
+				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, wTotalLength, userBuffer);
+			} while(completionCode != CC_NOERROR && --timeout > 0);
+
+			if(completionCode == CC_NOERROR) {
+				Debug::writeLine("Configuration tree received");
+			}
+			else {
+				Debug::writeLine("Error with get_descriptor request");
+				return;
+			}
+
+			// Set the new configuration tree to the device informations
+			rootHubPort[hubPortNumber].device->setConfigurationDescriptor(new ConfigurationDescriptor(userBuffer));
+
+			// Show debug informations
+			printDescriptors(rootHubPort[hubPortNumber].device);
+
+			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Setting configuration");
 				completionCode = setConfiguration(0x01);
@@ -392,6 +434,32 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 
 	// Return completion code
 	return (headTd->Control >> 28) & 0x0F;
+}
+
+void HostControllerDriver::printDescriptors(UsbDevice* device) {
+	char buffer[80];
+
+	Debug::writeLine("Configuration: 1");
+
+	sprintf(buffer,"- Interfaces: %d",device->getConfigurationDescriptor()->bNumInterfaces);
+	Debug::writeLine(buffer);
+
+	for(uint8_t i=0; i<device->getConfigurationDescriptor()->bNumInterfaces; i++) {
+		sprintf(buffer,"  Interface: %d",i);
+		Debug::writeLine(buffer);
+
+		sprintf(buffer,"  - Endpoints: %d",device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints);
+		Debug::writeLine(buffer);
+
+		for(int j=0; j<device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints; j++) {
+			sprintf(buffer,"  - Endpoint: %d %s %s MaxPacket %d Interval %d ms",(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0x0F),
+					((device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0xF0) >> 7) == 1 ? "IN" : "OUT",
+					(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bmAttributes & 0x03) ? "Interrupt" : "Other",
+					device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->wMaxPacketSize,
+					device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bInterval);
+			Debug::writeLine(buffer);
+		}
+	}
 }
 
 /**

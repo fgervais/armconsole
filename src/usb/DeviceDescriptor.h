@@ -14,6 +14,9 @@
 
 class DeviceDescriptor: public Descriptor {
 public:
+	static const uint16_t INDEX = 0x0100;
+	static const uint16_t LENGTH = 0x12;
+
 	uint16_t bcdUsb;
 	uint8_t bDeviceClass;
 	uint8_t bDeviceSubClass;

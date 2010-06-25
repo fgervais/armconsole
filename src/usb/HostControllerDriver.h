@@ -22,8 +22,9 @@
 class UsbDevice;
 
 // Device descriptor
-#define DEVICE_DESCRIPTOR_INDEX         0x0100
-#define DEVICE_DESCRIPTOR_LENGTH        0x12
+#define DEVICE_DESCRIPTOR_INDEX			0x0100
+#define DEVICE_DESCRIPTOR_LENGTH		0x12
+#define CONFIGURATION_DESCRIPTOR_INDEX	0x0200
 
 // The maximum number of device handled by the HCD
 #define MAXIMUM_NUMBER_OF_DEVICE	2
@@ -37,6 +38,9 @@ class UsbDevice;
 #define PID_SETUP	0x00
 #define PID_OUT		0x01
 #define PID_IN		0x02
+
+// The maximum number of time we will retry the request to a device
+#define ENUMERATION_QUERY_TIMEOUT	3
 
 struct HcEd {                       	/* ----------- HostController EndPoint Descriptor ------------- */
     volatile  uint32_t  Control;		/* Endpoint descriptor control                              */
@@ -133,6 +137,9 @@ private:
 
 	void enqueueED(HcEd* ed);
 	void enqueueTD(HcTd* td);
+
+	// Debug Function
+	void printDescriptors(UsbDevice* device);
 };
 
 #endif /* HOSTCONTROLLERDRIVER_H_ */
