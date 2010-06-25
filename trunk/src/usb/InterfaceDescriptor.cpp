@@ -6,6 +6,7 @@
  */
 
 #include "InterfaceDescriptor.h"
+#include "EndpointDescriptor.h"
 
 InterfaceDescriptor::InterfaceDescriptor(uint8_t* rawDescriptor) {
 	bLength				= rawDescriptor[0];
@@ -17,8 +18,27 @@ InterfaceDescriptor::InterfaceDescriptor(uint8_t* rawDescriptor) {
 	bInterfaceSubClass	= rawDescriptor[6];
 	bInterfaceProtocol	= rawDescriptor[7];
 	iInterface			= rawDescriptor[8];
+
+	endpointDescriptor = new EndpointDescriptor*[bNumEndPoints];
+
+	uint32_t rawDescriptorOffset = InterfaceDescriptor::LENGTH;
+
+	// Skip the Class or Vendor-Specific descriptor if any
+	if(rawDescriptor[rawDescriptorOffset+1] != EndpointDescriptor::TYPE) {
+		rawDescriptorOffset += rawDescriptor[rawDescriptorOffset];
+	}
+
+	for(uint8_t i=0; i<bNumEndPoints; i++) {
+		if(i > 0) {
+			rawDescriptorOffset += EndpointDescriptor::LENGTH;
+		}
+		endpointDescriptor[i] = new EndpointDescriptor(&rawDescriptor[rawDescriptorOffset]);
+	}
 }
 
 InterfaceDescriptor::~InterfaceDescriptor() {
-
+	for(uint8_t i=0; i<bNumEndPoints; i++) {
+		delete endpointDescriptor[i];
+	}
+	delete[] endpointDescriptor;
 }

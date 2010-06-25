@@ -7,6 +7,7 @@
 
 #include "UsbDevice.h"
 #include "DeviceDescriptor.h"
+#include "ConfigurationDescriptor.h"
 #include "Debug.h"
 
 UsbDevice::UsbDevice(uint8_t address) {
@@ -21,4 +22,8 @@ UsbDevice::~UsbDevice() {
 
 void UsbDevice::setDeviceDescriptor(DeviceDescriptor* deviceDescriptor) {
 	this->deviceDescriptor = deviceDescriptor;
+}
+
+void UsbDevice::setConfigurationDescriptor(ConfigurationDescriptor* configurationDescriptor) {
+	this->configurationDescriptor = configurationDescriptor;
 }

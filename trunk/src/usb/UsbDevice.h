@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 class DeviceDescriptor;
+class ConfigurationDescriptor;
 
 class UsbDevice {
 public:
@@ -19,10 +20,14 @@ public:
 
 	void setDeviceDescriptor(DeviceDescriptor*);
 	DeviceDescriptor* getDeviceDescriptor() { return deviceDescriptor; }
+	void setConfigurationDescriptor(ConfigurationDescriptor*);
+	ConfigurationDescriptor* getConfigurationDescriptor() { return configurationDescriptor; }
 
 private:
 	uint8_t address;
 	DeviceDescriptor* deviceDescriptor;
+	ConfigurationDescriptor* configurationDescriptor;
+
 };
 
 #endif /* USBDEVICE_H_ */
