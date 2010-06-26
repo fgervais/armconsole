@@ -568,7 +568,63 @@ void HostControllerDriver::registerEndpoints(UsbDevice* device) {
 void HostControllerDriver::unregisterEndpoints(UsbDevice* device) {
 	HcEd*** endpoint = device->getEndpoints();
 
+	for(uint8_t interfaceNumber=0; interfaceNumber<device->getConfigurationDescriptor()->bNumInterfaces; interfaceNumber++) {
+		for(uint8_t endpointNumber=0; endpointNumber<device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->bNumEndPoints; endpointNumber++) {
 
+			EndpointDescriptor* currentEndpointDescriptor = device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->getEndpointDescriptor(endpointNumber);
+
+			// TODO: Register Bulk and isochronous endpoints as well
+			switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
+			// Isochronous
+			case 1:
+				break;
+			// Bulk
+			case 2:
+				break;
+			// Interrupt
+			case 3:
+				// Find the interval next highest power of two
+				uint8_t power2 = currentEndpointDescriptor->bInterval;
+
+				power2--;
+				power2 |= power2 >> 1;  // handle  2 bit numbers
+				power2 |= power2 >> 2;  // handle  4 bit numbers
+				power2 |= power2 >> 4;  // handle  8 bit numbers
+				power2++;
+
+				// We found the highest power of 2 but we need the lowest
+				if(power2 > 1) {
+					power2 >>= 1;
+				}
+				// Protect against buggy devices
+				else if(power2 == 0) {
+					power2 = 1;
+				}
+
+				ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
+				// Ensure we finish the current frame processing
+				LPC2478::delay(1000);
+
+				for(uint8_t i=0; i<32; i+=power2) {
+					if(hcca->IntTable[i] == (uint32_t)endpoint[interfaceNumber][endpointNumber]) {
+						hcca->IntTable[i] = 0;
+					}
+					else {
+						// Find the endpoint we want to unlink
+						HcEd* endpointIterator = (HcEd*)hcca->IntTable[i];
+						while(endpointIterator->Next != (uint32_t)endpoint[interfaceNumber][endpointNumber]) {
+							endpointIterator = (HcEd*)endpointIterator->Next;
+						}
+						// Unlink the endpoint from the list
+						endpointIterator->Next = ((HcEd*)endpointIterator->Next)->Next;
+					}
+				}
+				ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
+				break;
+			}
+
+		}
+	}
 }
 
 void HostControllerDriver::printDescriptors(UsbDevice* device) {
