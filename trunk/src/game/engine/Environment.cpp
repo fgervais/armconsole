@@ -39,7 +39,7 @@ Environment::Environment(uint32_t width, uint32_t height, uint32_t tileWidth, ui
 	}*/
 
 	tileMap = new Tile**[heightInTile];
-	for(uint32_t i=0; i<widthInTile; i++) {
+	for(uint32_t i=0; i<heightInTile; i++) {
 		tileMap[i] = new Tile*[widthInTile];
 	}
 
@@ -51,7 +51,7 @@ Environment::Environment(uint32_t width, uint32_t height, uint32_t tileWidth, ui
 	}
 
 	spriteSpawnMap = new SpriteContainer**[heightInTile];
-	for(uint32_t i=0; i<widthInTile; i++) {
+	for(uint32_t i=0; i<heightInTile; i++) {
 		spriteSpawnMap[i] = new SpriteContainer*[widthInTile];
 	}
 

@@ -30,7 +30,7 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 		rootHubPort[hubPortNumber].deviceConnected = 0;
 		rootHubPort[hubPortNumber].deviceEnumerated = 0;
 		rootHubPort[hubPortNumber].lowSpeed = 0;
-		// It
+		// The HCD will start addressing devices at this address number
 		rootHubPort[hubPortNumber].deviceAddressesStart = hubPortNumber + 1;
 	}
 
@@ -61,12 +61,10 @@ void HostControllerDriver::init() {
 
 	// Memory allocation inside the USB section
 	headTd = (HcTd *)(USB_MEMORY+0x100);
-	tailTd = (HcTd *)(USB_MEMORY+0x110);
-	ctrlEd = (HcEd *)(USB_MEMORY+0x120);
-	intInEd = (HcEd *)(USB_MEMORY+0x130);
-	intOutEd = (HcEd *)(USB_MEMORY+0x140);
+	tailTd = (HcTd *)(USB_MEMORY+0x120);
+	ctrlEd = (HcEd *)(USB_MEMORY+0x140);
 	tdBuffer = (uint8_t *)(USB_MEMORY+0x150);
-	userBuffer = (uint8_t *)(USB_MEMORY+0x1000);
+	userBuffer = (uint8_t *)(USB_MEMORY+0x160);
 
 	// Clear USB memory
 	uint8_t* memory_ptr = (uint8_t*)(USB_MEMORY + 0x00);
@@ -150,13 +148,17 @@ void HostControllerDriver::portReset(uint32_t hubPortNumber) {
 	LPC2478::delay(100000);
 }
 
-void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
+UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 	uint8_t completionCode;
 	uint8_t timeout;
 
 	if(hubPortNumber < MAX_ROOT_PORTS) {
 		if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
 			Debug::writeLine("Enumerating device");
+
+			// Address that will be set to the device
+			uint8_t deviceAddress = rootHubPort[hubPortNumber].deviceAddressesStart;
+
 			// USB 2.0 spec says at least 50ms delay before port reset
 			LPC2478::delay(100000);
 			portReset(hubPortNumber);
@@ -174,7 +176,7 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
-				return;
+				return 0;
 			}
 
 			// Set the maximum packet size
@@ -187,7 +189,7 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			portReset(hubPortNumber);
 
 			// Create the new logical device
-			rootHubPort[hubPortNumber].device = new UsbDevice(hubPortNumber);
+			rootHubPort[hubPortNumber].device = new UsbDevice(deviceAddress, rootHubPort[hubPortNumber].lowSpeed ? UsbDevice::LowSpeed : UsbDevice::FullSpeed);
 
 			// Get the whole device descriptor
 			timeout = ENUMERATION_QUERY_TIMEOUT;
@@ -201,29 +203,15 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
-				return;
+				return 0;
 			}
 
 			rootHubPort[hubPortNumber].device->setDeviceDescriptor(new DeviceDescriptor(userBuffer));
 
-			if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idVendor == 0x045e) { // Xbox receiver
-				if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idProduct == 0x0719) { // Xbox receiver
-					Debug::writeLine("Xbox wireless receiver connected");
-				}
-			}
-			else if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idVendor == 0x046d) { // Mouse
-				if(rootHubPort[hubPortNumber].device->getDeviceDescriptor()->idProduct == 0xc018) { // Mouse
-					Debug::writeLine("Logitech mouse connected");
-				}
-			}
-			else {
-				Debug::writeLine("Unknown USB device");
-			}
-
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Setting address");
-				completionCode = setAddress(rootHubPort[hubPortNumber].deviceAddressesStart);
+				completionCode = setAddress(deviceAddress);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {
@@ -231,11 +219,11 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with set_address");
-				return;
+				return 0;
 			}
 
 			// Set the new address
-			ctrlEd->Control |= (rootHubPort[hubPortNumber].deviceAddressesStart);
+			ctrlEd->Control |= (deviceAddress);
 
 			// Device must finish the Set Address request within 2ms
 			LPC2478::delay(2000);
@@ -252,7 +240,7 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
-				return;
+				return 0;
 			}
 			// We queried the configuration descriptor only to get this value
 			uint16_t wTotalLength = (userBuffer[3] << 8) | userBuffer[2];
@@ -269,7 +257,7 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with get_descriptor request");
-				return;
+				return 0;
 			}
 
 			// Set the new configuration tree to the device informations
@@ -289,25 +277,33 @@ void HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 			else {
 				Debug::writeLine("Error with set_configuration");
-				return;
+				return 0;
 			}
 
 			rootHubPort[hubPortNumber].deviceEnumerated = 1;
 		}
 	}
+
+	return rootHubPort[hubPortNumber].device;
 }
 
-void HostControllerDriver::periodicTask() {
+UsbDevice* HostControllerDriver::periodicTask() {
 	for(uint32_t hubPortNumber=0; hubPortNumber<MAX_ROOT_PORTS; hubPortNumber++) {
 		// Device disconnected
 		if(!rootHubPort[hubPortNumber].deviceConnected && rootHubPort[hubPortNumber].device != 0) {
+			unregisterEndpoints(rootHubPort[hubPortNumber].device);
 			delete rootHubPort[hubPortNumber].device;
 			rootHubPort[hubPortNumber].device = 0;
 		}
 		else if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
-			enumerateDevice(hubPortNumber);
+			UsbDevice* device = enumerateDevice(hubPortNumber);
+			if(device != 0) {
+				registerEndpoints(device);
+			}
+			return device;
 		}
 	}
+	return 0;
 }
 
 uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
@@ -399,10 +395,10 @@ uint8_t HostControllerDriver::outTransaction(HcEd* ed, uint8_t* transmitBuffer, 
 	return launchTransaction(ed, PID_OUT, transmitBuffer, transactionLength);
 }
 
-uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_t* transmitBuffer, uint32_t transactionLength) {
+uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_t* transactionBuffer, uint32_t transactionLength) {
 	// TODO: A lot of that stuff doesn't work for something else than control transactions
 
-	uint32_t dataToggle = ((token == PID_SETUP) ? 2 : 3);
+	uint32_t dataToggle = ((token == PID_SETUP) ? DATA0 : DATA1);
 
 	headTd->Control = (1 << 18)	// Data packet may be smaller than the buffer
 		| (token << 19)			// PID
@@ -410,12 +406,15 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
 	tailTd->Control = 0;
 
-	headTd->CurrBufPtr = (uint32_t)transmitBuffer;
+	headTd->CurrBufPtr = (uint32_t)transactionBuffer;
 	tailTd->CurrBufPtr = 0;
 	headTd->Next = (uint32_t)tailTd;
 	tailTd->Next = 0;
-	headTd->BufEnd = (uint32_t)(transmitBuffer + (transactionLength - 1));
+	headTd->BufEnd = (uint32_t)(transactionBuffer + (transactionLength - 1));
 	tailTd->BufEnd = 0;
+
+	// This is not a periodic transfer
+	headTd->automaticRequeue = 0;
 
 	ed->HeadTd = (uint32_t)headTd;
 	ed->TailTd = (uint32_t)tailTd;
@@ -436,6 +435,142 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 	return (headTd->Control >> 28) & 0x0F;
 }
 
+void HostControllerDriver::setupPeriodicIn() {
+
+}
+
+void HostControllerDriver::setupPeriodicOut(uint8_t* transmitBuffer, uint32_t transactionLength) {
+	headTd->Control = (1 << 18)	// Data packet may be smaller than the buffer
+		| (PID_OUT << 19)		// PID
+		| (DATA1 << 24)			// Data toggle = LSB of this field
+		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
+	tailTd->Control = 0;
+
+	headTd->CurrBufPtr = (uint32_t)transmitBuffer;
+	tailTd->CurrBufPtr = 0;
+	headTd->Next = (uint32_t)tailTd;
+	tailTd->Next = 0;
+	headTd->BufEnd = (uint32_t)(transmitBuffer + (transactionLength - 1));
+	tailTd->BufEnd = 0;
+
+	intOutEd->HeadTd = (uint32_t)headTd;
+	intOutEd->TailTd = (uint32_t)tailTd;
+	intOutEd->Next = 0;
+
+	// Set 8ms interval
+	hcca->IntTable[0] = (uint32_t)intOutEd;
+	hcca->IntTable[7] = (uint32_t)intOutEd;
+	hcca->IntTable[15] = (uint32_t)intOutEd;
+	hcca->IntTable[31] = (uint32_t)intOutEd;
+
+	ohciRegisters->HcControl       |= (1<<2);	// Periodic list Enabled
+}
+
+void HostControllerDriver::registerEndpoints(UsbDevice* device) {
+	// TODO: Add some sort of dynamic memory allocation
+
+	// Memory allocation
+	HcEd*** endpoint;
+	HcTd* dummyTD;
+
+	// The first 1k of USB memory is reserved for device enumeration
+	uint32_t usb_memory_ptr = USB_MEMORY + 0x400;
+
+	endpoint = new HcEd**[device->getConfigurationDescriptor()->bNumInterfaces];
+
+	for(uint8_t interfaceNumber=0; interfaceNumber<device->getConfigurationDescriptor()->bNumInterfaces; interfaceNumber++) {
+		endpoint[interfaceNumber] = new HcEd*[device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->bNumEndPoints];
+
+		for(uint8_t endpointNumber=0; endpointNumber<device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->bNumEndPoints; endpointNumber++) {
+
+			endpoint[interfaceNumber][endpointNumber] = (HcEd *)(usb_memory_ptr);
+			usb_memory_ptr += sizeof(HcEd);
+
+			dummyTD = (HcTd *)(usb_memory_ptr);
+			usb_memory_ptr += sizeof(HcTd);
+
+			dummyTD->Control = 0;
+			dummyTD->CurrBufPtr = 0;
+			dummyTD->Next = 0;
+			dummyTD->BufEnd = 0;
+
+			EndpointDescriptor* currentEndpointDescriptor = device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->getEndpointDescriptor(endpointNumber);
+
+			// Set the maximum packet size
+			endpoint[interfaceNumber][endpointNumber]->Control = (currentEndpointDescriptor->wMaxPacketSize << 16);
+			if(device->getSpeed() == UsbDevice::LowSpeed) {
+				endpoint[interfaceNumber][endpointNumber]->Control |= (1 << 13);	// Low speed endpoint
+			}
+			// Device address
+			endpoint[interfaceNumber][endpointNumber]->Control |= (device->getAddress());
+			// Endpoint number
+			endpoint[interfaceNumber][endpointNumber]->Control |= (currentEndpointDescriptor->bEndpointAddress << 7);
+
+			endpoint[interfaceNumber][endpointNumber]->HeadTd = (uint32_t)dummyTD;
+			endpoint[interfaceNumber][endpointNumber]->TailTd = (uint32_t)dummyTD;
+			endpoint[interfaceNumber][endpointNumber]->Next = 0;
+
+			// TODO: Register Bulk and isochronous endpoints as well
+			switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
+			// Isochronous
+			case 1:
+				break;
+			// Bulk
+			case 2:
+				break;
+			// Interrupt
+			case 3:
+				// Find the interval next highest power of two
+				uint8_t power2 = currentEndpointDescriptor->bInterval;
+
+				power2--;
+				power2 |= power2 >> 1;  // handle  2 bit numbers
+				power2 |= power2 >> 2;  // handle  4 bit numbers
+				power2 |= power2 >> 4;  // handle  8 bit numbers
+				power2++;
+
+				// We found the highest power of 2 but we need the lowest
+				if(power2 > 1) {
+					power2 >>= 1;
+				}
+				// Protect against buggy devices
+				else if(power2 == 0) {
+					power2 = 1;
+				}
+
+				ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
+				// Ensure we finish the current frame processing
+				LPC2478::delay(1000);
+
+				for(uint8_t i=0; i<32; i+=power2) {
+					if(hcca->IntTable[i] == 0) {
+						hcca->IntTable[i] = (uint32_t)endpoint[interfaceNumber][endpointNumber];
+					}
+					else {
+						// Find the end of the list
+						HcEd* endpointIterator = (HcEd*)hcca->IntTable[i];
+						while(endpointIterator->Next != 0) {
+							endpointIterator = (HcEd*)endpointIterator->Next;
+						}
+						endpointIterator->Next = (uint32_t)endpoint[interfaceNumber][endpointNumber];
+					}
+				}
+				ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
+				break;
+			}
+
+		}
+	}
+
+	device->setEndpoints(endpoint);
+}
+
+void HostControllerDriver::unregisterEndpoints(UsbDevice* device) {
+	HcEd*** endpoint = device->getEndpoints();
+
+
+}
+
 void HostControllerDriver::printDescriptors(UsbDevice* device) {
 	char buffer[80];
 
@@ -451,7 +586,7 @@ void HostControllerDriver::printDescriptors(UsbDevice* device) {
 		sprintf(buffer,"  - Endpoints: %d",device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints);
 		Debug::writeLine(buffer);
 
-		for(int j=0; j<device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints; j++) {
+		for(uint8_t j=0; j<device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints; j++) {
 			sprintf(buffer,"  - Endpoint: %d %s %s MaxPacket %d Interval %d ms",(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0x0F),
 					((device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0xF0) >> 7) == 1 ? "IN" : "OUT",
 					(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bmAttributes & 0x03) ? "Interrupt" : "Other",
