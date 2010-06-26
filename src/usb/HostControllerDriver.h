@@ -39,6 +39,9 @@ class UsbDevice;
 #define PID_OUT		0x01
 #define PID_IN		0x02
 
+#define DATA0		0x02
+#define DATA1		0x03
+
 // The maximum number of time we will retry the request to a device
 #define ENUMERATION_QUERY_TIMEOUT	3
 
@@ -54,6 +57,10 @@ struct HcTd {                       	/* ------------ HostController Transfer Des
     volatile  uint32_t  CurrBufPtr;		/* Physical address of current buffer pointer               */
     volatile  uint32_t  Next;			/* Physical pointer to next Transfer Descriptor             */
     volatile  uint32_t  BufEnd;			/* Physical address of end of buffer                        */
+    // From here everything is for HCD purpose only
+    volatile uint32_t automaticRequeue;
+    volatile HcEd* parentED;
+    volatile uint32_t unused[2];
 };
 
 struct Hcca {                      	 	/* ----------- Host Controller Communication Area ------------  */
@@ -80,8 +87,8 @@ public:
 
 	uint8_t deviceConnected(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceConnected; }
 	uint8_t deviceEnumerated(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceEnumerated; }
-	void enumerateDevice(uint32_t hubPortNumber);
-	void periodicTask();
+	UsbDevice* enumerateDevice(uint32_t hubPortNumber);
+	UsbDevice* periodicTask();
 
 	void hcInterrupt();
 private:
@@ -135,8 +142,14 @@ private:
 
 	uint8_t launchTransaction(HcEd* ed, uint32_t token, uint8_t* transmitBuffer, uint32_t transactionLength);
 
+	void setupPeriodicIn();
+	void setupPeriodicOut(uint8_t* transmitBuffer, uint32_t transactionLength);
+
 	void enqueueED(HcEd* ed);
 	void enqueueTD(HcTd* td);
+
+	void registerEndpoints(UsbDevice*);
+	void unregisterEndpoints(UsbDevice*);
 
 	// Debug Function
 	void printDescriptors(UsbDevice* device);

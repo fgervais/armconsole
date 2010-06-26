@@ -22,6 +22,9 @@
 #include "AudioHelper.h"
 #include "DAC.h"
 #include "Engine.h"
+#include "XboxControllerDriver.h"
+#include "UsbDevice.h"
+#include "DeviceDescriptor.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -61,10 +64,22 @@ int main() {
 	//hcd->init();
 	Debug::writeLine("Please connect a USB device");
 	IntEnable();
+
+	UsbDevice* device;
+	XboxControllerDriver* controller;
 	while(1) {
-		hcd->periodicTask();
+		device = hcd->periodicTask();
+		if(device != 0) {
+			if(device->getDeviceDescriptor()->idVendor == 0x045e && device->getDeviceDescriptor()->idProduct == 0x0719) { // Xbox receiver
+				controller = new XboxControllerDriver(device, 0);
+				break;
+			}
+		}
 		LPC2478::delay(100000);
 	}
+
+	Debug::writeLine("Xbox controller ready to use");
+	while(1);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 
