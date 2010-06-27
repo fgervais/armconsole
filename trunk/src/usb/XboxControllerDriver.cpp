@@ -8,6 +8,7 @@
 #include "XboxControllerDriver.h"
 #include "UsbDevice.h"
 #include "HostControllerDriver.h"
+#include "LPC2478.h"
 
 XboxControllerDriver::XboxControllerDriver(UsbDevice* device, uint8_t controllerNumber) {
 	this->device = device;
@@ -76,4 +77,22 @@ void XboxControllerDriver::configure(uint8_t controllerNumber) {
 
 	// Set the interrupt output report
 
+	// Create the output interrupt report
+	uint8_t command = 0x02;
+	uint8_t* tdBuffer = (uint8_t*)(USB_MEMORY+0x2000);
+
+	tdBuffer[0] = 0x00;
+	tdBuffer[1] = 0x00;
+	tdBuffer[2] = 0x08;
+	tdBuffer[3] = 0x40 + (command % 0x0E);
+	tdBuffer[4] = 0x00;
+	tdBuffer[5] = 0x00;
+	tdBuffer[6] = 0x00;
+	tdBuffer[7] = 0x00;
+	tdBuffer[8] = 0x00;
+	tdBuffer[9] = 0x00;
+	tdBuffer[10] = 0x00;
+	tdBuffer[11] = 0x00;
+
+	LPC2478::getHCD()->usbRequest(device, 0, 1, tdBuffer, 12);
 }

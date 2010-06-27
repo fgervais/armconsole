@@ -63,6 +63,7 @@ struct HcTd {                       	/* ------------ HostController Transfer Des
     volatile uint32_t unused[2];
 };
 
+#define HCCA_INTERRUPT_NUMBER	32
 struct Hcca {                      	 	/* ----------- Host Controller Communication Area ------------  */
     volatile  uint32_t  IntTable[32];	/* Interrupt Table                                          */
     volatile  uint32_t  FrameNumber;	/* Frame Number                                             */
@@ -80,6 +81,14 @@ struct RootHubPort {
 	uint8_t deviceAddressesStart;
 };
 
+// From NetBSD OHCI
+/* Reverse the bits in a value 0 .. 31 */
+const uint8_t revbits[32] =
+  { 0x00, 0x10, 0x08, 0x18, 0x04, 0x14, 0x0c, 0x1c,
+	0x02, 0x12, 0x0a, 0x1a, 0x06, 0x16, 0x0e, 0x1e,
+	0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d,
+	0x03, 0x13, 0x0b, 0x1b, 0x07, 0x17, 0x0f, 0x1f };
+
 class HostControllerDriver {
 public:
 	HostControllerDriver(OHCI_Typedef* ohciRegisters);
@@ -89,6 +98,8 @@ public:
 	uint8_t deviceEnumerated(uint32_t hubPortNumber) { return rootHubPort[hubPortNumber].deviceEnumerated; }
 	UsbDevice* enumerateDevice(uint32_t hubPortNumber);
 	UsbDevice* periodicTask();
+
+	void usbRequest(UsbDevice*, uint8_t interfaceIndex, uint8_t endpointIndex, uint8_t* transactionBuffer, uint32_t transactionLength);
 
 	void hcInterrupt();
 private:
@@ -100,6 +111,9 @@ private:
 	HcEd* intOutEd;
 	uint8_t* tdBuffer;
 	uint8_t* userBuffer;
+
+	// Dummy EDs that make up the interrupt tree.
+	HcEd* interruptTreeNode;
 
 	OHCI_Typedef* ohciRegisters;
 
@@ -140,13 +154,10 @@ private:
 	uint8_t inTransaction(HcEd* ed, uint8_t* receiveBuffer, uint32_t transactionLength);
 	uint8_t outTransaction(HcEd* ed, uint8_t* transmitBuffer, uint32_t transactionLength);
 
-	uint8_t launchTransaction(HcEd* ed, uint32_t token, uint8_t* transmitBuffer, uint32_t transactionLength);
+	uint8_t launchTransaction(HcEd* ed, uint32_t token, uint8_t* transactionBuffer, uint32_t transactionLength);
 
 	void setupPeriodicIn();
 	void setupPeriodicOut(uint8_t* transmitBuffer, uint32_t transactionLength);
-
-	void enqueueED(HcEd* ed);
-	void enqueueTD(HcTd* td);
 
 	void registerEndpoints(UsbDevice*);
 	void unregisterEndpoints(UsbDevice*);
