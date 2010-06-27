@@ -79,6 +79,53 @@ void HostControllerDriver::init() {
 	hcca->DoneHead = 0;
 	hcca->FrameNumber = 0;
 
+	// Build the interrupt endpoint tree
+	/*
+	 * Every node of this tree has it's own pooling time.
+	 *
+	 * The array has this form :
+	 *
+	 * 0,1,2,2,4,4,4,4,8,8,8,8,8,8,8,8,...,16,...,32
+	 *
+	 * You can see that the 16 nodes with a polling time
+	 * of 16 ms have a position starting at index 16 of
+	 * the array. There may be a better way but this seems
+	 * efficient enough.
+	 */
+	interruptTreeNode = (HcEd*)(USB_MEMORY + 0x400);
+
+	// Clear every EDs (USB_MEMORY + 0x400) to (USB_MEMORY + 0x800)
+	memory_ptr = (uint8_t*)(USB_MEMORY + 0x400);
+	for(uint32_t i=0; i<0x400; i++) {
+		*(memory_ptr+i) = 0x00;
+	}
+
+	// Set the skip bit for all of them
+	for(uint8_t i=0; i<HCCA_INTERRUPT_NUMBER*2; i++) {
+		interruptTreeNode[i].Control |= (1 << 14);
+	}
+
+	// Link all these structs in some king a reverse binary tree
+	// See OHCI specification 1.0a 5.2.7.2
+	/*
+	 * NOTE: I created this algorithm by looking at the pattern
+	 * myself. It is possible that there is known algorithm for
+	 * this kind of problem but I'm not aware of them.
+	 */
+	for(uint8_t i=0; i<HCCA_INTERRUPT_NUMBER; i++) {
+		interruptTreeNode[(i>>0) + 32].Next = (uint32_t)&interruptTreeNode[(i>>1) + 16];
+		interruptTreeNode[(i>>1) + 16].Next = (uint32_t)&interruptTreeNode[(i>>2) + 8];
+		interruptTreeNode[(i>>2) + 8].Next = (uint32_t)&interruptTreeNode[(i>>3) + 4];
+		interruptTreeNode[(i>>3) + 4].Next = (uint32_t)&interruptTreeNode[(i>>4) + 2];
+		interruptTreeNode[(i>>4) + 2].Next = (uint32_t)&interruptTreeNode[(i>>5) + 1];
+		interruptTreeNode[(i>>5) + 1].Next = 0;
+	}
+
+	// Add all the leaf of the tree to the HCCA interrupt table
+	for(uint8_t i=0; i<HCCA_INTERRUPT_NUMBER; i++) {
+		hcca->IntTable[i] = (uint32_t)&interruptTreeNode[32 + revbits[i]];
+	}
+
 	LPC2478::delay(50000);	// 50 ms
 
 	/*
@@ -298,12 +345,65 @@ UsbDevice* HostControllerDriver::periodicTask() {
 		else if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
 			UsbDevice* device = enumerateDevice(hubPortNumber);
 			if(device != 0) {
+				Debug::writeLine("Entering registerEndpoints()");
 				registerEndpoints(device);
 			}
 			return device;
 		}
 	}
 	return 0;
+}
+
+void HostControllerDriver::usbRequest(UsbDevice* device, uint8_t interfaceIndex, uint8_t endpointIndex, uint8_t* transactionBuffer, uint32_t transactionLength) {
+	HcEd* endpoint = device->getEndpoints()[interfaceIndex][endpointIndex];
+	EndpointDescriptor* currentEndpointDescriptor = device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceIndex)->getEndpointDescriptor(endpointIndex);
+	// The new tail TD
+	HcTd* dummyTD = (HcTd*)(USB_MEMORY+0x800);
+
+	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
+	// Isochronous
+	case 1:
+		break;
+	// Bulk
+	case 2:
+		break;
+	// Interrupt
+	case 3:
+		ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
+		LPC2478::delay(1000);
+		break;
+	}
+
+	((HcTd*)endpoint->TailTd)->Control = (1 << 18)	// Data packet may be smaller than the buffer
+		| ((((currentEndpointDescriptor->bEndpointAddress & 0xF0) >> 7) == 1 ? PID_IN : PID_OUT) << 19)		// PID
+		| (DATA1 << 24)			// Data toggle = LSB of this field
+		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
+	dummyTD->Control = 0;
+
+	((HcTd*)endpoint->TailTd)->CurrBufPtr = (uint32_t)transactionBuffer;
+	dummyTD->CurrBufPtr = 0;
+	((HcTd*)endpoint->TailTd)->Next = (uint32_t)dummyTD;
+	dummyTD->Next = 0;
+	((HcTd*)endpoint->TailTd)->BufEnd = (uint32_t)(transactionBuffer + (transactionLength - 1));
+	dummyTD->BufEnd = 0;
+
+	((HcTd*)endpoint->TailTd)->automaticRequeue = 1;
+	((HcTd*)endpoint->TailTd)->parentED = endpoint;
+
+	endpoint->TailTd = (uint32_t)dummyTD;
+
+	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
+	// Isochronous
+	case 1:
+		break;
+	// Bulk
+	case 2:
+		break;
+	// Interrupt
+	case 3:
+		ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
+		break;
+	}
 }
 
 uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
@@ -474,7 +574,7 @@ void HostControllerDriver::registerEndpoints(UsbDevice* device) {
 	HcTd* dummyTD;
 
 	// The first 1k of USB memory is reserved for device enumeration
-	uint32_t usb_memory_ptr = USB_MEMORY + 0x400;
+	uint32_t usb_memory_ptr = USB_MEMORY + 0x1000;
 
 	endpoint = new HcEd**[device->getConfigurationDescriptor()->bNumInterfaces];
 
@@ -523,38 +623,29 @@ void HostControllerDriver::registerEndpoints(UsbDevice* device) {
 				// Find the interval next highest power of two
 				uint8_t power2 = currentEndpointDescriptor->bInterval;
 
+				// Protect against buggy devices
+				if(power2 == 0) {
+					power2 = 1;
+				}
+
 				power2--;
 				power2 |= power2 >> 1;  // handle  2 bit numbers
 				power2 |= power2 >> 2;  // handle  4 bit numbers
 				power2 |= power2 >> 4;  // handle  8 bit numbers
 				power2++;
 
-				// We found the highest power of 2 but we need the lowest
-				if(power2 > 1) {
+				if(power2 > currentEndpointDescriptor->bInterval) {
 					power2 >>= 1;
-				}
-				// Protect against buggy devices
-				else if(power2 == 0) {
-					power2 = 1;
 				}
 
 				ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
 				// Ensure we finish the current frame processing
 				LPC2478::delay(1000);
 
-				for(uint8_t i=0; i<32; i+=power2) {
-					if(hcca->IntTable[i] == 0) {
-						hcca->IntTable[i] = (uint32_t)endpoint[interfaceNumber][endpointNumber];
-					}
-					else {
-						// Find the end of the list
-						HcEd* endpointIterator = (HcEd*)hcca->IntTable[i];
-						while(endpointIterator->Next != 0) {
-							endpointIterator = (HcEd*)endpointIterator->Next;
-						}
-						endpointIterator->Next = (uint32_t)endpoint[interfaceNumber][endpointNumber];
-					}
-				}
+				// TODO: Add load balancing
+				endpoint[interfaceNumber][endpointNumber]->Next = interruptTreeNode[power2].Next;
+				interruptTreeNode[power2].Next = (uint32_t)endpoint[interfaceNumber][endpointNumber];
+
 				ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
 				break;
 			}
@@ -586,6 +677,11 @@ void HostControllerDriver::unregisterEndpoints(UsbDevice* device) {
 				// Find the interval next highest power of two
 				uint8_t power2 = currentEndpointDescriptor->bInterval;
 
+				// Protect against buggy devices
+				if(power2 == 0) {
+					power2 = 1;
+				}
+
 				power2--;
 				power2 |= power2 >> 1;  // handle  2 bit numbers
 				power2 |= power2 >> 2;  // handle  4 bit numbers
@@ -596,29 +692,19 @@ void HostControllerDriver::unregisterEndpoints(UsbDevice* device) {
 				if(power2 > 1) {
 					power2 >>= 1;
 				}
-				// Protect against buggy devices
-				else if(power2 == 0) {
-					power2 = 1;
-				}
 
 				ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
 				// Ensure we finish the current frame processing
 				LPC2478::delay(1000);
 
-				for(uint8_t i=0; i<32; i+=power2) {
-					if(hcca->IntTable[i] == (uint32_t)endpoint[interfaceNumber][endpointNumber]) {
-						hcca->IntTable[i] = 0;
-					}
-					else {
-						// Find the endpoint we want to unlink
-						HcEd* endpointIterator = (HcEd*)hcca->IntTable[i];
-						while(endpointIterator->Next != (uint32_t)endpoint[interfaceNumber][endpointNumber]) {
-							endpointIterator = (HcEd*)endpointIterator->Next;
-						}
-						// Unlink the endpoint from the list
-						endpointIterator->Next = ((HcEd*)endpointIterator->Next)->Next;
-					}
+				// Find the endpoint we want to unlink
+				HcEd* endpointIterator = &interruptTreeNode[power2];
+				while(endpointIterator->Next != (uint32_t)endpoint[interfaceNumber][endpointNumber]) {
+					endpointIterator = (HcEd*)endpointIterator->Next;
 				}
+				// Unlink the endpoint from the list
+				endpointIterator->Next = ((HcEd*)endpointIterator->Next)->Next;
+
 				ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
 				break;
 			}
@@ -645,7 +731,7 @@ void HostControllerDriver::printDescriptors(UsbDevice* device) {
 		for(uint8_t j=0; j<device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->bNumEndPoints; j++) {
 			sprintf(buffer,"  - Endpoint: %d %s %s MaxPacket %d Interval %d ms",(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0x0F),
 					((device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bEndpointAddress & 0xF0) >> 7) == 1 ? "IN" : "OUT",
-					(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bmAttributes & 0x03) ? "Interrupt" : "Other",
+					(device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bmAttributes & 0x03) == 3 ? "Interrupt" : "Other",
 					device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->wMaxPacketSize,
 					device->getConfigurationDescriptor()->getInterfaceDescriptor(i)->getEndpointDescriptor(j)->bInterval);
 			Debug::writeLine(buffer);

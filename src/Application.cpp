@@ -79,6 +79,7 @@ int main() {
 	}
 
 	Debug::writeLine("Xbox controller ready to use");
+	controller->configure(0);
 	while(1);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
