@@ -20,14 +20,13 @@
 
 // Forward declaration
 class UsbDevice;
+class HCDRequest;
+class HCDEventListener;
 
 // Device descriptor
 #define DEVICE_DESCRIPTOR_INDEX			0x0100
 #define DEVICE_DESCRIPTOR_LENGTH		0x12
 #define CONFIGURATION_DESCRIPTOR_INDEX	0x0200
-
-// The maximum number of device handled by the HCD
-#define MAXIMUM_NUMBER_OF_DEVICE	2
 
 #define FRAME_INTERVAL		0x2EDF		/* 12000 bits per frame (-1) */
 
@@ -52,15 +51,22 @@ struct HcEd {                       	/* ----------- HostController EndPoint Desc
     volatile  uint32_t  Next;			/* Physical address of next Endpoint descriptor             */
 };
 
+#define TD_CONTROL		1
+#define TD_ISOCHRONOUS	2
+#define TD_BULK			3
+#define TD_INTERRUPT	4
 struct HcTd {                       	/* ------------ HostController Transfer Descriptor ------------ */
     volatile  uint32_t  Control;		/* Transfer descriptor control                              */
     volatile  uint32_t  CurrBufPtr;		/* Physical address of current buffer pointer               */
     volatile  uint32_t  Next;			/* Physical pointer to next Transfer Descriptor             */
     volatile  uint32_t  BufEnd;			/* Physical address of end of buffer                        */
     // From here everything is for HCD purpose only
-    volatile uint32_t automaticRequeue;
-    volatile HcEd* parentED;
-    volatile uint32_t unused[2];
+    volatile uint8_t type;
+    volatile uint8_t free;
+    volatile uint8_t unused1[2];
+    HCDRequest* request;
+    HCDEventListener* listener;
+    volatile uint32_t unused2[1];
 };
 
 #define HCCA_INTERRUPT_NUMBER	32
@@ -99,7 +105,7 @@ public:
 	UsbDevice* enumerateDevice(uint32_t hubPortNumber);
 	UsbDevice* periodicTask();
 
-	void usbRequest(UsbDevice*, uint8_t interfaceIndex, uint8_t endpointIndex, uint8_t* transactionBuffer, uint32_t transactionLength);
+	uint8_t sendRequest(HCDRequest*);
 
 	void hcInterrupt();
 private:
@@ -112,13 +118,15 @@ private:
 	uint8_t* tdBuffer;
 	uint8_t* userBuffer;
 
+#define TD_IN_POOL	16
+	HcTd* tdPool;
+
 	// Dummy EDs that make up the interrupt tree.
 	HcEd* interruptTreeNode;
 
 	OHCI_Typedef* ohciRegisters;
 
 	volatile RootHubPort rootHubPort[MAX_ROOT_PORTS];
-	UsbDevice* device[MAXIMUM_NUMBER_OF_DEVICE];
 
 	// Global flags
 	volatile uint8_t transferCompleted;
@@ -155,9 +163,6 @@ private:
 	uint8_t outTransaction(HcEd* ed, uint8_t* transmitBuffer, uint32_t transactionLength);
 
 	uint8_t launchTransaction(HcEd* ed, uint32_t token, uint8_t* transactionBuffer, uint32_t transactionLength);
-
-	void setupPeriodicIn();
-	void setupPeriodicOut(uint8_t* transmitBuffer, uint32_t transactionLength);
 
 	void registerEndpoints(UsbDevice*);
 	void unregisterEndpoints(UsbDevice*);

@@ -17,6 +17,8 @@
 #include "ConfigurationDescriptor.h"
 #include "InterfaceDescriptor.h"
 #include "EndpointDescriptor.h"
+#include "HCDRequest.h"
+#include "HCDEventListener.h"
 #include <cstdio>
 
 HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
@@ -34,21 +36,11 @@ HostControllerDriver::HostControllerDriver(OHCI_Typedef* ohciRegisters) {
 		rootHubPort[hubPortNumber].deviceAddressesStart = hubPortNumber + 1;
 	}
 
-	// Initialize devices
-	for(uint32_t deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
-		device[deviceNumber] = 0;
-	}
-
 	init();
 }
 
 HostControllerDriver::~HostControllerDriver() {
 	/* Free memory */
-	for(uint32_t deviceNumber=0; deviceNumber<MAXIMUM_NUMBER_OF_DEVICE; deviceNumber++) {
-		if(device[deviceNumber] != 0) {
-			delete device[deviceNumber];
-		}
-	}
 }
 
 void HostControllerDriver::init() {
@@ -66,9 +58,12 @@ void HostControllerDriver::init() {
 	tdBuffer = (uint8_t *)(USB_MEMORY+0x150);
 	userBuffer = (uint8_t *)(USB_MEMORY+0x160);
 
+	// These are used by the sendRequest function to add a new TD
+	tdPool = (HcTd *)(USB_MEMORY+0x800);
+
 	// Clear USB memory
 	uint8_t* memory_ptr = (uint8_t*)(USB_MEMORY + 0x00);
-	for(uint32_t i=0; i<0x1000; i++) {
+	for(uint32_t i=0; i<0x4000; i++) {
 		*(memory_ptr+i) = 0x00;
 	}
 
@@ -207,7 +202,8 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			uint8_t deviceAddress = rootHubPort[hubPortNumber].deviceAddressesStart;
 
 			// USB 2.0 spec says at least 50ms delay before port reset
-			LPC2478::delay(100000);
+			// The practice shows that even 100ms is too quick for some devices
+			LPC2478::delay(500000);
 			portReset(hubPortNumber);
 
 			// Get first 8 bytes of device descriptor
@@ -311,7 +307,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			rootHubPort[hubPortNumber].device->setConfigurationDescriptor(new ConfigurationDescriptor(userBuffer));
 
 			// Show debug informations
-			printDescriptors(rootHubPort[hubPortNumber].device);
+			//printDescriptors(rootHubPort[hubPortNumber].device);
 
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
@@ -345,7 +341,6 @@ UsbDevice* HostControllerDriver::periodicTask() {
 		else if(rootHubPort[hubPortNumber].deviceConnected && !rootHubPort[hubPortNumber].deviceEnumerated) {
 			UsbDevice* device = enumerateDevice(hubPortNumber);
 			if(device != 0) {
-				Debug::writeLine("Entering registerEndpoints()");
 				registerEndpoints(device);
 			}
 			return device;
@@ -354,11 +349,17 @@ UsbDevice* HostControllerDriver::periodicTask() {
 	return 0;
 }
 
-void HostControllerDriver::usbRequest(UsbDevice* device, uint8_t interfaceIndex, uint8_t endpointIndex, uint8_t* transactionBuffer, uint32_t transactionLength) {
-	HcEd* endpoint = device->getEndpoints()[interfaceIndex][endpointIndex];
-	EndpointDescriptor* currentEndpointDescriptor = device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceIndex)->getEndpointDescriptor(endpointIndex);
+uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
+	HcEd* endpoint = request->device->getEndpoints()[request->interfaceIndex][request->endpointIndex];
+	EndpointDescriptor* currentEndpointDescriptor = request->device->getConfigurationDescriptor()->getInterfaceDescriptor(request->interfaceIndex)->getEndpointDescriptor(request->endpointIndex);
 	// The new tail TD
-	HcTd* dummyTD = (HcTd*)(USB_MEMORY+0x800);
+	//HcTd* dummyTD = (HcTd*)(USB_MEMORY+0x800);
+	HcTd* dummyTD = 0;
+
+	Debug::writeLine("sendRequest");
+
+	//dummyTD = &tdPool[bit];
+	//dummyTD = (HcTd*)(USB_MEMORY+0x800);
 
 	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
 	// Isochronous
@@ -369,27 +370,49 @@ void HostControllerDriver::usbRequest(UsbDevice* device, uint8_t interfaceIndex,
 		break;
 	// Interrupt
 	case 3:
-		ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
-		LPC2478::delay(1000);
+		//ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
+		//LPC2478::delay(1000);
+
+		((HcTd*)endpoint->TailTd)->type = TD_INTERRUPT;
 		break;
 	}
 
 	((HcTd*)endpoint->TailTd)->Control = (1 << 18)	// Data packet may be smaller than the buffer
-		| ((((currentEndpointDescriptor->bEndpointAddress & 0xF0) >> 7) == 1 ? PID_IN : PID_OUT) << 19)		// PID
+		//| ((((currentEndpointDescriptor->bEndpointAddress & 0xF0) >> 7) == 1 ? PID_IN : PID_OUT) << 19)		// PID
 		| (DATA1 << 24)			// Data toggle = LSB of this field
 		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
-	dummyTD->Control = 0;
 
-	((HcTd*)endpoint->TailTd)->CurrBufPtr = (uint32_t)transactionBuffer;
+	((HcTd*)endpoint->TailTd)->CurrBufPtr = (uint32_t)request->transactionBuffer;
+	((HcTd*)endpoint->TailTd)->BufEnd = (uint32_t)(request->transactionBuffer + (request->transactionLength - 1));
+
+	// Set additionnal parameters
+	((HcTd*)endpoint->TailTd)->listener = request->listener;
+	((HcTd*)endpoint->TailTd)->request = request;
+
+	// Find an empty TD in the pool
+	for(uint32_t i=0; i<TD_IN_POOL; i++) {
+		if(tdPool[i].Control == 0) {
+			dummyTD = &tdPool[i];
+			break;
+		}
+	}
+	if(dummyTD == 0) {
+		Debug::writeLine("No TD available");
+		return 0;	// No TD available
+	}
+
+	dummyTD->Control = 0;
 	dummyTD->CurrBufPtr = 0;
-	((HcTd*)endpoint->TailTd)->Next = (uint32_t)dummyTD;
 	dummyTD->Next = 0;
-	((HcTd*)endpoint->TailTd)->BufEnd = (uint32_t)(transactionBuffer + (transactionLength - 1));
 	dummyTD->BufEnd = 0;
 
-	((HcTd*)endpoint->TailTd)->automaticRequeue = 1;
-	((HcTd*)endpoint->TailTd)->parentED = endpoint;
+	((HcTd*)endpoint->TailTd)->Next = (uint32_t)dummyTD;
 
+	char buffer[80];
+	sprintf(buffer, "tailTD at : %x dummyTD at : %x", (unsigned int)endpoint->TailTd, (unsigned int)dummyTD);
+	Debug::writeLine(buffer);
+
+	// Change the tail pointer so it point to our new dummy TD
 	endpoint->TailTd = (uint32_t)dummyTD;
 
 	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
@@ -401,9 +424,11 @@ void HostControllerDriver::usbRequest(UsbDevice* device, uint8_t interfaceIndex,
 		break;
 	// Interrupt
 	case 3:
-		ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
+		//ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
 		break;
 	}
+
+	return 1;
 }
 
 uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
@@ -513,8 +538,10 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 	headTd->BufEnd = (uint32_t)(transactionBuffer + (transactionLength - 1));
 	tailTd->BufEnd = 0;
 
-	// This is not a periodic transfer
-	headTd->automaticRequeue = 0;
+	// Set additional TD parameter
+	headTd->type = TD_CONTROL;
+	headTd->listener = 0;
+	headTd->request = 0;
 
 	ed->HeadTd = (uint32_t)headTd;
 	ed->TailTd = (uint32_t)tailTd;
@@ -533,37 +560,6 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 
 	// Return completion code
 	return (headTd->Control >> 28) & 0x0F;
-}
-
-void HostControllerDriver::setupPeriodicIn() {
-
-}
-
-void HostControllerDriver::setupPeriodicOut(uint8_t* transmitBuffer, uint32_t transactionLength) {
-	headTd->Control = (1 << 18)	// Data packet may be smaller than the buffer
-		| (PID_OUT << 19)		// PID
-		| (DATA1 << 24)			// Data toggle = LSB of this field
-		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
-	tailTd->Control = 0;
-
-	headTd->CurrBufPtr = (uint32_t)transmitBuffer;
-	tailTd->CurrBufPtr = 0;
-	headTd->Next = (uint32_t)tailTd;
-	tailTd->Next = 0;
-	headTd->BufEnd = (uint32_t)(transmitBuffer + (transactionLength - 1));
-	tailTd->BufEnd = 0;
-
-	intOutEd->HeadTd = (uint32_t)headTd;
-	intOutEd->TailTd = (uint32_t)tailTd;
-	intOutEd->Next = 0;
-
-	// Set 8ms interval
-	hcca->IntTable[0] = (uint32_t)intOutEd;
-	hcca->IntTable[7] = (uint32_t)intOutEd;
-	hcca->IntTable[15] = (uint32_t)intOutEd;
-	hcca->IntTable[31] = (uint32_t)intOutEd;
-
-	ohciRegisters->HcControl       |= (1<<2);	// Periodic list Enabled
 }
 
 void HostControllerDriver::registerEndpoints(UsbDevice* device) {
@@ -604,7 +600,9 @@ void HostControllerDriver::registerEndpoints(UsbDevice* device) {
 			// Device address
 			endpoint[interfaceNumber][endpointNumber]->Control |= (device->getAddress());
 			// Endpoint number
-			endpoint[interfaceNumber][endpointNumber]->Control |= (currentEndpointDescriptor->bEndpointAddress << 7);
+			endpoint[interfaceNumber][endpointNumber]->Control |= ((currentEndpointDescriptor->bEndpointAddress & 0x0F) << 7);
+			// PID
+			endpoint[interfaceNumber][endpointNumber]->Control |= ((((currentEndpointDescriptor->bEndpointAddress & 0xF0) >> 7) == 1 ? PID_IN : PID_OUT) << 11);
 
 			endpoint[interfaceNumber][endpointNumber]->HeadTd = (uint32_t)dummyTD;
 			endpoint[interfaceNumber][endpointNumber]->TailTd = (uint32_t)dummyTD;
@@ -784,6 +782,41 @@ void HostControllerDriver::hcInterrupt() {
 	// Writeback done head
 	else if(ohciRegisters->HcInterruptStatus & OHCI_INTR_WDH) {
 		transferCompleted = 1;
+
+		Debug::writeLine("WDH");
+
+		HcTd* iteratorTD = (HcTd*)hcca->DoneHead;
+		HcTd* nextIteratorTD;
+
+		while(iteratorTD != 0) {
+			nextIteratorTD = (HcTd*)iteratorTD->Next;
+
+			// Notify the completion listener
+			if(iteratorTD->listener != 0) {
+				iteratorTD->listener->transferCompleted(iteratorTD->request);
+			}
+
+			// Free TD
+			//iteratorTD->Control = 0;
+
+			switch(iteratorTD->type) {
+			case TD_CONTROL:
+				break;
+			case TD_ISOCHRONOUS:
+				break;
+			case TD_BULK:
+				break;
+			case TD_INTERRUPT:
+				iteratorTD->Control = 0;
+				iteratorTD->Next = 0;
+				iteratorTD->listener = 0;
+				iteratorTD->request = 0;
+				break;
+			}
+
+			iteratorTD = nextIteratorTD;
+		}
+		hcca->DoneHead = 0;
 	}
 	else if(ohciRegisters->HcInterruptStatus & OHCI_INTR_FNO) {
 		Debug::writeLine("Frame number overflow");

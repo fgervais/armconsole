@@ -12,6 +12,14 @@ GamepadInputReport::GamepadInputReport() {
 }
 
 GamepadInputReport::GamepadInputReport(uint8_t* rawReport) {
+
+}
+
+GamepadInputReport::~GamepadInputReport() {
+
+}
+
+void GamepadInputReport::fill(uint8_t* rawReport) {
 	messageType		= rawReport[0];
 	packetSize		= rawReport[1];
 	buttons[0]		= rawReport[2];
@@ -40,8 +48,4 @@ GamepadInputReport::GamepadInputReport(uint8_t* rawReport) {
 	b				= ((rawReport[3] & 0x20) >> 5);
 	x				= ((rawReport[3] & 0x40) >> 6);
 	y				= ((rawReport[3] & 0x80) >> 7);
-}
-
-GamepadInputReport::~GamepadInputReport() {
-
 }
