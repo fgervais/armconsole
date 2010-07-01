@@ -62,7 +62,7 @@ struct HcTd {                       	/* ------------ HostController Transfer Des
     volatile  uint32_t  BufEnd;			/* Physical address of end of buffer                        */
     // From here everything is for HCD purpose only
     volatile uint8_t type;
-    volatile uint8_t free;
+    volatile uint8_t queued;
     volatile uint8_t unused1[2];
     HCDRequest* request;
     HCDEventListener* listener;

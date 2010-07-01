@@ -356,7 +356,19 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 	//HcTd* dummyTD = (HcTd*)(USB_MEMORY+0x800);
 	HcTd* dummyTD = 0;
 
-	Debug::writeLine("sendRequest");
+	//Debug::writeLine("sendRequest");
+
+	// Find an empty TD in the pool
+	for(uint32_t i=0; i<TD_IN_POOL; i++) {
+		if(tdPool[i].queued == 0) {
+			dummyTD = &tdPool[i];
+			break;
+		}
+	}
+	if(dummyTD == 0) {
+		Debug::writeLine("No TD available");
+		return 0;	// No TD available
+	}
 
 	//dummyTD = &tdPool[bit];
 	//dummyTD = (HcTd*)(USB_MEMORY+0x800);
@@ -386,31 +398,22 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 	((HcTd*)endpoint->TailTd)->BufEnd = (uint32_t)(request->transactionBuffer + (request->transactionLength - 1));
 
 	// Set additionnal parameters
+	((HcTd*)endpoint->TailTd)->queued = 1;
 	((HcTd*)endpoint->TailTd)->listener = request->listener;
 	((HcTd*)endpoint->TailTd)->request = request;
 
-	// Find an empty TD in the pool
-	for(uint32_t i=0; i<TD_IN_POOL; i++) {
-		if(tdPool[i].Control == 0) {
-			dummyTD = &tdPool[i];
-			break;
-		}
-	}
-	if(dummyTD == 0) {
-		Debug::writeLine("No TD available");
-		return 0;	// No TD available
-	}
-
+	dummyTD->queued = 1;
 	dummyTD->Control = 0;
 	dummyTD->CurrBufPtr = 0;
 	dummyTD->Next = 0;
 	dummyTD->BufEnd = 0;
 
+
 	((HcTd*)endpoint->TailTd)->Next = (uint32_t)dummyTD;
 
-	char buffer[80];
-	sprintf(buffer, "tailTD at : %x dummyTD at : %x", (unsigned int)endpoint->TailTd, (unsigned int)dummyTD);
-	Debug::writeLine(buffer);
+	//char buffer[80];
+	//sprintf(buffer, "tailTD at : %x dummyTD at : %x", (unsigned int)endpoint->TailTd, (unsigned int)dummyTD);
+	//Debug::writeLine(buffer);
 
 	// Change the tail pointer so it point to our new dummy TD
 	endpoint->TailTd = (uint32_t)dummyTD;
@@ -783,8 +786,6 @@ void HostControllerDriver::hcInterrupt() {
 	else if(ohciRegisters->HcInterruptStatus & OHCI_INTR_WDH) {
 		transferCompleted = 1;
 
-		Debug::writeLine("WDH");
-
 		HcTd* iteratorTD = (HcTd*)hcca->DoneHead;
 		HcTd* nextIteratorTD;
 
@@ -797,7 +798,7 @@ void HostControllerDriver::hcInterrupt() {
 			}
 
 			// Free TD
-			//iteratorTD->Control = 0;
+			iteratorTD->queued = 0;
 
 			switch(iteratorTD->type) {
 			case TD_CONTROL:
@@ -807,10 +808,6 @@ void HostControllerDriver::hcInterrupt() {
 			case TD_BULK:
 				break;
 			case TD_INTERRUPT:
-				iteratorTD->Control = 0;
-				iteratorTD->Next = 0;
-				iteratorTD->listener = 0;
-				iteratorTD->request = 0;
 				break;
 			}
 
