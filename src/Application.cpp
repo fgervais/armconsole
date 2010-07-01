@@ -71,7 +71,7 @@ int main() {
 		device = hcd->periodicTask();
 		if(device != 0) {
 			if(device->getDeviceDescriptor()->idVendor == 0x045e && device->getDeviceDescriptor()->idProduct == 0x0719) { // Xbox receiver
-				controller = new XboxControllerDriver(device, 0);
+				controller = new XboxControllerDriver(device);
 				break;
 			}
 		}
@@ -79,7 +79,11 @@ int main() {
 	}
 
 	Debug::writeLine("Xbox controller ready to use");
-	controller->configure(0);
+	LPC2478::delay(1000000);
+	controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
+	//controller->setRumbleState(0, 128, XboxControllerDriver::CONTROLLER1);
+	//LPC2478::delay(100000);
+	//controller->getStatus(XboxControllerDriver::CONTROLLER1);
 	while(1);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);

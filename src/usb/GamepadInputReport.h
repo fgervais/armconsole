@@ -75,6 +75,8 @@ public:
 	GamepadInputReport(uint8_t* rawReport);
 	GamepadInputReport();
 	virtual ~GamepadInputReport();
+
+	void fill(uint8_t* rawReport);
 };
 
 #endif /* GAMEPADINPUTREPORT_H_ */
