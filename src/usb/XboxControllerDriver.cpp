@@ -26,10 +26,10 @@ void XboxControllerDriver::transferCompleted(HCDRequest* request) {
 		Debug::writeLine("USB request failed");
 	}
 	else {
-		Debug::writeLine("Good");
+		//Debug::writeLine("Good");
 	}
 
-	/*if(request == &statusRequest) {
+	if(request == &statusRequest) {
 		//debug
 		GpioPin *led = LPC2478::getGpio1()->getPin(12);
 
@@ -45,7 +45,7 @@ void XboxControllerDriver::transferCompleted(HCDRequest* request) {
 			led->setLow();
 		}
 
-	}*/
+	}
 }
 
 void XboxControllerDriver::configure() {

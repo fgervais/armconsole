@@ -83,7 +83,7 @@ int main() {
 	controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
 	//controller->setRumbleState(0, 128, XboxControllerDriver::CONTROLLER1);
 	//LPC2478::delay(100000);
-	//controller->getStatus(XboxControllerDriver::CONTROLLER1);
+	controller->getStatus(XboxControllerDriver::CONTROLLER1);
 	while(1);
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
