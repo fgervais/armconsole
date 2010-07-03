@@ -24,27 +24,31 @@ XboxControllerDriver::~XboxControllerDriver() {
 
 void XboxControllerDriver::transferCompleted(HCDRequest* request) {;
 	if(request == &statusRequest) {
-		/*char debug[80];
-		sprintf(debug, "%d %d %d %d %d %d", (unsigned int)request->transactionBuffer[0],
-				(unsigned int)request->transactionBuffer[1],
-				(unsigned int)request->transactionBuffer[2],
-				(unsigned int)request->transactionBuffer[3],
-				(unsigned int)request->transactionBuffer[4],
-				(unsigned int)request->transactionBuffer[5]);
-		Debug::writeLine(debug);*/
-
 		if(request->transactionBuffer[1] == 0x01) {
 			gamepadStatus.fill(&request->transactionBuffer[4]);
 		}
+		else if(request->transactionBuffer[1] == 0x80 || request->transactionBuffer[1] == 0xC0) {
+			setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
+		}
 
+		// Send another query request since it's periodic
 		if(LPC2478::getHCD()->sendRequest(request) == 0) {
 			Debug::writeLine("USB request failed");
 		}
 	}
 }
 
-void XboxControllerDriver::configure() {
+void XboxControllerDriver::query(uint8_t controllerNumber) {
+	uint8_t* tdBuffer = (uint8_t*)(USB_MEMORY+0x2020);
 
+	statusRequest.device = device;
+	statusRequest.interfaceIndex = controllerNumber*2;
+	statusRequest.endpointIndex = 0;
+	statusRequest.transactionBuffer = tdBuffer;
+	statusRequest.transactionLength = 0x1d;
+	statusRequest.listener = this;
+
+	LPC2478::getHCD()->sendRequest(&statusRequest);
 }
 
 void XboxControllerDriver::setLedState(LedState state, uint8_t controllerNumber) {
@@ -100,16 +104,5 @@ void XboxControllerDriver::setRumbleState(uint8_t smallSpeed, uint8_t largeSpeed
 }
 
 GamepadInputReport* XboxControllerDriver::getStatus(uint8_t controllerNumber) {
-	uint8_t* tdBuffer = (uint8_t*)(USB_MEMORY+0x2020);
-
-	statusRequest.device = device;
-	statusRequest.interfaceIndex = controllerNumber*2;
-	statusRequest.endpointIndex = 0;
-	statusRequest.transactionBuffer = tdBuffer;
-	statusRequest.transactionLength = 0x1d;
-	statusRequest.listener = this;
-
-	LPC2478::getHCD()->sendRequest(&statusRequest);
-
 	return &gamepadStatus;
 }

@@ -15,6 +15,14 @@
 
 class UsbDevice;
 
+/**
+ * This class is the high-level driver for the
+ * Xbox 360 wireless controller.
+ *
+ * A lot of this is based on the userspace linux
+ * driver xboxdrv and on personal reverse engineering.
+ *
+ */
 class XboxControllerDriver : HCDEventListener {
 public:
 
@@ -52,7 +60,7 @@ public:
 	// HCDEventListener implementation
 	virtual void transferCompleted(HCDRequest*);
 
-	void configure();
+	void query(uint8_t controllerNumber);
 	void setLedState(LedState, uint8_t controllerNumber);
 	void setRumbleState(uint8_t smallSpeed, uint8_t largeSpeed, uint8_t controllerNumber);
 	GamepadInputReport* getStatus(uint8_t controllerNumber);
