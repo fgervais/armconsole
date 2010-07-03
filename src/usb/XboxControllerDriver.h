@@ -55,7 +55,7 @@ public:
 	void configure();
 	void setLedState(LedState, uint8_t controllerNumber);
 	void setRumbleState(uint8_t smallSpeed, uint8_t largeSpeed, uint8_t controllerNumber);
-	void getStatus(uint8_t controllerNumber);
+	GamepadInputReport* getStatus(uint8_t controllerNumber);
 
 private:
 	static const uint8_t NON_PERIODIC_REQUEST = 0;
