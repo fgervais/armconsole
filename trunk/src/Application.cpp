@@ -81,19 +81,20 @@ int main() {
 
 	Debug::writeLine("Xbox controller ready to use");
 	LPC2478::delay(1000000);
-	controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
+	controller->query(XboxControllerDriver::CONTROLLER1);
+	//controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
 	//controller->setRumbleState(0, 128, XboxControllerDriver::CONTROLLER1);
 	//LPC2478::delay(100000);
 	GamepadInputReport* gamepadStatus = controller->getStatus(XboxControllerDriver::CONTROLLER1);
 
-	while(1) {
+	/*while(1) {
 		if(gamepadStatus->a) {
 			led->setHigh();
 		}
 		else {
 			led->setLow();
 		}
-	}
+	}*/
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 
@@ -127,7 +128,7 @@ int main() {
 	//------ Engine Test
 
 	Engine* engine = new Engine();
-	engine->start();
+	engine->start(gamepadStatus);
 
 	//------------------
 

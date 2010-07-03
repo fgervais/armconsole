@@ -8,7 +8,34 @@
 #include "GamepadInputReport.h"
 
 GamepadInputReport::GamepadInputReport() {
+	messageType		= 0;
+	packetSize		= 0;
+	buttons[0]		= 0;
+	buttons[1]		= 0;
+	leftTrigger		= 0;
+	rightTrigger	= 0;
+	LeftStickX		= 0;
+	LeftStickY		= 0;
+	rightStickX		= 0;
+	rightStickY		= 0;
 
+	dPadUp			= 0;
+	dPadDown		= 0;
+	dPadLeft		= 0;
+	dPadRight		= 0;
+	start			= 0;
+	back			= 0;
+	leftStickPress	= 0;
+	rightStickPress	= 0;
+
+	lb				= 0;
+	rb				= 0;
+	xboxButton		= 0;
+	// Unused		= 0;
+	a				= 0;
+	b				= 0;
+	x				= 0;
+	y				= 0;
 }
 
 GamepadInputReport::GamepadInputReport(uint8_t* rawReport) {

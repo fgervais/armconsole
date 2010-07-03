@@ -14,6 +14,7 @@
 #include "LCDControllerDriver.h"
 #include "Sprite.h"
 #include "Megaman.h"
+#include "GamepadInputReport.h"
 
 Engine::Engine() {
 
@@ -24,7 +25,7 @@ Engine::~Engine() {
 
 }
 
-void Engine::start() {
+void Engine::start(GamepadInputReport* gamepad) {
 	Debug::writeLine("Entering Engine start function");
 	// Create the instance of a level
 	Environment* environment = new Level1();
@@ -52,7 +53,7 @@ void Engine::start() {
 		// Switch to the other video page
 		currentPage ^= 1;
 
-		if(counter > 0) {
+		/*if(counter > 0) {
 			counter--;
 		}
 
@@ -72,9 +73,24 @@ void Engine::start() {
 		else if(counter == 0) {
 			((Megaman*)environment->getHero())->stopRunning();
 			counter = 200;
+		}*/
+
+		if(gamepad->a) {
+			((Megaman*)environment->getHero())->jump();
+		}
+		else {
+			//((Megaman*)environment->getHero())->stopJumping();
 		}
 
-
+		if(gamepad->dPadLeft) {
+			((Megaman*)environment->getHero())->runLeft();
+		}
+		else if(gamepad->dPadRight) {
+			((Megaman*)environment->getHero())->runRight();
+		}
+		else {
+			((Megaman*)environment->getHero())->stopRunning();
+		}
 
 		environment->update();
 		environment->render(videoPage[currentPage]);
