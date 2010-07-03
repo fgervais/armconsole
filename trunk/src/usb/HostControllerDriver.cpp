@@ -352,8 +352,7 @@ UsbDevice* HostControllerDriver::periodicTask() {
 uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 	HcEd* endpoint = request->device->getEndpoints()[request->interfaceIndex][request->endpointIndex];
 	EndpointDescriptor* currentEndpointDescriptor = request->device->getConfigurationDescriptor()->getInterfaceDescriptor(request->interfaceIndex)->getEndpointDescriptor(request->endpointIndex);
-	// The new tail TD
-	//HcTd* dummyTD = (HcTd*)(USB_MEMORY+0x800);
+
 	HcTd* dummyTD = 0;
 
 	//Debug::writeLine("sendRequest");
@@ -370,8 +369,6 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 		return 0;	// No TD available
 	}
 
-	//dummyTD = &tdPool[bit];
-	//dummyTD = (HcTd*)(USB_MEMORY+0x800);
 
 	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
 	// Isochronous
@@ -382,16 +379,13 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 		break;
 	// Interrupt
 	case 3:
-		//ohciRegisters->HcControl &= ~(1<<2);	// Periodic list Disabled
-		//LPC2478::delay(1000);
-
 		((HcTd*)endpoint->TailTd)->type = TD_INTERRUPT;
 		break;
 	}
 
 	((HcTd*)endpoint->TailTd)->Control = (1 << 18)	// Data packet may be smaller than the buffer
 		//| ((((currentEndpointDescriptor->bEndpointAddress & 0xF0) >> 7) == 1 ? PID_IN : PID_OUT) << 19)		// PID
-		| (DATA1 << 24)			// Data toggle = LSB of this field
+		//| (DATA1 << 24)			// Data toggle = LSB of this field
 		| (0x0F << 28);			// See section 4.3.3 of OHCI 1.0a specification
 
 	((HcTd*)endpoint->TailTd)->CurrBufPtr = (uint32_t)request->transactionBuffer;
@@ -417,19 +411,6 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 
 	// Change the tail pointer so it point to our new dummy TD
 	endpoint->TailTd = (uint32_t)dummyTD;
-
-	switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
-	// Isochronous
-	case 1:
-		break;
-	// Bulk
-	case 2:
-		break;
-	// Interrupt
-	case 3:
-		//ohciRegisters->HcControl |= (1<<2);		// Periodic list Enabled
-		break;
-	}
 
 	return 1;
 }
@@ -799,17 +780,6 @@ void HostControllerDriver::hcInterrupt() {
 
 			// Free TD
 			iteratorTD->queued = 0;
-
-			switch(iteratorTD->type) {
-			case TD_CONTROL:
-				break;
-			case TD_ISOCHRONOUS:
-				break;
-			case TD_BULK:
-				break;
-			case TD_INTERRUPT:
-				break;
-			}
 
 			iteratorTD = nextIteratorTD;
 		}

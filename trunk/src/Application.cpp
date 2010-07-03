@@ -25,6 +25,7 @@
 #include "XboxControllerDriver.h"
 #include "UsbDevice.h"
 #include "DeviceDescriptor.h"
+#include "GamepadInputReport.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -83,8 +84,16 @@ int main() {
 	controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
 	//controller->setRumbleState(0, 128, XboxControllerDriver::CONTROLLER1);
 	//LPC2478::delay(100000);
-	controller->getStatus(XboxControllerDriver::CONTROLLER1);
-	while(1);
+	GamepadInputReport* gamepadStatus = controller->getStatus(XboxControllerDriver::CONTROLLER1);
+
+	while(1) {
+		if(gamepadStatus->a) {
+			led->setHigh();
+		}
+		else {
+			led->setLow();
+		}
+	}
 
 	DisplayHelper* displayHelper = new DisplayHelper(lcd);
 

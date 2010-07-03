@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "Gpio.h"
 #include "GpioPin.h"
+#include <cstdio>
 
 XboxControllerDriver::XboxControllerDriver(UsbDevice* device) {
 	this->device = device;
@@ -21,30 +22,24 @@ XboxControllerDriver::~XboxControllerDriver() {
 
 }
 
-void XboxControllerDriver::transferCompleted(HCDRequest* request) {
-	if(LPC2478::getHCD()->sendRequest(request) == 0) {
-		Debug::writeLine("USB request failed");
-	}
-	else {
-		//Debug::writeLine("Good");
-	}
-
+void XboxControllerDriver::transferCompleted(HCDRequest* request) {;
 	if(request == &statusRequest) {
-		//debug
-		GpioPin *led = LPC2478::getGpio1()->getPin(12);
+		/*char debug[80];
+		sprintf(debug, "%d %d %d %d %d %d", (unsigned int)request->transactionBuffer[0],
+				(unsigned int)request->transactionBuffer[1],
+				(unsigned int)request->transactionBuffer[2],
+				(unsigned int)request->transactionBuffer[3],
+				(unsigned int)request->transactionBuffer[4],
+				(unsigned int)request->transactionBuffer[5]);
+		Debug::writeLine(debug);*/
 
 		if(request->transactionBuffer[1] == 0x01) {
 			gamepadStatus.fill(&request->transactionBuffer[4]);
 		}
 
-		if(gamepadStatus.a) {
-			//Debug::writeLine("A");
-			led->setHigh();
+		if(LPC2478::getHCD()->sendRequest(request) == 0) {
+			Debug::writeLine("USB request failed");
 		}
-		else {
-			led->setLow();
-		}
-
 	}
 }
 
@@ -104,7 +99,7 @@ void XboxControllerDriver::setRumbleState(uint8_t smallSpeed, uint8_t largeSpeed
 	LPC2478::getHCD()->sendRequest(&rumbleStateRequest);
 }
 
-void XboxControllerDriver::getStatus(uint8_t controllerNumber) {
+GamepadInputReport* XboxControllerDriver::getStatus(uint8_t controllerNumber) {
 	uint8_t* tdBuffer = (uint8_t*)(USB_MEMORY+0x2020);
 
 	statusRequest.device = device;
@@ -115,4 +110,6 @@ void XboxControllerDriver::getStatus(uint8_t controllerNumber) {
 	statusRequest.listener = this;
 
 	LPC2478::getHCD()->sendRequest(&statusRequest);
+
+	return &gamepadStatus;
 }
