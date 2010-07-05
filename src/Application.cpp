@@ -26,6 +26,7 @@
 #include "UsbDevice.h"
 #include "DeviceDescriptor.h"
 #include "GamepadInputReport.h"
+#include "MemoryPool.h"
 
 #include "irq.h"
 #include "swi.h"
@@ -72,8 +73,14 @@ int main() {
 		device = hcd->periodicTask();
 		if(device != 0) {
 			if(device->getDeviceDescriptor()->idVendor == 0x045e && device->getDeviceDescriptor()->idProduct == 0x0719) { // Xbox receiver
-				controller = new XboxControllerDriver(device);
-				break;
+				MemoryPool* memoryPool = hcd->getMemoryPool();
+				if(memoryPool != 0) {
+					controller = new XboxControllerDriver(device, memoryPool);
+					break;
+				}
+				else {
+					Debug::writeLine("Not enough USB memory");
+				}
 			}
 		}
 		LPC2478::delay(100000);
@@ -82,10 +89,14 @@ int main() {
 	Debug::writeLine("Xbox controller ready to use");
 	LPC2478::delay(1000000);
 	controller->query(XboxControllerDriver::CONTROLLER1);
+	controller->query(XboxControllerDriver::CONTROLLER2);
 	//controller->setLedState(XboxControllerDriver::Flashes_ON_1, XboxControllerDriver::CONTROLLER1);
 	//controller->setRumbleState(0, 128, XboxControllerDriver::CONTROLLER1);
 	//LPC2478::delay(100000);
-	GamepadInputReport* gamepadStatus = controller->getStatus(XboxControllerDriver::CONTROLLER1);
+	GamepadInputReport* gamepadStatus1 = controller->getStatus(XboxControllerDriver::CONTROLLER1);
+	GamepadInputReport* gamepadStatus2 = controller->getStatus(XboxControllerDriver::CONTROLLER2);
+
+	//while(1);
 
 	/*while(1) {
 		if(gamepadStatus->a) {
@@ -128,7 +139,7 @@ int main() {
 	//------ Engine Test
 
 	Engine* engine = new Engine();
-	engine->start(gamepadStatus);
+	engine->start(gamepadStatus1, gamepadStatus2);
 
 	//------------------
 

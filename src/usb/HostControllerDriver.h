@@ -16,6 +16,7 @@
 #define USB_MEMORY 0x7FD00000
 
 #include "LPC23xx.h"
+#include "MemoryPool.h"
 #include <stdint.h>
 
 // Forward declaration
@@ -95,6 +96,15 @@ const uint8_t revbits[32] =
 	0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d,
 	0x03, 0x13, 0x0b, 0x1b, 0x07, 0x17, 0x0f, 0x1f };
 
+/**
+ * This class is the Host Controller Driver (HCD).
+ *
+ * For now, it does not support more than one USB device
+ * at a time because of how registerDescriptors() function
+ * allocate descriptor. It wouldn't be hard to handle multiple
+ * devices but since I only have one USB port on my board, I
+ * can't test it so I won't bother implementing it.
+ */
 class HostControllerDriver {
 public:
 	HostControllerDriver(OHCI_Typedef* ohciRegisters);
@@ -106,6 +116,8 @@ public:
 	UsbDevice* periodicTask();
 
 	uint8_t sendRequest(HCDRequest*);
+	MemoryPool* getMemoryPool();
+	void freeMemoryPool(MemoryPool*);
 
 	void hcInterrupt();
 private:
@@ -116,10 +128,18 @@ private:
 	HcEd* intInEd;
 	HcEd* intOutEd;
 	uint8_t* tdBuffer;
-	uint8_t* userBuffer;
+	uint8_t* ctrlBuffer;
 
-#define TD_IN_POOL	16
+#define TD_IN_POOL	32
 	HcTd* tdPool;
+
+#define ED_IN_POOL	32
+	HcEd* edPool;
+
+#define MEMORY_POOL_NUMBER	8
+#define MEMORY_POOL_SIZE	0x400
+	// USB memory pools used by device driver
+	MemoryPool usbMemoryPool[MEMORY_POOL_NUMBER];
 
 	// Dummy EDs that make up the interrupt tree.
 	HcEd* interruptTreeNode;

@@ -24,6 +24,7 @@ public:
 	uint8_t* transactionBuffer;
 	uint32_t transactionLength;
 	HCDEventListener* listener;
+	uint32_t tag;	// Optional tag may be used by the device driver
 };
 
 #endif /* HCDREQUEST_H_ */
