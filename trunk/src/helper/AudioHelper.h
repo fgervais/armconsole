@@ -38,10 +38,11 @@ private:
 	uint8_t stopped;
 	uint8_t asyncEnabled;
 
+#define MIXER_SIZE	2
 	// Used in asynchronous mode
-	Wave* wavePlaying;
-	uint32_t waveSampleCount;
-	uint32_t waveLength;
+	Wave* wavePlaying[MIXER_SIZE];
+	uint32_t waveSampleCount[MIXER_SIZE];
+	uint32_t waveLength[MIXER_SIZE];
 };
 
 #endif /* AUDIOHELPER_H_ */

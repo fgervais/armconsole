@@ -313,7 +313,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Getting configuration descriptor");
-				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, 0x09, ctrlBuffer);
+				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, CONFIGURATION_DESCRIPTOR_LENGTH, ctrlBuffer);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {

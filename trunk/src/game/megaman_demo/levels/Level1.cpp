@@ -25,6 +25,9 @@
 #include "MetoolWalkingLeft.h"
 #include "MetoolWalkingRight.h"
 
+#include "Wave.h"
+#include "Audio.h"
+
 Level1::Level1()
 	: Environment(960, 272, 56, 32) {
 
@@ -121,4 +124,9 @@ void Level1::build() {
 	Metool* lonely_metool = new Metool(MetoolWalkingRight::getInstance(), this);
 	lonely_metool->setPosition(600, 50);
 	activate(lonely_metool);
+
+	Debug::writeLine("Loading background sound");
+	Wave* intro = new Wave("0:sound/intro.wav");
+	intro->load();
+	Audio::playAsync(intro);
 }

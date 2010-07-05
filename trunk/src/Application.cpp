@@ -27,6 +27,7 @@
 #include "DeviceDescriptor.h"
 #include "GamepadInputReport.h"
 #include "MemoryPool.h"
+#include "Audio.h"
 
 #include "irq.h"
 #include "swi.h"

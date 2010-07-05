@@ -20,7 +20,9 @@ AudioHelper::AudioHelper(DAC* dac) {
 	stopped = 1;
 	asyncEnabled = 0;
 
-	wavePlaying = 0;
+	for(uint8_t i=0; i<MIXER_SIZE; i++) {
+		wavePlaying[i] = 0;
+	}
 	timer = 0;
 }
 
@@ -41,7 +43,9 @@ AudioHelper::AudioHelper(DAC* dac, Timer* timer) {
 	stopped = 1;
 	asyncEnabled = 1;
 
-	wavePlaying = 0;
+	for(uint8_t i=0; i<MIXER_SIZE; i++) {
+		wavePlaying[i] = 0;
+	}
 }
 
 AudioHelper::~AudioHelper() {
@@ -49,17 +53,30 @@ AudioHelper::~AudioHelper() {
 }
 
 void AudioHelper::timerOverflowed(Timer* timer) {
-	if(waveSampleCount<waveLength) {
-		// Sample are stored as a 16 bits signed value
-		int32_t sample = wavePlaying->getData()[waveSampleCount];
-		sample = (sample + 32768) >> 1;
-		dac->setValue(sample);
-		waveSampleCount++;
+	int32_t mixedSample = 0;
+	for(uint8_t i=0; i<MIXER_SIZE; i++) {
+		if(wavePlaying[i] != 0) {
+			if(waveSampleCount[i]<waveLength[i]) {
+				// Sample are stored as a 16 bits signed value
+				int32_t sample = wavePlaying[i]->getData()[waveSampleCount[i]];
+				//sample = (sample + 32768) >> 1;
+				mixedSample += sample;
+				waveSampleCount[i]++;
+			}
+			else {
+				wavePlaying[i] = 0;
+			}
+		}
+	}
+	/*if(mixedSample == 0) {
+		timer->disable();
+		stopped = 1;
 	}
 	else {
-		timer->disable();
-		wavePlaying = 0;
-		stopped = 1;
+		dac->setValue(mixedSample);
+	}*/
+	if(mixedSample != 0) {
+		dac->setValue((mixedSample+ 32768) >> 1);
 	}
 }
 
@@ -97,29 +114,41 @@ void AudioHelper::playAsync(Wave* wave) {
 			}
 		}
 
-		waveLength = (wave->getDataHeader()->size * 8) /  wave->getWAVEHeader()->bitPerSample;
+		uint8_t mixerPosition;
+		for(mixerPosition=0; mixerPosition<MIXER_SIZE; mixerPosition++) {
+			if(wavePlaying[mixerPosition] == 0) {
+				break;
+			}
+		}
+		if(mixerPosition == MIXER_SIZE) {
+			return;	// No free spot available
+		}
+
+		waveLength[mixerPosition] = (wave->getDataHeader()->size * 8) /  wave->getWAVEHeader()->bitPerSample;
 		//uint32_t usDelay = (1.0/(float)wave->getWAVEHeader()->sampleRate) / (1.0/0.000001);
 
-		// Configure Timer
-		TimerConfiguration timerConfig;
-		timerConfig.mode = Timer::Counter;
-		timerConfig.prescaler = 0;
-		//debug - Hardcoded
-		timerConfig.compare = 2250;		// 32 kHz
+		waveSampleCount[mixerPosition] = 0;
+		wavePlaying[mixerPosition] = wave;
 
-		timer->configure(timerConfig);
+		if(stopped) {
+			// Configure Timer
+			TimerConfiguration timerConfig;
+			timerConfig.mode = Timer::Counter;
+			timerConfig.prescaler = 0;
+			//debug - Hardcoded
+			timerConfig.compare = 2250;		// 32 kHz
 
-		wavePlaying = wave;
-		waveSampleCount = 0;
-		stopped = 0;
+			timer->configure(timerConfig);
 
-		timer->enable();
+			timer->enable();
 
-		int32_t sample = wave->getData()[waveSampleCount];
-		sample = (sample + 32768) >> 1;
-		dac->setValue(sample);
-		waveSampleCount++;
+			int32_t sample = wave->getData()[waveSampleCount[mixerPosition]];
+			sample = (sample + 32768) >> 1;
+			dac->setValue(sample);
+			waveSampleCount[mixerPosition]++;
 
+			stopped = 0;
+		}
 	}
 }
 
