@@ -25,7 +25,7 @@ Engine::~Engine() {
 
 }
 
-void Engine::start(GamepadInputReport* gamepad) {
+void Engine::start(GamepadInputReport* gamepad1, GamepadInputReport* gamepad2) {
 	Debug::writeLine("Entering Engine start function");
 	// Create the instance of a level
 	Environment* environment = new Level1();
@@ -75,17 +75,17 @@ void Engine::start(GamepadInputReport* gamepad) {
 			counter = 200;
 		}*/
 
-		if(gamepad->a) {
+		if(gamepad1->a || gamepad2->a) {
 			((Megaman*)environment->getHero())->jump();
 		}
 		else {
 			//((Megaman*)environment->getHero())->stopJumping();
 		}
 
-		if(gamepad->dPadLeft) {
+		if(gamepad1->dPadLeft || gamepad2->dPadLeft) {
 			((Megaman*)environment->getHero())->runLeft();
 		}
-		else if(gamepad->dPadRight) {
+		else if(gamepad1->dPadRight || gamepad2->dPadRight) {
 			((Megaman*)environment->getHero())->runRight();
 		}
 		else {

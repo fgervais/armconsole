@@ -14,6 +14,7 @@
 #include "GamepadInputReport.h"
 
 class UsbDevice;
+class MemoryPool;
 
 /**
  * This class is the high-level driver for the
@@ -53,8 +54,9 @@ public:
 	static const uint8_t CONTROLLER2 = 1;
 	static const uint8_t CONTROLLER3 = 2;
 	static const uint8_t CONTROLLER4 = 3;
+	static const uint8_t NUMBER_OF_CONTROLLER = 4;
 
-	XboxControllerDriver(UsbDevice* device);
+	XboxControllerDriver(UsbDevice*, MemoryPool*);
 	virtual ~XboxControllerDriver();
 
 	// HCDEventListener implementation
@@ -66,16 +68,29 @@ public:
 	GamepadInputReport* getStatus(uint8_t controllerNumber);
 
 private:
-	static const uint8_t NON_PERIODIC_REQUEST = 0;
-	static const uint8_t PERIODIC_REQUEST = 1;
+	// Used to tag the HCDRequest so we recognize them
+	// in the transferCompleted() function.
+	static const uint8_t QUERY_TAG			= 1;
+	static const uint8_t LED_STATE_TAG		= 2;
+	static const uint8_t RUMBLE_STATE_TAG 	= 3;
+
+	static const uint8_t NON_PERIODIC_REQUEST 	= 0;
+	static const uint8_t PERIODIC_REQUEST 		= 1;
 
 	UsbDevice* device;
+	MemoryPool* memoryPool;
 
-	HCDRequest ledStateRequest;
-	HCDRequest rumbleStateRequest;
-	HCDRequest statusRequest;
+	// USB requests
+	HCDRequest ledStateRequest[NUMBER_OF_CONTROLLER];
+	HCDRequest rumbleStateRequest[NUMBER_OF_CONTROLLER];
+	HCDRequest statusRequest[NUMBER_OF_CONTROLLER];
 
-	GamepadInputReport gamepadStatus;
+	GamepadInputReport gamepadStatus[NUMBER_OF_CONTROLLER];
+
+	// USB memory pointers
+	uint8_t* queryBuffer[NUMBER_OF_CONTROLLER];
+	uint8_t* ledStateBuffer[NUMBER_OF_CONTROLLER];
+	uint8_t* rumbleStateBuffer[NUMBER_OF_CONTROLLER];
 };
 
 #endif /* XBOXCONTROLLERDRIVER_H_ */

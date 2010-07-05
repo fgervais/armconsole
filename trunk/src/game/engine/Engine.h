@@ -15,7 +15,7 @@ public:
 	Engine();
 	virtual ~Engine();
 
-	void start(GamepadInputReport*);
+	void start(GamepadInputReport*, GamepadInputReport*);
 };
 
 #endif /* ENGINE_H_ */

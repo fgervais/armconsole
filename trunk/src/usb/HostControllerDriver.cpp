@@ -45,6 +45,34 @@ HostControllerDriver::~HostControllerDriver() {
 
 void HostControllerDriver::init() {
 	/*
+	 * USB MEMORY ALLOCATION
+	 *
+	 * This is the manual memory allocation of the 16k byte
+	 * of USB memory of the LPC2478. This way of doing things
+	 * makes this code harder to port than by using dynamic
+	 * memory allocation. If someone wants to add support
+	 * for it, please do.
+	 *
+	 * Here's how the memory is mapped
+	 *
+	 * USB_MEMORY +
+	 * 0x0000	Control requests (Enumeration)
+	 * ...
+	 * 0x0400	Interrupt tree (64 dummy endpoints)
+	 * ...
+	 * 0x0800	32 EDs of edPool. Used by registerEndpoints()
+	 * ...
+	 * 0x1000	32 TDs of tdPool. Used by registerEndpoints() and sendRequest()
+	 * ...
+	 * 0x1400	Unused
+	 * ...
+	 * 0x2000	8 memory pools of 1k used by device drivers
+	 * ...
+	 * 0x3FFF
+	 */
+
+
+	/*
 	 * Allocate the Host Controller Communication Area
 	 *
 	 * It must be 256-bytes aligned.
@@ -56,10 +84,39 @@ void HostControllerDriver::init() {
 	tailTd = (HcTd *)(USB_MEMORY+0x120);
 	ctrlEd = (HcEd *)(USB_MEMORY+0x140);
 	tdBuffer = (uint8_t *)(USB_MEMORY+0x150);
-	userBuffer = (uint8_t *)(USB_MEMORY+0x160);
+	ctrlBuffer = (uint8_t *)(USB_MEMORY+0x160);
 
-	// These are used by the sendRequest function to add a new TD
-	tdPool = (HcTd *)(USB_MEMORY+0x800);
+	/*
+	 * Every node of this tree has it's own pooling time.
+	 *
+	 * The array has this form :
+	 *
+	 * 0,1,2,2,4,4,4,4,8,8,8,8,8,8,8,8,...,16,...,32
+	 *
+	 * You can see that the 16 nodes with a polling time
+	 * of 16 ms have a position starting at index 16 of
+	 * the array. There may be a better way but this seems
+	 * efficient enough.
+	 */
+	interruptTreeNode = (HcEd*)(USB_MEMORY + 0x400);
+
+	// These are used by the registerEndpoints() function
+	edPool = (HcEd*)(USB_MEMORY+0x800);
+
+	// These are used by registerEndpoints() (for dummy TD) and sendRequest() functions
+	tdPool = (HcTd *)(USB_MEMORY+0x1000);
+
+	// These memory pools are used by device driver.
+	for(uint32_t i=0; i<MEMORY_POOL_NUMBER; i++) {
+		usbMemoryPool[i].free = 1;
+		if(i == 0) {
+			usbMemoryPool[i].head = (void*)(USB_MEMORY+0x2000);
+			usbMemoryPool[i].size = MEMORY_POOL_SIZE;
+		}
+		else {
+			usbMemoryPool[i].head = (uint8_t*)usbMemoryPool[i-1].head + usbMemoryPool[i-1].size;
+		}
+	}
 
 	// Clear USB memory
 	uint8_t* memory_ptr = (uint8_t*)(USB_MEMORY + 0x00);
@@ -75,25 +132,6 @@ void HostControllerDriver::init() {
 	hcca->FrameNumber = 0;
 
 	// Build the interrupt endpoint tree
-	/*
-	 * Every node of this tree has it's own pooling time.
-	 *
-	 * The array has this form :
-	 *
-	 * 0,1,2,2,4,4,4,4,8,8,8,8,8,8,8,8,...,16,...,32
-	 *
-	 * You can see that the 16 nodes with a polling time
-	 * of 16 ms have a position starting at index 16 of
-	 * the array. There may be a better way but this seems
-	 * efficient enough.
-	 */
-	interruptTreeNode = (HcEd*)(USB_MEMORY + 0x400);
-
-	// Clear every EDs (USB_MEMORY + 0x400) to (USB_MEMORY + 0x800)
-	memory_ptr = (uint8_t*)(USB_MEMORY + 0x400);
-	for(uint32_t i=0; i<0x400; i++) {
-		*(memory_ptr+i) = 0x00;
-	}
 
 	// Set the skip bit for all of them
 	for(uint8_t i=0; i<HCCA_INTERRUPT_NUMBER*2; i++) {
@@ -104,7 +142,7 @@ void HostControllerDriver::init() {
 	// See OHCI specification 1.0a 5.2.7.2
 	/*
 	 * NOTE: I created this algorithm by looking at the pattern
-	 * myself. It is possible that there is known algorithm for
+	 * myself. It is possible that there is known algorithms for
 	 * this kind of problem but I'm not aware of them.
 	 */
 	for(uint8_t i=0; i<HCCA_INTERRUPT_NUMBER; i++) {
@@ -213,7 +251,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			if(rootHubPort[hubPortNumber].lowSpeed) {
 				ctrlEd->Control |= (1 << 13);	// Low speed endpoint
 			}
-			completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, userBuffer);
+			completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, 0x0012, ctrlBuffer);
 			if(completionCode == CC_NOERROR) {
 				Debug::writeLine("Descriptor received");
 			}
@@ -223,7 +261,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 
 			// Set the maximum packet size
-			ctrlEd->Control = (userBuffer[7] << 16);
+			ctrlEd->Control = (ctrlBuffer[7] << 16);
 			if(rootHubPort[hubPortNumber].lowSpeed) {
 				ctrlEd->Control |= (1 << 13);	// Low speed endpoint
 			}
@@ -238,7 +276,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Getting device descriptor");;
-				completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, userBuffer);
+				completionCode = getDescriptor(DEVICE_DESCRIPTOR_INDEX, DEVICE_DESCRIPTOR_LENGTH, ctrlBuffer);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {
@@ -249,7 +287,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 				return 0;
 			}
 
-			rootHubPort[hubPortNumber].device->setDeviceDescriptor(new DeviceDescriptor(userBuffer));
+			rootHubPort[hubPortNumber].device->setDeviceDescriptor(new DeviceDescriptor(ctrlBuffer));
 
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
@@ -275,7 +313,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Getting configuration descriptor");
-				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, 0x09, userBuffer);
+				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, 0x09, ctrlBuffer);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {
@@ -286,13 +324,13 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 				return 0;
 			}
 			// We queried the configuration descriptor only to get this value
-			uint16_t wTotalLength = (userBuffer[3] << 8) | userBuffer[2];
+			uint16_t wTotalLength = (ctrlBuffer[3] << 8) | ctrlBuffer[2];
 
 			// Now get the whole configuration descriptor tree
 			timeout = ENUMERATION_QUERY_TIMEOUT;
 			do {
 				Debug::writeLine("Getting configuration tree");
-				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, wTotalLength, userBuffer);
+				completionCode = getDescriptor(CONFIGURATION_DESCRIPTOR_INDEX, wTotalLength, ctrlBuffer);
 			} while(completionCode != CC_NOERROR && --timeout > 0);
 
 			if(completionCode == CC_NOERROR) {
@@ -304,7 +342,7 @@ UsbDevice* HostControllerDriver::enumerateDevice(uint32_t hubPortNumber) {
 			}
 
 			// Set the new configuration tree to the device informations
-			rootHubPort[hubPortNumber].device->setConfigurationDescriptor(new ConfigurationDescriptor(userBuffer));
+			rootHubPort[hubPortNumber].device->setConfigurationDescriptor(new ConfigurationDescriptor(ctrlBuffer));
 
 			// Show debug informations
 			//printDescriptors(rootHubPort[hubPortNumber].device);
@@ -355,8 +393,6 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 
 	HcTd* dummyTD = 0;
 
-	//Debug::writeLine("sendRequest");
-
 	// Find an empty TD in the pool
 	for(uint32_t i=0; i<TD_IN_POOL; i++) {
 		if(tdPool[i].queued == 0) {
@@ -405,14 +441,23 @@ uint8_t HostControllerDriver::sendRequest(HCDRequest* request) {
 
 	((HcTd*)endpoint->TailTd)->Next = (uint32_t)dummyTD;
 
-	//char buffer[80];
-	//sprintf(buffer, "tailTD at : %x dummyTD at : %x", (unsigned int)endpoint->TailTd, (unsigned int)dummyTD);
-	//Debug::writeLine(buffer);
-
 	// Change the tail pointer so it point to our new dummy TD
 	endpoint->TailTd = (uint32_t)dummyTD;
 
 	return 1;
+}
+
+MemoryPool* HostControllerDriver::getMemoryPool() {
+	for(uint8_t i=0; i<MEMORY_POOL_NUMBER; i++) {
+		if(usbMemoryPool[i].free) {
+			return &usbMemoryPool[i];
+		}
+	}
+	return 0;
+}
+
+void HostControllerDriver::freeMemoryPool(MemoryPool* pool) {
+	pool->free = 1;
 }
 
 uint8_t HostControllerDriver::getDescriptor(uint16_t descriptorTypeIndex, uint16_t descriptorLength, uint8_t* receiveBuffer) {
@@ -547,14 +592,10 @@ uint8_t HostControllerDriver::launchTransaction(HcEd* ed, uint32_t token, uint8_
 }
 
 void HostControllerDriver::registerEndpoints(UsbDevice* device) {
-	// TODO: Add some sort of dynamic memory allocation
-
 	// Memory allocation
 	HcEd*** endpoint;
-	HcTd* dummyTD;
 
-	// The first 1k of USB memory is reserved for device enumeration
-	uint32_t usb_memory_ptr = USB_MEMORY + 0x1000;
+	uint32_t edPoolPosition = 0;
 
 	endpoint = new HcEd**[device->getConfigurationDescriptor()->bNumInterfaces];
 
@@ -563,12 +604,24 @@ void HostControllerDriver::registerEndpoints(UsbDevice* device) {
 
 		for(uint8_t endpointNumber=0; endpointNumber<device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->bNumEndPoints; endpointNumber++) {
 
-			endpoint[interfaceNumber][endpointNumber] = (HcEd *)(usb_memory_ptr);
-			usb_memory_ptr += sizeof(HcEd);
+			endpoint[interfaceNumber][endpointNumber] = &edPool[edPoolPosition];
+			edPoolPosition++;
 
-			dummyTD = (HcTd *)(usb_memory_ptr);
-			usb_memory_ptr += sizeof(HcTd);
+			HcTd* dummyTD = 0;
 
+			// Find an empty TD in the pool
+			for(uint32_t i=0; i<TD_IN_POOL; i++) {
+				if(tdPool[i].queued == 0) {
+					dummyTD = &tdPool[i];
+					break;
+				}
+			}
+			if(dummyTD == 0) {
+				Debug::writeLine("No TD available");
+				//return 0;	// No TD available
+			}
+
+			dummyTD->queued = 1;
 			dummyTD->Control = 0;
 			dummyTD->CurrBufPtr = 0;
 			dummyTD->Next = 0;
@@ -645,6 +698,16 @@ void HostControllerDriver::unregisterEndpoints(UsbDevice* device) {
 		for(uint8_t endpointNumber=0; endpointNumber<device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->bNumEndPoints; endpointNumber++) {
 
 			EndpointDescriptor* currentEndpointDescriptor = device->getConfigurationDescriptor()->getInterfaceDescriptor(interfaceNumber)->getEndpointDescriptor(endpointNumber);
+
+			// Free every TDs associated with this ED
+			HcTd* tdIterator = (HcTd*)endpoint[interfaceNumber][endpointNumber]->HeadTd;
+
+			while(tdIterator != (HcTd*)endpoint[interfaceNumber][endpointNumber]->TailTd) {
+				tdIterator->queued = 0;
+				tdIterator = (HcTd*)tdIterator->Next;
+			}
+			// Free TailTd as well
+			tdIterator->queued = 0;
 
 			// TODO: Register Bulk and isochronous endpoints as well
 			switch((currentEndpointDescriptor->bmAttributes & 0x03)) {
