@@ -1,0 +1,1 @@
+./lpc21isp -wipe -verify -bin /home/fgervais/Documents/Data/devel/arm/workspace/console/src/Application.bin /dev/ttyUSB0 115200 16000
